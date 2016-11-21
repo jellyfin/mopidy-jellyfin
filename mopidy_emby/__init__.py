@@ -25,7 +25,7 @@ class Extension(ext.Extension):
         schema = super(Extension, self).get_config_schema()
         schema['username'] = config.String()
         schema['password'] = config.Secret()
-        schema['hostname'] = config.Hostname()
+        schema['hostname'] = config.String()
         schema['port'] = config.Port()
         return schema
 

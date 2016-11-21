@@ -21,4 +21,4 @@ class EmbyBackend(pykka.ThreadingActor, backend.Backend):
         self.library = EmbyLibraryProvider(backend=self)
         self.playback = None
         self.playlist = None
-        self.remote = EmbyHandler()
+        self.remote = EmbyHandler(config['emby'])

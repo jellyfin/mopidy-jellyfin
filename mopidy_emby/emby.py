@@ -6,20 +6,19 @@ from urllib import urlencode
 
 
 class EmbyHandler(object):
-    def __init__(self, host, port, username, password):
-        self.host = host
-        self.port = port
-        self.username = username
-        self.password = password
+    def __init__(self, config):
+        self.hostname = config['hostname']
+        self.port = config['port']
+        self.username = config['username']
+        self.password = config['password']
 
         # create authentication headers
         self.auth_data = self._password_data()
         self.user_id = self._get_user()[0]['Id']
-        self.token = None
         self.headers = self._create_headers()
         self.token = self._get_token()
 
-        self.headers = self._create_headers()
+        self.headers = self._create_headers(token=self.token)
 
     def _get_user(self):
         """Return user dict from server or None if there is no user.
@@ -49,7 +48,7 @@ class EmbyHandler(object):
                 self.password.encode('utf-8')).hexdigest()
         }
 
-    def _create_headers(self):
+    def _create_headers(self, token=None):
         """Return header dict that is needed to talk to the Emby API.
         """
         headers = {}
@@ -64,7 +63,7 @@ class EmbyHandler(object):
 
         headers['x-emby-authorization'] = authorization
 
-        if self.token:
+        if token:
             headers['x-mediabrowser-token'] = self.token
 
         return headers
@@ -75,8 +74,9 @@ class EmbyHandler(object):
         Takes host, port and endpoint and generates a valid emby API url.
         """
         # check if http or https is defined as host and create hostname
-        hostname_list = [self.host]
-        if self.host.startswith('http://') or self.host.startswith('https://'):
+        hostname_list = [self.hostname]
+        if self.hostname.startswith('http://') or \
+                self.hostname.startswith('https://'):
             hostname = ''.join(hostname_list)
         else:
             hostname_list.insert(0, 'http://')
@@ -98,9 +98,23 @@ class EmbyHandler(object):
 
         return urlunsplit((scheme, netloc, path, new_query_string, fragment))
 
-    def get_albums(self):
+    def get_music_root(self):
         url = self.api_url(
-            '/Users/{}/Items?MediaType=music'.format(self.user_id)
+            '/Users/{}/Views'.format(self.user_id)
         )
+
         r = requests.get(url, headers=self.headers)
-        return r.json()
+        data = r.json()
+        id = [i['Id'] for i in data['Items'] if i['Name'] == 'Music'][0]
+
+        return id
+
+    def get_item(self, id):
+        return requests.get(
+            self.api_url(
+                '/Users/{}/Items?ParentId={}&SortOrder=Ascending'.format(
+                    self.user_id,
+                    id
+                )
+            ), headers=self.headers
+        ).json()
