@@ -1,8 +1,14 @@
-import requests
 import hashlib
+import logging
+import requests
 
 from urlparse import urljoin, urlsplit, parse_qs, urlunsplit
 from urllib import urlencode
+
+from mopidy import models
+
+
+logger = logging.getLogger(__name__)
 
 
 class EmbyHandler(object):
@@ -109,7 +115,7 @@ class EmbyHandler(object):
 
         return id
 
-    def get_item(self, id):
+    def get_directory(self, id):
         return requests.get(
             self.api_url(
                 '/Users/{}/Items?ParentId={}&SortOrder=Ascending'.format(
@@ -118,3 +124,30 @@ class EmbyHandler(object):
                 )
             ), headers=self.headers
         ).json()
+
+    def get_item(self, id):
+        return requests.get(
+            self.api_url(
+                '/Users/{}/Items/{}'.format(self.user_id, id)
+            ),
+            headers=self.headers
+        ).json()
+
+    def get_album_tracks(self, uri):
+        id = uri.split(':')[-1]
+        data = sorted(self.get_item(id)['Items'], key=lambda k: k['Name'])
+        return [
+            models.Track(
+                uri='{}:{}'.format(uri, i['Id']),
+                name=i['Name']
+            )
+            for i in data
+        ]
+
+    def get_track(self, uri):
+        id = uri.split(':')[-1]
+        track = self.get_item(id)
+        return models.Track(
+            uri='{}:{}'.format(uri, track['Id']),
+            name=track['Name']
+        )

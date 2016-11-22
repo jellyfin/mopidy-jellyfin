@@ -19,6 +19,20 @@ class EmbyBackend(pykka.ThreadingActor, backend.Backend):
         super(EmbyBackend, self).__init__()
 
         self.library = EmbyLibraryProvider(backend=self)
-        self.playback = None
+        self.playback = EmbyPlaybackProvider(audio=audio, backend=self)
         self.playlist = None
         self.remote = EmbyHandler(config['emby'])
+
+
+class EmbyPlaybackProvider(backend.PlaybackProvider):
+
+    def translate_uri(self, uri):
+        id = uri.split(':')[-1]
+
+        track_url = self.backend.remote.api_url(
+            '/Audio/{}/stream.mp3'.format(id)
+        )
+
+        logger.debug('Emby track streaming url: {}'.format(track_url))
+
+        return track_url
