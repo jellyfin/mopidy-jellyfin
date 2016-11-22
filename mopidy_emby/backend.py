@@ -8,7 +8,9 @@ import requests
 from urlparse import urljoin, urlsplit, parse_qs, urlunsplit
 from urllib import urlencode
 
-from mopidy import backend, models
+from mopidy import backend, models, httpclient
+
+import mopidy_emby
 
 
 logger = logging.getLogger(__name__)
@@ -23,7 +25,7 @@ class EmbyBackend(pykka.ThreadingActor, backend.Backend):
         self.library = EmbyLibraryProvider(backend=self)
         self.playback = EmbyPlaybackProvider(audio=audio, backend=self)
         self.playlist = None
-        self.remote = EmbyHandler(config['emby'])
+        self.remote = EmbyHandler(config['emby'], config['proxy'])
 
 
 class EmbyPlaybackProvider(backend.PlaybackProvider):
@@ -82,7 +84,8 @@ class EmbyLibraryProvider(backend.LibraryProvider):
         if len(parts) == 3:
             id = parts[2]
             tracks = sorted(
-                self.backend.remote.get_directory(id)['Items']
+                self.backend.remote.get_directory(id)['Items'],
+                key=lambda k: k['IndexNumber']
             )
             return [
                 models.Ref.track(
@@ -117,11 +120,12 @@ class EmbyLibraryProvider(backend.LibraryProvider):
 
 
 class EmbyHandler(object):
-    def __init__(self, config):
+    def __init__(self, config, proxy):
         self.hostname = config['hostname']
         self.port = config['port']
         self.username = config['username']
         self.password = config['password']
+        self.proxy = proxy
 
         # create authentication headers
         self.auth_data = self._password_data()
@@ -179,6 +183,36 @@ class EmbyHandler(object):
 
         return headers
 
+    def _get_session(self):
+        proxy = httpclient.format_proxy(self.proxy)
+        full_user_agent = httpclient.format_user_agent(
+            '/'.join(
+                (mopidy_emby.Extension.dist_name, mopidy_emby.__version__)
+            )
+        )
+
+        session = requests.Session()
+        session.proxies.update({'http': proxy, 'https': proxy})
+        session.headers.update({'user-agent': full_user_agent})
+
+        return session
+
+    def r_get(self, url):
+        counter = 0
+        session = self._get_session()
+        session.headers.update(self.headers)
+        while counter <= 5:
+            try:
+                r = session.get(url)
+                return r.json()
+            except Exception as e:
+                logger.info(
+                    'Emby connection on try {} with problem: {}'.format(
+                        counter, e
+                    )
+                )
+                counter += 1
+
     def api_url(self, endpoint):
         """Returns a joined url.
 
@@ -214,29 +248,27 @@ class EmbyHandler(object):
             '/Users/{}/Views'.format(self.user_id)
         )
 
-        r = requests.get(url, headers=self.headers)
-        data = r.json()
+        data = self.r_get(url)
         id = [i['Id'] for i in data['Items'] if i['Name'] == 'Music'][0]
 
         return id
 
     def get_directory(self, id):
-        return requests.get(
+        return self.r_get(
             self.api_url(
                 '/Users/{}/Items?ParentId={}&SortOrder=Ascending'.format(
                     self.user_id,
                     id
                 )
-            ), headers=self.headers
-        ).json()
+            )
+        )
 
     def get_item(self, id):
-        data = requests.get(
+        data = self.r_get(
             self.api_url(
                 '/Users/{}/Items/{}'.format(self.user_id, id)
-            ),
-            headers=self.headers
-        ).json()
+            )
+        )
 
         logger.debug('Emby item: {}'.format(data))
 
@@ -249,7 +281,8 @@ class EmbyHandler(object):
             track_no=track.get('IndexNumber'),
             genre=track.get('Genre'),
             artists=[self.create_artist(track)],
-            album=self.create_album(track)
+            album=self.create_album(track),
+            length=track['RunTimeTicks'] / 10000
         )
 
     def create_album(self, track):
@@ -266,7 +299,9 @@ class EmbyHandler(object):
 
     def get_album_tracks(self, uri):
         id = uri.split(':')[-1]
-        data = sorted(self.get_item(id)['Items'], key=lambda k: k['Name'])
+        data = sorted(
+            self.get_item(id)['Items'], key=lambda k: k['IndexNumber']
+        )
         return [self.create_track(uri, i) for i in data]
 
     def get_track(self, uri):
