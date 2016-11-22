@@ -4,6 +4,7 @@ import hashlib
 import logging
 import pykka
 import requests
+import time
 
 from urlparse import urljoin, urlsplit, parse_qs, urlunsplit
 from urllib import urlencode
@@ -117,6 +118,39 @@ class EmbyLibraryProvider(backend.LibraryProvider):
 
         else:
             return {uri: self.lookup(uri=uri) for uri in uris}
+
+
+class cache(object):
+
+    def __init__(self, ctl=8, ttl=3600):
+        self.cache = {}
+        self.ctl = ctl
+        self.ttl = ttl
+        self._call_count = 1
+
+    def __call__(self, func):
+        def _memoized(*args):
+            self.func = func
+            now = time.time()
+            try:
+                value, last_update = self.cache[args]
+                age = now - last_update
+                if self._call_count >= self.ctl or age > self.ttl:
+                    self._call_count = 1
+                    raise AttributeError
+
+                self._call_count += 1
+                return value
+
+            except (KeyError, AttributeError):
+                value = self.func(*args)
+                self.cache[args] = (value, now)
+                return value
+
+            except TypeError:
+                return self.func(*args)
+
+        return _memoized
 
 
 class EmbyHandler(object):
@@ -253,6 +287,7 @@ class EmbyHandler(object):
 
         return id
 
+    @cache()
     def get_directory(self, id):
         return self.r_get(
             self.api_url(
@@ -263,6 +298,7 @@ class EmbyHandler(object):
             )
         )
 
+    @cache()
     def get_item(self, id):
         data = self.r_get(
             self.api_url(
@@ -275,6 +311,7 @@ class EmbyHandler(object):
         return data
 
     def create_track(self, uri, track):
+        # TODO: add more metadata
         return models.Track(
             uri='{}:{}'.format(uri, track['Id']),
             name=track.get('Name'),
@@ -297,6 +334,7 @@ class EmbyHandler(object):
             uri='embi:{}'.format(track['ArtistItems'][0]['Id'])
         )
 
+    @cache()
     def get_album_tracks(self, uri):
         id = uri.split(':')[-1]
         data = sorted(
@@ -304,6 +342,7 @@ class EmbyHandler(object):
         )
         return [self.create_track(uri, i) for i in data]
 
+    @cache()
     def get_track(self, uri):
         id = uri.split(':')[-1]
         track = self.get_item(id)
