@@ -107,7 +107,7 @@ class EmbyLibraryProvider(backend.LibraryProvider):
             if len(parts) == 3:
                 tracks = self.backend.remote.get_album_tracks(uri)
 
-            elif len(parts) == 4:
+            elif len(parts) == 4 or len(parts) == 5:
                 tracks = [self.backend.remote.get_track(uri)]
 
             else:
@@ -317,7 +317,7 @@ class EmbyHandler(object):
             name=track.get('Name'),
             track_no=track.get('IndexNumber'),
             genre=track.get('Genre'),
-            artists=[self.create_artist(track)],
+            artists=self.create_artists(track),
             album=self.create_album(track),
             length=track['RunTimeTicks'] / 10000
         )
@@ -325,14 +325,16 @@ class EmbyHandler(object):
     def create_album(self, track):
         return models.Album(
             name=track.get('Album'),
-            artists=[self.create_artist(track)]
+            artists=self.create_artists(track)
         )
 
-    def create_artist(self, track):
-        return models.Artist(
-            name=track['ArtistItems'][0]['Name'],
-            uri='embi:{}'.format(track['ArtistItems'][0]['Id'])
-        )
+    def create_artists(self, track):
+        return [
+            models.Artist(
+                name=artist['Name']
+            )
+            for artist in track['ArtistItems']
+        ]
 
     @cache()
     def get_album_tracks(self, uri):
