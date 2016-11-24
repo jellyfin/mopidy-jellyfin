@@ -26,7 +26,7 @@ class EmbyBackend(pykka.ThreadingActor, backend.Backend):
         self.library = EmbyLibraryProvider(backend=self)
         self.playback = EmbyPlaybackProvider(audio=audio, backend=self)
         self.playlist = None
-        self.remote = EmbyHandler(config['emby'], config['proxy'])
+        self.remote = EmbyHandler(config)
 
 
 class EmbyPlaybackProvider(backend.PlaybackProvider):
@@ -154,12 +154,12 @@ class cache(object):
 
 
 class EmbyHandler(object):
-    def __init__(self, config, proxy):
-        self.hostname = config['hostname']
-        self.port = config['port']
-        self.username = config['username']
-        self.password = config['password']
-        self.proxy = proxy
+    def __init__(self, config):
+        self.hostname = config['emby']['hostname']
+        self.port = config['emby']['port']
+        self.username = config['emby']['username']
+        self.password = config['emby']['password']
+        self.proxy = config['proxy']
 
         # create authentication headers
         self.auth_data = self._password_data()
@@ -247,6 +247,9 @@ class EmbyHandler(object):
                 )
                 counter += 1
 
+        # if everything goes wrong return a empty dict
+        return {'Items': []}
+
     def api_url(self, endpoint):
         """Returns a joined url.
 
@@ -283,9 +286,10 @@ class EmbyHandler(object):
         )
 
         data = self.r_get(url)
-        id = [i['Id'] for i in data['Items'] if i['Name'] == 'Music'][0]
+        id = [i['Id'] for i in data['Items'] if i['Name'] == 'Music']
 
-        return id
+        if id:
+            return id[0]
 
     @cache()
     def get_directory(self, id):
