@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 from mock import patch
+import json
 import pytest
 
 import mopidy_emby
@@ -42,3 +43,23 @@ def test_api_url(password_data_mock, get_user_mock, create_header_mock,
     emby = mopidy_emby.backend.EmbyHandler(config)
 
     assert emby.api_url(url) == expected
+
+
+@pytest.mark.parametrize('data,expected', [
+    ('tests/data/get_music_root0.json', 'eb169f4ba53fc560f549cb0f2a47d577')
+])
+@patch('mopidy_emby.backend.EmbyHandler.r_get')
+@patch('mopidy_emby.backend.EmbyHandler._get_token')
+@patch('mopidy_emby.backend.EmbyHandler._create_headers')
+@patch('mopidy_emby.backend.EmbyHandler._get_user')
+@patch('mopidy_emby.backend.EmbyHandler._password_data')
+def test_get_music_root(password_data_mock, get_user_mock, create_header_mock,
+                        get_token_mock, r_get_mock, config, data, expected):
+    get_user_mock.return_value = [{'Id': 'foo'}]
+
+    with open(data, 'r') as f:
+        r_get_mock.return_value = json.load(f)
+
+    emby = mopidy_emby.backend.EmbyHandler(config)
+
+    assert emby.get_music_root() == expected
