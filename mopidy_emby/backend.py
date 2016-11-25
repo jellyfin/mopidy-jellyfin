@@ -248,7 +248,7 @@ class EmbyHandler(object):
                 counter += 1
 
         # if everything goes wrong return a empty dict
-        return {'Items': []}
+        return {}
 
     def api_url(self, endpoint):
         """Returns a joined url.
@@ -288,8 +288,7 @@ class EmbyHandler(object):
         data = self.r_get(url)
         id = [i['Id'] for i in data['Items'] if i['Name'] == 'Music']
 
-        if id:
-            return id[0]
+        return id[0]
 
     @cache()
     def get_directory(self, id):

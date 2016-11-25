@@ -1,8 +1,10 @@
 from __future__ import unicode_literals
 
-from mock import patch
 import json
 import pytest
+
+from mopidy.models import Track, Album, Artist
+from mock import patch
 
 import mopidy_emby
 
@@ -63,3 +65,54 @@ def test_get_music_root(password_data_mock, get_user_mock, create_header_mock,
     emby = mopidy_emby.backend.EmbyHandler(config)
 
     assert emby.get_music_root() == expected
+
+
+@pytest.mark.parametrize('data,expected', [
+    (
+        'tests/data/track0.json',
+        Track(
+            album=Album(artists=[Artist(name=u'Chairlift')], name=u'Moth'),
+            artists=[Artist(name=u'Chairlift')],
+            length=295915,
+            name=u'Ottawa to Osaka',
+            track_no=6,
+            uri='emby::18e5a9871e6a4a2294d5af998457ca16'
+        )
+     ),
+    (
+        'tests/data/track1.json',
+        Track(
+            album=Album(artists=[Artist(name=u'Chairlift')], name=u'Moth'),
+            artists=[Artist(name=u'Chairlift')],
+            length=269035,
+            name=u'Crying in Public',
+            track_no=5,
+            uri='emby::37f57f0b370274af96de06895a78c2c3'
+         )
+     ),
+    (
+        'tests/data/track2.json',
+        Track(
+            album=Album(artists=[Artist(name=u'Chairlift')], name=u'Moth'),
+            artists=[Artist(name=u'Chairlift')],
+            length=283115,
+            name=u'Polymorphing',
+            track_no=2,
+            uri='emby::3315cccffe37ab47d50d1dbeefd3537b'
+        )
+    ),
+])
+@patch('mopidy_emby.backend.EmbyHandler._get_token')
+@patch('mopidy_emby.backend.EmbyHandler._create_headers')
+@patch('mopidy_emby.backend.EmbyHandler._get_user')
+@patch('mopidy_emby.backend.EmbyHandler._password_data')
+def test_create_track(password_data_mock, get_user_mock, create_header_mock,
+                      get_token_mock, config, data, expected):
+    get_user_mock.return_value = [{'Id': 'foo'}]
+
+    with open(data, 'r') as f:
+        track = json.load(f)
+
+    emby = mopidy_emby.backend.EmbyHandler(config)
+
+    assert emby.create_track('emby:', track) == expected

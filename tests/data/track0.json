@@ -1,0 +1,216 @@
+{
+    "Album": "Moth", 
+    "Genres": [
+        "Electronic"
+    ], 
+    "MediaStreams": [
+        {
+            "IsInterlaced": false, 
+            "DisplayTitle": "MP3 stereo", 
+            "SupportsExternalStream": false, 
+            "ChannelLayout": "stereo", 
+            "Index": 0, 
+            "Type": "Audio", 
+            "IsForced": false, 
+            "Level": 0, 
+            "Channels": 2, 
+            "Codec": "mp3", 
+            "CodecTimeBase": "1/44100", 
+            "TimeBase": "1/14112000", 
+            "SampleRate": 44100, 
+            "BitRate": 245537, 
+            "IsTextSubtitleStream": false, 
+            "IsDefault": false, 
+            "IsExternal": false
+        }, 
+        {
+            "Comment": "Cover (front)", 
+            "IsInterlaced": false, 
+            "TimeBase": "1/90000", 
+            "SupportsExternalStream": false, 
+            "Index": 1, 
+            "IsForced": false, 
+            "Level": -99, 
+            "IsAnamorphic": false, 
+            "Height": 5100, 
+            "Width": 7019, 
+            "PixelFormat": "yuvj420p", 
+            "Codec": "mjpeg", 
+            "RefFrames": 1, 
+            "CodecTimeBase": "1/90000", 
+            "RealFrameRate": 90000, 
+            "BitDepth": 8, 
+            "AspectRatio": "4:3", 
+            "Type": "EmbeddedImage", 
+            "IsTextSubtitleStream": false, 
+            "IsDefault": false, 
+            "IsExternal": false
+        }
+    ], 
+    "Container": "mp3", 
+    "CanDelete": false, 
+    "LocationType": "FileSystem", 
+    "ArtistItems": [
+        {
+            "Name": "Chairlift", 
+            "Id": "e0361aff955c30f5a6dcc6fcf0c9d1cf"
+        }
+    ], 
+    "CanDownload": true, 
+    "ExternalUrls": [
+        {
+            "Url": "https://musicbrainz.org/release/13c6ad1f-ac2c-47d1-b5b3-fb75b6679c81", 
+            "Name": "MusicBrainz Album"
+        }, 
+        {
+            "Url": "https://musicbrainz.org/artist/a3cd61ef-7fd4-44af-a27f-99641a82b22b", 
+            "Name": "MusicBrainz Album Artist"
+        }, 
+        {
+            "Url": "https://musicbrainz.org/artist/a3cd61ef-7fd4-44af-a27f-99641a82b22b", 
+            "Name": "MusicBrainz Artist"
+        }, 
+        {
+            "Url": "https://musicbrainz.org/release-group/90551b85-1d7e-4e5e-a73a-e9008efd4f3e", 
+            "Name": "MusicBrainz Release Group"
+        }
+    ], 
+    "Etag": "38bb58a565d1d4d4600fb9691b4846c6", 
+    "ScreenshotImageTags": [], 
+    "RemoteTrailers": [], 
+    "ParentBackdropImageTags": [
+        "1c417e9d2489a69daa1eea2456d3034a"
+    ], 
+    "ServerId": "1efa5077976bfa92bc71652404f646ec", 
+    "Type": "Audio", 
+    "ParentIndexNumber": 1, 
+    "SortName": "0001 - 0006 - Ottawa to Osaka", 
+    "AlbumPrimaryImageTag": "62d04d062d993b3281cdbede12d41b52", 
+    "PlayAccess": "Full", 
+    "Tags": [], 
+    "ImageTags": {
+        "Primary": "3352c846560f817c8bcb2c5d3596eac6"
+    }, 
+    "IsFolder": false, 
+    "LockedFields": [], 
+    "ParentLogoImageTag": "78efdf8c98b67660bb1649a41c8ef07a", 
+    "ProviderIds": {
+        "MusicBrainzAlbum": "13c6ad1f-ac2c-47d1-b5b3-fb75b6679c81", 
+        "MusicBrainzReleaseGroup": "90551b85-1d7e-4e5e-a73a-e9008efd4f3e", 
+        "MusicBrainzArtist": "a3cd61ef-7fd4-44af-a27f-99641a82b22b", 
+        "MusicBrainzAlbumArtist": "a3cd61ef-7fd4-44af-a27f-99641a82b22b"
+    }, 
+    "PremiereDate": "2016-01-22T05:00:00.0000000Z", 
+    "ProductionYear": 2016, 
+    "DisplayPreferencesId": "61bba315f137702baa296a1c417faada", 
+    "Path": "/media/Musik/Chairlift/Moth/06 Ottawa to Osaka.mp3", 
+    "BackdropImageTags": [], 
+    "Name": "Ottawa to Osaka", 
+    "AlbumArtists": [
+        {
+            "Name": "Chairlift", 
+            "Id": "e0361aff955c30f5a6dcc6fcf0c9d1cf"
+        }
+    ], 
+    "MediaType": "Audio", 
+    "LockData": false, 
+    "Taglines": [], 
+    "AlbumArtist": "Chairlift", 
+    "ParentId": "ccb5e9bd85119952eb9ad5a46133fafc", 
+    "PrimaryImageAspectRatio": 1.38248847926267, 
+    "ParentLogoItemId": "e0361aff955c30f5a6dcc6fcf0c9d1cf", 
+    "MediaSources": [
+        {
+            "SupportsDirectStream": true, 
+            "Container": "mp3", 
+            "RequiresClosing": false, 
+            "MediaStreams": [
+                {
+                    "IsInterlaced": false, 
+                    "DisplayTitle": "MP3 stereo", 
+                    "SupportsExternalStream": false, 
+                    "ChannelLayout": "stereo", 
+                    "Index": 0, 
+                    "Type": "Audio", 
+                    "IsForced": false, 
+                    "Level": 0, 
+                    "Channels": 2, 
+                    "Codec": "mp3", 
+                    "CodecTimeBase": "1/44100", 
+                    "TimeBase": "1/14112000", 
+                    "SampleRate": 44100, 
+                    "BitRate": 245537, 
+                    "IsTextSubtitleStream": false, 
+                    "IsDefault": false, 
+                    "IsExternal": false
+                }, 
+                {
+                    "Comment": "Cover (front)", 
+                    "IsInterlaced": false, 
+                    "TimeBase": "1/90000", 
+                    "SupportsExternalStream": false, 
+                    "Index": 1, 
+                    "IsForced": false, 
+                    "Level": -99, 
+                    "IsAnamorphic": false, 
+                    "Height": 5100, 
+                    "Width": 7019, 
+                    "PixelFormat": "yuvj420p", 
+                    "Codec": "mjpeg", 
+                    "RefFrames": 1, 
+                    "CodecTimeBase": "1/90000", 
+                    "RealFrameRate": 90000, 
+                    "BitDepth": 8, 
+                    "AspectRatio": "4:3", 
+                    "Type": "EmbeddedImage", 
+                    "IsTextSubtitleStream": false, 
+                    "IsDefault": false, 
+                    "IsExternal": false
+                }
+            ], 
+            "Type": "Default", 
+            "ReadAtNativeFramerate": false, 
+            "Path": "/media/Musik/Chairlift/Moth/06 Ottawa to Osaka.mp3", 
+            "RequiresOpening": false, 
+            "Bitrate": 472648, 
+            "Name": "Ottawa to Osaka", 
+            "RequiredHttpHeaders": {}, 
+            "SupportsTranscoding": true, 
+            "SupportsDirectPlay": true, 
+            "Formats": [], 
+            "Protocol": "File", 
+            "PlayableStreamFileNames": [], 
+            "IsInfiniteStream": false, 
+            "ETag": "25905e83e076200f2289165323ddf082", 
+            "RunTimeTicks": 2959150000, 
+            "SupportsProbing": true, 
+            "Id": "18e5a9871e6a4a2294d5af998457ca16", 
+            "Size": 17482982
+        }
+    ], 
+    "UserData": {
+        "PlayCount": 0, 
+        "Key": "MusicAlbum-MusicBrainzReleaseGroup-90551b85-1d7e-4e5e-a73a-e9008efd4f3e0001 - 0006 - ", 
+        "PlaybackPositionTicks": 0, 
+        "IsFavorite": false, 
+        "Played": false
+    }, 
+    "Studios": [
+        {
+            "Name": "Columbia", 
+            "Id": "14f3e6c8262c36afbe87a80c6b830b6b"
+        }
+    ], 
+    "IndexNumber": 6, 
+    "People": [], 
+    "DateCreated": "2016-11-25T11:09:03.0000000Z", 
+    "ParentBackdropItemId": "e0361aff955c30f5a6dcc6fcf0c9d1cf", 
+    "AlbumId": "ccb5e9bd85119952eb9ad5a46133fafc", 
+    "RunTimeTicks": 2959150000, 
+    "Artists": [
+        "Chairlift"
+    ], 
+    "Keywords": [], 
+    "SupportsSync": true, 
+    "Id": "18e5a9871e6a4a2294d5af998457ca16"
+}
