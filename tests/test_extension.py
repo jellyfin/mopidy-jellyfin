@@ -1,10 +1,12 @@
 from __future__ import unicode_literals
 
 import json
-import pytest
 
-from mopidy.models import Track, Album, Artist
 from mock import patch
+
+from mopidy.models import Album, Artist, Track
+
+import pytest
 
 import mopidy_emby
 
@@ -51,20 +53,12 @@ def test_api_url(password_data_mock, get_user_mock, create_header_mock,
     ('tests/data/get_music_root0.json', 'eb169f4ba53fc560f549cb0f2a47d577')
 ])
 @patch('mopidy_emby.backend.EmbyHandler.r_get')
-@patch('mopidy_emby.backend.EmbyHandler._get_token')
-@patch('mopidy_emby.backend.EmbyHandler._create_headers')
-@patch('mopidy_emby.backend.EmbyHandler._get_user')
-@patch('mopidy_emby.backend.EmbyHandler._password_data')
-def test_get_music_root(password_data_mock, get_user_mock, create_header_mock,
-                        get_token_mock, r_get_mock, config, data, expected):
-    get_user_mock.return_value = [{'Id': 'foo'}]
+def test_get_music_root(r_get_mock, data, expected, emby_client):
 
     with open(data, 'r') as f:
         r_get_mock.return_value = json.load(f)
 
-    emby = mopidy_emby.backend.EmbyHandler(config)
-
-    assert emby.get_music_root() == expected
+    assert emby_client.get_music_root() == expected
 
 
 @pytest.mark.parametrize('data,expected', [
@@ -102,17 +96,8 @@ def test_get_music_root(password_data_mock, get_user_mock, create_header_mock,
         )
     ),
 ])
-@patch('mopidy_emby.backend.EmbyHandler._get_token')
-@patch('mopidy_emby.backend.EmbyHandler._create_headers')
-@patch('mopidy_emby.backend.EmbyHandler._get_user')
-@patch('mopidy_emby.backend.EmbyHandler._password_data')
-def test_create_track(password_data_mock, get_user_mock, create_header_mock,
-                      get_token_mock, config, data, expected):
-    get_user_mock.return_value = [{'Id': 'foo'}]
-
+def test_create_track(data, expected, emby_client):
     with open(data, 'r') as f:
         track = json.load(f)
 
-    emby = mopidy_emby.backend.EmbyHandler(config)
-
-    assert emby.create_track('emby:', track) == expected
+    assert emby_client.create_track('emby:', track) == expected

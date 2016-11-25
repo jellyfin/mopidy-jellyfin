@@ -2,14 +2,16 @@ from __future__ import unicode_literals
 
 import hashlib
 import logging
-import pykka
-import requests
 import time
 
-from urlparse import urljoin, urlsplit, parse_qs, urlunsplit
 from urllib import urlencode
+from urlparse import parse_qs, urljoin, urlsplit, urlunsplit
 
-from mopidy import backend, models, httpclient
+from mopidy import backend, httpclient, models
+
+import pykka
+
+import requests
 
 import mopidy_emby
 
