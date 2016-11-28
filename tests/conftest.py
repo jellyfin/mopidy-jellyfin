@@ -38,6 +38,10 @@ def backend_mock():
     backend_mock.remote.get_artists.return_value = ['Artistlist']
     backend_mock.remote.get_albums.return_value = ['Albumlist']
     backend_mock.remote.get_tracks.return_value = ['Tracklist']
+    backend_mock.remote.get_track.return_value = {
+        'Name': 'Foo',
+        'Id': 123
+    }
 
     return backend_mock
 

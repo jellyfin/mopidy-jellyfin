@@ -215,3 +215,19 @@ def test_create_artists(data, expected, emby_client):
 ])
 def test_browse(uri, expected, provider):
     assert provider.browse(uri) == expected
+
+
+@pytest.mark.parametrize('uri,expected', [
+    ('emby:track:123', [{'Name': 'Foo', 'Id': 123}]),
+    ('emby:track', [])
+])
+def test_lookup_uri(uri, expected, provider):
+    assert provider.lookup(uri=uri) == expected
+
+
+@pytest.mark.parametrize('uri,expected', [
+    (['emby:track:123'], {'emby:track:123': [{'Name': 'Foo', 'Id': 123}]}),
+    (['emby:track'], {u'emby:track': []})
+])
+def test_lookup_uris(uri, expected, provider):
+    assert provider.lookup(uris=uri) == expected
