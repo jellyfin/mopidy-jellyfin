@@ -1,3 +1,5 @@
+import mock
+
 import pytest
 
 import mopidy_emby
@@ -27,3 +29,19 @@ def emby_client(config, mocker):
     mocker.patch('mopidy_emby.backend.EmbyHandler._password_data')
 
     return mopidy_emby.backend.EmbyHandler(config)
+
+
+@pytest.fixture
+def backend_mock():
+    backend_mock = mock.Mock(autospec=mopidy_emby.backend.EmbyBackend)
+    backend_mock.remote(autospec=mopidy_emby.backend.EmbyHandler)
+    backend_mock.remote.get_artists.return_value = ['Artistlist']
+    backend_mock.remote.get_albums.return_value = ['Albumlist']
+    backend_mock.remote.get_tracks.return_value = ['Tracklist']
+
+    return backend_mock
+
+
+@pytest.fixture
+def provider(backend_mock):
+    return mopidy_emby.backend.EmbyLibraryProvider(backend_mock)

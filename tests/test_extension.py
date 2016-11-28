@@ -206,3 +206,12 @@ def test_create_artists(data, expected, emby_client):
         track = json.load(f)
 
     assert emby_client.create_artists(track) == expected
+
+
+@pytest.mark.parametrize('uri,expected', [
+    ('emby:', ['Artistlist']),
+    ('emby:artist:123', ['Albumlist']),
+    ('emby:album:123', ['Tracklist']),
+])
+def test_browse(uri, expected, provider):
+    assert provider.browse(uri) == expected
