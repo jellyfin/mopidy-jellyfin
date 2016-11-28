@@ -365,14 +365,7 @@ class EmbyHandler(object):
         ]
 
     @cache()
-    def get_album_tracks(self, uri):
-        id = uri.split(':')[-1]
-        data = sorted(
-            self.get_item(id)['Items'], key=lambda k: k['IndexNumber']
-        )
-        return [self.create_track(uri, i) for i in data]
-
-    @cache()
     def get_track(self, track_id):
         track = self.get_item(track_id)
+
         return self.create_track(track)

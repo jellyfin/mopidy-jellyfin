@@ -11,8 +11,8 @@ Mopidy-Emby
     :alt: Travis CI build status
 
 .. image:: https://img.shields.io/coveralls/xsteadfastx/mopidy-emby/master.svg?style=flat
-   :target: https://coveralls.io/r/xsteadfastx/mopidy-emby
-   :alt: Test coverage
+    :target: https://coveralls.io/r/xsteadfastx/mopidy-emby
+    :alt: Test coverage
 
 Mopidy extension for playing music from Emby
 
@@ -24,9 +24,6 @@ Install by running::
 
     pip install Mopidy-Emby
 
-Or, if available, install the Debian/Ubuntu package from `apt.mopidy.com
-<http://apt.mopidy.com/>`_.
-
 
 Configuration
 =============
@@ -35,7 +32,10 @@ Before starting Mopidy, you must add configuration for
 Mopidy-Emby to your Mopidy configuration file::
 
     [emby]
-    # TODO: Add example of extension config
+    hostname = Emby server hostname
+    port = Emby server port
+    username = username
+    password = password
 
 
 Project resources
@@ -56,7 +56,7 @@ Credits
 Changelog
 =========
 
-v0.1.0 (UNRELEASED)
+v0.1.0
 ----------------------------------------
 
 - Initial release.

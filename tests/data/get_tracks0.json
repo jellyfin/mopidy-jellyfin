@@ -1,0 +1,156 @@
+{
+    "Items": [
+        {
+            "Album": "American Football", 
+            "Container": "mp3", 
+            "LocationType": "FileSystem", 
+            "ArtistItems": [
+                {
+                    "Name": "American Football", 
+                    "Id": "758127639e29df82ff7f3e8285275935"
+                }
+            ], 
+            "ParentBackdropImageTags": [
+                "1756c90db5915ad6243e10a93ac4a4d5"
+            ], 
+            "ServerId": "1efa5077976bfa92bc71652404f646ec", 
+            "Type": "Audio", 
+            "ParentIndexNumber": 1, 
+            "PlayAccess": "Full", 
+            "ImageTags": {}, 
+            "IsFolder": false, 
+            "AlbumPrimaryImageTag": "c71656b885cf71c7a7553dad7ec342d2", 
+            "PremiereDate": "1998-10-01T00:00:00.0000000Z", 
+            "ProductionYear": 1998, 
+            "BackdropImageTags": [], 
+            "Name": "The One With the Tambourine", 
+            "AlbumArtists": [
+                {
+                    "Name": "American Football", 
+                    "Id": "758127639e29df82ff7f3e8285275935"
+                }
+            ], 
+            "MediaType": "Audio", 
+            "AlbumArtist": "American Football", 
+            "UserData": {
+                "IsFavorite": false, 
+                "Played": true, 
+                "LastPlayedDate": "2016-11-01T12:26:30.8699880Z", 
+                "PlaybackPositionTicks": 0, 
+                "Key": "MusicAlbum-MusicBrainzReleaseGroup-2cf0d427-90ba-3950-9231-9ffd9386f00a0001 - 0001 - ", 
+                "PlayCount": 31
+            }, 
+            "IndexNumber": 1, 
+            "ParentBackdropItemId": "758127639e29df82ff7f3e8285275935", 
+            "AlbumId": "ca498ea939b28593744c051d9f5e74ed", 
+            "RunTimeTicks": 2411620000, 
+            "Artists": [
+                "American Football"
+            ], 
+            "Id": "eb6c305bdb1e40d3b46909473c22d906"
+        }, 
+        {
+            "Album": "American Football", 
+            "Container": "mp3", 
+            "LocationType": "FileSystem", 
+            "ArtistItems": [
+                {
+                    "Name": "American Football", 
+                    "Id": "758127639e29df82ff7f3e8285275935"
+                }
+            ], 
+            "ParentBackdropImageTags": [
+                "1756c90db5915ad6243e10a93ac4a4d5"
+            ], 
+            "ServerId": "1efa5077976bfa92bc71652404f646ec", 
+            "Type": "Audio", 
+            "ParentIndexNumber": 1, 
+            "PlayAccess": "Full", 
+            "ImageTags": {
+                "Primary": "0ff1972ea107162925ac508e71c68495"
+            }, 
+            "IsFolder": false, 
+            "AlbumPrimaryImageTag": "c71656b885cf71c7a7553dad7ec342d2", 
+            "PremiereDate": "1998-10-01T00:00:00.0000000Z", 
+            "ProductionYear": 1998, 
+            "BackdropImageTags": [], 
+            "Name": "Letters and Packages", 
+            "AlbumArtists": [
+                {
+                    "Name": "American Football", 
+                    "Id": "758127639e29df82ff7f3e8285275935"
+                }
+            ], 
+            "MediaType": "Audio", 
+            "AlbumArtist": "American Football", 
+            "UserData": {
+                "IsFavorite": false, 
+                "Played": true, 
+                "LastPlayedDate": "2016-10-31T09:22:05.1369410Z", 
+                "PlaybackPositionTicks": 0, 
+                "Key": "MusicAlbum-MusicBrainzReleaseGroup-2cf0d427-90ba-3950-9231-9ffd9386f00a0001 - 0002 - ", 
+                "PlayCount": 24
+            }, 
+            "IndexNumber": 2, 
+            "ParentBackdropItemId": "758127639e29df82ff7f3e8285275935", 
+            "AlbumId": "ca498ea939b28593744c051d9f5e74ed", 
+            "RunTimeTicks": 2010380000, 
+            "Artists": [
+                "American Football"
+            ], 
+            "Id": "7739d3830818c7aacf6c346172384914"
+        }, 
+        {
+            "Album": "American Football", 
+            "Container": "mp3", 
+            "LocationType": "FileSystem", 
+            "ArtistItems": [
+                {
+                    "Name": "American Football", 
+                    "Id": "758127639e29df82ff7f3e8285275935"
+                }
+            ], 
+            "ParentBackdropImageTags": [
+                "1756c90db5915ad6243e10a93ac4a4d5"
+            ], 
+            "ServerId": "1efa5077976bfa92bc71652404f646ec", 
+            "Type": "Audio", 
+            "ParentIndexNumber": 1, 
+            "PlayAccess": "Full", 
+            "ImageTags": {
+                "Primary": "3418078afd682d6feca5110a75db634b"
+            }, 
+            "IsFolder": false, 
+            "AlbumPrimaryImageTag": "c71656b885cf71c7a7553dad7ec342d2", 
+            "PremiereDate": "1998-10-01T00:00:00.0000000Z", 
+            "ProductionYear": 1998, 
+            "BackdropImageTags": [], 
+            "Name": "Five Silent Miles", 
+            "AlbumArtists": [
+                {
+                    "Name": "American Football", 
+                    "Id": "758127639e29df82ff7f3e8285275935"
+                }
+            ], 
+            "MediaType": "Audio", 
+            "AlbumArtist": "American Football", 
+            "UserData": {
+                "IsFavorite": false, 
+                "Played": true, 
+                "LastPlayedDate": "2016-10-31T09:25:29.1365630Z", 
+                "PlaybackPositionTicks": 0, 
+                "Key": "MusicAlbum-MusicBrainzReleaseGroup-2cf0d427-90ba-3950-9231-9ffd9386f00a0001 - 0003 - ", 
+                "PlayCount": 19
+            }, 
+            "IndexNumber": 3, 
+            "ParentBackdropItemId": "758127639e29df82ff7f3e8285275935", 
+            "AlbumId": "ca498ea939b28593744c051d9f5e74ed", 
+            "RunTimeTicks": 2508020000, 
+            "Artists": [
+                "American Football"
+            ], 
+            "Id": "f84df9f70e592a3abda82b1d78026608"
+        }
+    ], 
+    "TotalRecordCount": 3
+}

@@ -4,7 +4,7 @@ import json
 
 from mock import patch
 
-from mopidy.models import Album, Artist, Track
+from mopidy.models import Album, Artist, Ref, Track
 
 import pytest
 
@@ -61,6 +61,69 @@ def test_get_music_root(r_get_mock, data, expected, emby_client):
     assert emby_client.get_music_root() == expected
 
 
+@patch('mopidy_emby.backend.EmbyHandler.get_music_root')
+@patch('mopidy_emby.backend.EmbyHandler.r_get')
+def test_get_artists(r_get_mock, get_music_root_mock, emby_client):
+    expected = [
+        Ref(name=u'Chairlift',
+            type='artist',
+            uri='emby:artist:e0361aff955c30f5a6dcc6fcf0c9d1cf'),
+        Ref(name=u'Hans Zimmer',
+            type='artist',
+            uri='emby:artist:36de3368f493ebca94a55a411cc87862'),
+        Ref(name=u'The Menzingers',
+            type='artist',
+            uri='emby:artist:21c8f78763231ece7defd07b5f3f56be')
+    ]
+
+    with open('tests/data/get_artists0.json', 'r') as f:
+        r_get_mock.return_value = json.load(f)
+
+    assert emby_client.get_artists() == expected
+
+
+@patch('mopidy_emby.backend.EmbyHandler.get_music_root')
+@patch('mopidy_emby.backend.EmbyHandler.r_get')
+def test_get_albums(r_get_mock, get_music_root_mock, emby_client):
+    expected = [
+        Ref(name=u'American Football',
+            type='album',
+            uri='emby:album:6e4a2da7df0502650bb9b091312c3dbf'),
+        Ref(name=u'American Football',
+            type='album',
+            uri='emby:album:ca498ea939b28593744c051d9f5e74ed'),
+        Ref(name=u'American Football',
+            type='album',
+            uri='emby:album:0db6395ab76b6edbaba3a51ef23d0aa3')
+    ]
+
+    with open('tests/data/get_albums0.json', 'r') as f:
+        r_get_mock.return_value = json.load(f)
+
+    assert emby_client.get_albums(0) == expected
+
+
+@patch('mopidy_emby.backend.EmbyHandler.get_music_root')
+@patch('mopidy_emby.backend.EmbyHandler.r_get')
+def test_get_tracks(r_get_mock, get_music_root_mock, emby_client):
+    expected = [
+        Ref(name=u'The One With the Tambourine',
+            type='track',
+            uri='emby:track:eb6c305bdb1e40d3b46909473c22d906'),
+        Ref(name=u'Letters and Packages',
+            type='track',
+            uri='emby:track:7739d3830818c7aacf6c346172384914'),
+        Ref(name=u'Five Silent Miles',
+            type='track',
+            uri='emby:track:f84df9f70e592a3abda82b1d78026608')
+    ]
+
+    with open('tests/data/get_tracks0.json', 'r') as f:
+        r_get_mock.return_value = json.load(f)
+
+    assert emby_client.get_tracks(0) == expected
+
+
 @pytest.mark.parametrize('data,expected', [
     (
         'tests/data/track0.json',
@@ -101,3 +164,45 @@ def test_create_track(data, expected, emby_client):
         track = json.load(f)
 
     assert emby_client.create_track(track) == expected
+
+
+@pytest.mark.parametrize('data,expected', [
+    (
+        'tests/data/track0.json',
+        Album(artists=[Artist(name=u'Chairlift')], name=u'Moth')
+    ),
+    (
+        'tests/data/track1.json',
+        Album(artists=[Artist(name=u'Chairlift')], name=u'Moth')
+    ),
+    (
+        'tests/data/track2.json',
+        Album(artists=[Artist(name=u'Chairlift')], name=u'Moth')
+    ),
+])
+def test_create_album(data, expected, emby_client):
+    with open(data, 'r') as f:
+        track = json.load(f)
+
+    assert emby_client.create_album(track) == expected
+
+
+@pytest.mark.parametrize('data,expected', [
+    (
+        'tests/data/track0.json',
+        [Artist(name=u'Chairlift')]
+    ),
+    (
+        'tests/data/track1.json',
+        [Artist(name=u'Chairlift')]
+    ),
+    (
+        'tests/data/track2.json',
+        [Artist(name=u'Chairlift')]
+    ),
+])
+def test_create_artists(data, expected, emby_client):
+    with open(data, 'r') as f:
+        track = json.load(f)
+
+    assert emby_client.create_artists(track) == expected

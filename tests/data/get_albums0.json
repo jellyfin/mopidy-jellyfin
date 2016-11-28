@@ -1,0 +1,146 @@
+{
+    "Items": [
+        {
+            "UserData": {
+                "IsFavorite": false, 
+                "Played": true, 
+                "PlayedPercentage": 100, 
+                "UnplayedItemCount": 0, 
+                "PlaybackPositionTicks": 0, 
+                "Key": "MusicAlbum-MusicBrainzReleaseGroup-8e40a68c-58e8-3c92-a763-645fda2ce8a7", 
+                "PlayCount": 0
+            }, 
+            "LocationType": "FileSystem", 
+            "Name": "American Football", 
+            "PlayAccess": "Full", 
+            "ImageTags": {
+                "Primary": "6f9aa56dde788f4413cd23d18aea93b6"
+            }, 
+            "RecursiveItemCount": 19, 
+            "AlbumArtists": [
+                {
+                    "Name": "American Football", 
+                    "Id": "758127639e29df82ff7f3e8285275935"
+                }
+            ], 
+            "IsFolder": true, 
+            "ArtistItems": [
+                {
+                    "Name": "American Football", 
+                    "Id": "758127639e29df82ff7f3e8285275935"
+                }
+            ], 
+            "ChildCount": 19, 
+            "ParentBackdropItemId": "758127639e29df82ff7f3e8285275935", 
+            "PremiereDate": "1999-09-14T00:00:00.0000000Z", 
+            "AlbumArtist": "American Football", 
+            "ProductionYear": 1999, 
+            "RunTimeTicks": 49715720000, 
+            "Artists": [
+                "American Football"
+            ], 
+            "ParentBackdropImageTags": [
+                "1756c90db5915ad6243e10a93ac4a4d5"
+            ], 
+            "ServerId": "1efa5077976bfa92bc71652404f646ec", 
+            "Type": "MusicAlbum", 
+            "Id": "6e4a2da7df0502650bb9b091312c3dbf", 
+            "BackdropImageTags": []
+        }, 
+        {
+            "UserData": {
+                "IsFavorite": false, 
+                "Played": true, 
+                "PlayedPercentage": 100, 
+                "UnplayedItemCount": 0, 
+                "PlaybackPositionTicks": 0, 
+                "Key": "MusicAlbum-MusicBrainzReleaseGroup-2cf0d427-90ba-3950-9231-9ffd9386f00a", 
+                "PlayCount": 0
+            }, 
+            "LocationType": "FileSystem", 
+            "Name": "American Football", 
+            "PlayAccess": "Full", 
+            "ImageTags": {
+                "Primary": "c71656b885cf71c7a7553dad7ec342d2"
+            }, 
+            "RecursiveItemCount": 3, 
+            "AlbumArtists": [
+                {
+                    "Name": "American Football", 
+                    "Id": "758127639e29df82ff7f3e8285275935"
+                }
+            ], 
+            "IsFolder": true, 
+            "ArtistItems": [
+                {
+                    "Name": "American Football", 
+                    "Id": "758127639e29df82ff7f3e8285275935"
+                }
+            ], 
+            "ChildCount": 3, 
+            "ParentBackdropItemId": "758127639e29df82ff7f3e8285275935", 
+            "PremiereDate": "1998-10-01T00:00:00.0000000Z", 
+            "AlbumArtist": "American Football", 
+            "ProductionYear": 1998, 
+            "RunTimeTicks": 6930020000, 
+            "Artists": [
+                "American Football"
+            ], 
+            "ParentBackdropImageTags": [
+                "1756c90db5915ad6243e10a93ac4a4d5"
+            ], 
+            "ServerId": "1efa5077976bfa92bc71652404f646ec", 
+            "Type": "MusicAlbum", 
+            "Id": "ca498ea939b28593744c051d9f5e74ed", 
+            "BackdropImageTags": []
+        }, 
+        {
+            "UserData": {
+                "IsFavorite": false, 
+                "Played": true, 
+                "PlayedPercentage": 100, 
+                "UnplayedItemCount": 0, 
+                "PlaybackPositionTicks": 0, 
+                "Key": "MusicAlbum-MusicBrainzReleaseGroup-f98334d4-5eb5-48b2-820b-faa8db645c10", 
+                "PlayCount": 0
+            }, 
+            "LocationType": "FileSystem", 
+            "Name": "American Football", 
+            "PlayAccess": "Full", 
+            "ImageTags": {
+                "Primary": "febb660caab98738b45da98d4afd6abd"
+            }, 
+            "RecursiveItemCount": 9, 
+            "AlbumArtists": [
+                {
+                    "Name": "American Football", 
+                    "Id": "758127639e29df82ff7f3e8285275935"
+                }
+            ], 
+            "IsFolder": true, 
+            "ArtistItems": [
+                {
+                    "Name": "American Football", 
+                    "Id": "758127639e29df82ff7f3e8285275935"
+                }
+            ], 
+            "ChildCount": 9, 
+            "ParentBackdropItemId": "758127639e29df82ff7f3e8285275935", 
+            "PremiereDate": "2016-09-30T04:00:00.0000000Z", 
+            "AlbumArtist": "American Football", 
+            "ProductionYear": 2016, 
+            "RunTimeTicks": 22784800000, 
+            "Artists": [
+                "American Football"
+            ], 
+            "ParentBackdropImageTags": [
+                "1756c90db5915ad6243e10a93ac4a4d5"
+            ], 
+            "ServerId": "1efa5077976bfa92bc71652404f646ec", 
+            "Type": "MusicAlbum", 
+            "Id": "0db6395ab76b6edbaba3a51ef23d0aa3", 
+            "BackdropImageTags": []
+        }
+    ], 
+    "TotalRecordCount": 3
+}

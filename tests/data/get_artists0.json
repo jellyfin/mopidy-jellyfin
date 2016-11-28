@@ -1,0 +1,89 @@
+{
+    "Items": [
+        {
+            "UserData": {
+                "IsFavorite": false,
+                "Played": false,
+                "PlayedPercentage": 4.65116279069767,
+                "UnplayedItemCount": 41,
+                "PlaybackPositionTicks": 0,
+                "Key": "Artist-Musicbrainz-3071d829-b9ca-4499-b4f5-74d6d8531aed",
+                "PlayCount": 0
+            },
+            "Name": "The Menzingers",
+            "PlayAccess": "Full",
+            "RecursiveItemCount": 43,
+            "IsFolder": true,
+            "ChildCount": 4,
+            "ImageTags": {
+                "Logo": "9294d6afbd95de3d7db78c0402de1a0c",
+                "Primary": "2d94cdf9770d1b7fe86ad2b261596abf"
+            },
+            "RunTimeTicks": 74127680000,
+            "LocationType": "FileSystem",
+            "ServerId": "1efa5077976bfa92bc71652404f646ec",
+            "Type": "MusicArtist",
+            "Id": "21c8f78763231ece7defd07b5f3f56be",
+            "BackdropImageTags": [
+                "b44ae2922bc84382102d3e58bf86e33c"
+            ]
+        },
+        {
+            "UserData": {
+                "IsFavorite": false,
+                "Played": false,
+                "PlayedPercentage": 0,
+                "UnplayedItemCount": 16,
+                "PlaybackPositionTicks": 0,
+                "Key": "Artist-Musicbrainz-e6de1f3b-6484-491c-88dd-6d619f142abc",
+                "PlayCount": 0
+            },
+            "Name": "Hans Zimmer",
+            "PlayAccess": "Full",
+            "RecursiveItemCount": 16,
+            "IsFolder": true,
+            "ChildCount": 1,
+            "ImageTags": {
+                "Logo": "2ab00ac437805c3ff662999d4b0ba30b",
+                "Primary": "24f2106920109a77ce8c20aa7224e29e"
+            },
+            "RunTimeTicks": 43067560000,
+            "LocationType": "FileSystem",
+            "ServerId": "1efa5077976bfa92bc71652404f646ec",
+            "Type": "MusicArtist",
+            "Id": "36de3368f493ebca94a55a411cc87862",
+            "BackdropImageTags": [
+                "622f7ec4f603d419c179f562f8e2f58c"
+            ]
+        },
+        {
+            "UserData": {
+                "IsFavorite": false,
+                "Played": false,
+                "PlayedPercentage": 0,
+                "UnplayedItemCount": 34,
+                "PlaybackPositionTicks": 0,
+                "Key": "Artist-Musicbrainz-a3cd61ef-7fd4-44af-a27f-99641a82b22b",
+                "PlayCount": 0
+            },
+            "Name": "Chairlift",
+            "PlayAccess": "Full",
+            "RecursiveItemCount": 34,
+            "IsFolder": true,
+            "ChildCount": 3,
+            "ImageTags": {
+                "Logo": "78efdf8c98b67660bb1649a41c8ef07a",
+                "Primary": "eabf1baa44e7427b4fea9ee19e732693"
+            },
+            "RunTimeTicks": 80851360000,
+            "LocationType": "FileSystem",
+            "ServerId": "1efa5077976bfa92bc71652404f646ec",
+            "Type": "MusicArtist",
+            "Id": "e0361aff955c30f5a6dcc6fcf0c9d1cf",
+            "BackdropImageTags": [
+                "1c417e9d2489a69daa1eea2456d3034a"
+            ]
+        }
+    ],
+    "TotalRecordCount": 3
+}
