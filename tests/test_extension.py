@@ -70,7 +70,7 @@ def test_get_music_root(r_get_mock, data, expected, emby_client):
             length=295915,
             name=u'Ottawa to Osaka',
             track_no=6,
-            uri='emby::18e5a9871e6a4a2294d5af998457ca16'
+            uri='emby:track:18e5a9871e6a4a2294d5af998457ca16'
         )
      ),
     (
@@ -81,7 +81,7 @@ def test_get_music_root(r_get_mock, data, expected, emby_client):
             length=269035,
             name=u'Crying in Public',
             track_no=5,
-            uri='emby::37f57f0b370274af96de06895a78c2c3'
+            uri='emby:track:37f57f0b370274af96de06895a78c2c3'
          )
      ),
     (
@@ -92,7 +92,7 @@ def test_get_music_root(r_get_mock, data, expected, emby_client):
             length=283115,
             name=u'Polymorphing',
             track_no=2,
-            uri='emby::3315cccffe37ab47d50d1dbeefd3537b'
+            uri='emby:track:3315cccffe37ab47d50d1dbeefd3537b'
         )
     ),
 ])
@@ -100,4 +100,4 @@ def test_create_track(data, expected, emby_client):
     with open(data, 'r') as f:
         track = json.load(f)
 
-    assert emby_client.create_track('emby:', track) == expected
+    assert emby_client.create_track(track) == expected

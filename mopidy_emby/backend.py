@@ -51,52 +51,29 @@ class EmbyLibraryProvider(backend.LibraryProvider):
                                           name='Emby')
 
     def browse(self, uri):
+        # artistlist
         if uri == self.root_directory.uri:
-            music_root = self.backend.remote.get_music_root()
-            artists = sorted(
-                self.backend.remote.get_directory(music_root)['Items'],
-                key=lambda k: k['Name']
-            )
-            return [
-                models.Ref.artist(
-                    uri='emby:{}'.format(i['Id']),
-                    name=i['Name']
-                )
-                for i in artists
-            ]
+            logger.debug('Get Emby artist list')
+            return self.backend.remote.get_artists()
 
         # split uri
         parts = uri.split(':')
 
-        # albums
-        if len(parts) == 2:
-            id = parts[1]
-            albums = sorted(
-                self.backend.remote.get_directory(id)['Items'],
-                key=lambda k: k['Name']
-            )
-            return [
-                models.Ref.album(
-                    uri='emby:{}:{}'.format(id, i['Id']),
-                    name=i['Name']
-                )
-                for i in albums
-            ]
+        # artists albums
+        # uri: emby:artist:<artist_id>
+        if uri.startswith('emby:artist:') and len(parts) == 3:
+            logger.debug('Get Emby album list')
+            artist_id = parts[-1]
+
+            return self.backend.remote.get_albums(artist_id)
 
         # tracklist
-        if len(parts) == 3:
-            id = parts[2]
-            tracks = sorted(
-                self.backend.remote.get_directory(id)['Items'],
-                key=lambda k: k['IndexNumber']
-            )
-            return [
-                models.Ref.track(
-                    uri='emby:{}:{}:{}'.format(id, parts[1], i['Id']),
-                    name=i['Name']
-                )
-                for i in tracks
-            ]
+        # uri: emby:album:<album_id>
+        if uri.startswith('emby:album:') and len(parts) == 3:
+            logger.debug('Get Emby track list')
+            album_id = parts[-1]
+
+            return self.backend.remote.get_tracks(album_id)
 
         return []
 
@@ -104,13 +81,13 @@ class EmbyLibraryProvider(backend.LibraryProvider):
         logger.debug('Emby lookup: {}'.format(uri or uris))
         if uri:
             parts = uri.split(':')
-            logger.debug('Emby lookup: {}'.format(uri))
 
-            if len(parts) == 4:
-                tracks = [self.backend.remote.get_track(uri)]
+            if uri.startswith('emby:track:') and len(parts) == 3:
+                track_id = parts[-1]
+                tracks = [self.backend.remote.get_track(track_id)]
 
             else:
-                logger.info('Unknown Emby lookup URI: '.format(uri))
+                logger.info('Unknown Emby lookup URI: {}'.format(uri))
                 tracks = []
 
             return [track for track in tracks if track]
@@ -289,6 +266,53 @@ class EmbyHandler(object):
 
         return id[0]
 
+    def get_artists(self):
+        music_root = self.get_music_root()
+        artists = sorted(
+            self.get_directory(music_root)['Items'],
+            key=lambda k: k['Name']
+        )
+
+        return [
+            models.Ref.artist(
+                uri='emby:artist:{}'.format(i['Id']),
+                name=i['Name']
+            )
+            for i in artists
+            if i
+        ]
+
+    def get_albums(self, artist_id):
+        albums = sorted(
+            self.get_directory(artist_id)['Items'],
+            key=lambda k: k['Name']
+        )
+        return [
+            models.Ref.album(
+                uri='emby:album:{}'.format(i['Id']),
+                name=i['Name']
+            )
+            for i in albums
+            if i
+        ]
+
+    def get_tracks(self, album_id):
+        tracks = sorted(
+            self.get_directory(album_id)['Items'],
+            key=lambda k: k['IndexNumber']
+        )
+
+        return [
+            models.Ref.track(
+                uri='emby:track:{}'.format(
+                    i['Id']
+                ),
+                name=i['Name']
+            )
+            for i in tracks
+            if i
+        ]
+
     @cache()
     def get_directory(self, id):
         return self.r_get(
@@ -312,10 +336,12 @@ class EmbyHandler(object):
 
         return data
 
-    def create_track(self, uri, track):
+    def create_track(self, track):
         # TODO: add more metadata
         return models.Track(
-            uri='{}:{}'.format(uri, track['Id']),
+            uri='emby:track:{}'.format(
+                track['Id']
+            ),
             name=track.get('Name'),
             track_no=track.get('IndexNumber'),
             genre=track.get('Genre'),
@@ -347,7 +373,6 @@ class EmbyHandler(object):
         return [self.create_track(uri, i) for i in data]
 
     @cache()
-    def get_track(self, uri):
-        id = uri.split(':')[-1]
-        track = self.get_item(id)
-        return self.create_track(uri, track)
+    def get_track(self, track_id):
+        track = self.get_item(track_id)
+        return self.create_track(track)
