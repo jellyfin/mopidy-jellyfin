@@ -2,17 +2,17 @@ from __future__ import unicode_literals
 
 import json
 
-from mock import patch
+import mock
 
 from mopidy.models import Album, Artist, Ref, Track
 
 import pytest
 
-import mopidy_emby
+from mopidy_emby import Extension, backend
 
 
 def test_get_default_config():
-    ext = mopidy_emby.Extension()
+    ext = Extension()
 
     config = ext.get_default_config()
 
@@ -21,7 +21,7 @@ def test_get_default_config():
 
 
 def test_get_config_schema():
-    ext = mopidy_emby.Extension()
+    ext = Extension()
 
     schema = ext.get_config_schema()
 
@@ -35,16 +35,16 @@ def test_get_config_schema():
     ('https://foo.bar', '/Foo', 'https://foo.bar:443/Foo?format=json'),
     ('foo.bar', '/Foo', 'http://foo.bar:443/Foo?format=json'),
 ])
-@patch('mopidy_emby.backend.EmbyHandler._get_token')
-@patch('mopidy_emby.backend.EmbyHandler._create_headers')
-@patch('mopidy_emby.backend.EmbyHandler._get_user')
-@patch('mopidy_emby.backend.EmbyHandler._password_data')
+@mock.patch('mopidy_emby.backend.EmbyHandler._get_token')
+@mock.patch('mopidy_emby.backend.EmbyHandler._create_headers')
+@mock.patch('mopidy_emby.backend.EmbyHandler._get_user')
+@mock.patch('mopidy_emby.backend.EmbyHandler._password_data')
 def test_api_url(password_data_mock, get_user_mock, create_header_mock,
                  get_token_mock, config, hostname, url, expected):
     get_user_mock.return_value = [{'Id': 'foo'}]
 
     config['emby']['hostname'] = hostname
-    emby = mopidy_emby.backend.EmbyHandler(config)
+    emby = backend.EmbyHandler(config)
 
     assert emby.api_url(url) == expected
 
@@ -52,7 +52,7 @@ def test_api_url(password_data_mock, get_user_mock, create_header_mock,
 @pytest.mark.parametrize('data,expected', [
     ('tests/data/get_music_root0.json', 'eb169f4ba53fc560f549cb0f2a47d577')
 ])
-@patch('mopidy_emby.backend.EmbyHandler.r_get')
+@mock.patch('mopidy_emby.backend.EmbyHandler.r_get')
 def test_get_music_root(r_get_mock, data, expected, emby_client):
 
     with open(data, 'r') as f:
@@ -61,8 +61,8 @@ def test_get_music_root(r_get_mock, data, expected, emby_client):
     assert emby_client.get_music_root() == expected
 
 
-@patch('mopidy_emby.backend.EmbyHandler.get_music_root')
-@patch('mopidy_emby.backend.EmbyHandler.r_get')
+@mock.patch('mopidy_emby.backend.EmbyHandler.get_music_root')
+@mock.patch('mopidy_emby.backend.EmbyHandler.r_get')
 def test_get_artists(r_get_mock, get_music_root_mock, emby_client):
     expected = [
         Ref(name=u'Chairlift',
@@ -82,8 +82,8 @@ def test_get_artists(r_get_mock, get_music_root_mock, emby_client):
     assert emby_client.get_artists() == expected
 
 
-@patch('mopidy_emby.backend.EmbyHandler.get_music_root')
-@patch('mopidy_emby.backend.EmbyHandler.r_get')
+@mock.patch('mopidy_emby.backend.EmbyHandler.get_music_root')
+@mock.patch('mopidy_emby.backend.EmbyHandler.r_get')
 def test_get_albums(r_get_mock, get_music_root_mock, emby_client):
     expected = [
         Ref(name=u'American Football',
@@ -103,8 +103,8 @@ def test_get_albums(r_get_mock, get_music_root_mock, emby_client):
     assert emby_client.get_albums(0) == expected
 
 
-@patch('mopidy_emby.backend.EmbyHandler.get_music_root')
-@patch('mopidy_emby.backend.EmbyHandler.r_get')
+@mock.patch('mopidy_emby.backend.EmbyHandler.get_music_root')
+@mock.patch('mopidy_emby.backend.EmbyHandler.r_get')
 def test_get_tracks(r_get_mock, get_music_root_mock, emby_client):
     expected = [
         Ref(name=u'The One With the Tambourine',

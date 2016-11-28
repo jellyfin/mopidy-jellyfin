@@ -24,6 +24,10 @@ Install by running::
 
     pip install Mopidy-Emby
 
+or straight from GitHub::
+
+    pip install git+https://github.com/xsteadfastx/mopidy-emby#egg=mopidy-emby
+
 
 Configuration
 =============
