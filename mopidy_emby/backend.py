@@ -106,10 +106,7 @@ class EmbyLibraryProvider(backend.LibraryProvider):
             parts = uri.split(':')
             logger.debug('Emby lookup: {}'.format(uri))
 
-            if len(parts) == 3:
-                tracks = self.backend.remote.get_album_tracks(uri)
-
-            elif len(parts) == 4 or len(parts) == 5:
+            if len(parts) == 4:
                 tracks = [self.backend.remote.get_track(uri)]
 
             else:
