@@ -34,6 +34,12 @@ def emby_client(config, mocker):
 @pytest.fixture
 def backend_mock():
     backend_mock = mock.Mock(autospec=mopidy_emby.backend.EmbyBackend)
+
+    return backend_mock
+
+
+@pytest.fixture
+def libraryprovider(backend_mock):
     backend_mock.remote(autospec=mopidy_emby.backend.EmbyHandler)
     backend_mock.remote.get_artists.return_value = ['Artistlist']
     backend_mock.remote.get_albums.return_value = ['Albumlist']
@@ -43,9 +49,12 @@ def backend_mock():
         'Id': 123
     }
 
-    return backend_mock
+    return mopidy_emby.backend.EmbyLibraryProvider(backend_mock)
 
 
 @pytest.fixture
-def provider(backend_mock):
-    return mopidy_emby.backend.EmbyLibraryProvider(backend_mock)
+def playbackprovider(backend_mock, emby_client):
+    backend_mock.remote = emby_client
+
+    return mopidy_emby.backend.EmbyPlaybackProvider(audio=mock.Mock(),
+                                                    backend=backend_mock)

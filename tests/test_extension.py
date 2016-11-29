@@ -213,21 +213,35 @@ def test_create_artists(data, expected, emby_client):
     ('emby:artist:123', ['Albumlist']),
     ('emby:album:123', ['Tracklist']),
 ])
-def test_browse(uri, expected, provider):
-    assert provider.browse(uri) == expected
+def test_browse(uri, expected, libraryprovider):
+    assert libraryprovider.browse(uri) == expected
 
 
 @pytest.mark.parametrize('uri,expected', [
     ('emby:track:123', [{'Name': 'Foo', 'Id': 123}]),
     ('emby:track', [])
 ])
-def test_lookup_uri(uri, expected, provider):
-    assert provider.lookup(uri=uri) == expected
+def test_lookup_uri(uri, expected, libraryprovider):
+    assert libraryprovider.lookup(uri=uri) == expected
 
 
 @pytest.mark.parametrize('uri,expected', [
     (['emby:track:123'], {'emby:track:123': [{'Name': 'Foo', 'Id': 123}]}),
     (['emby:track'], {u'emby:track': []})
 ])
-def test_lookup_uris(uri, expected, provider):
-    assert provider.lookup(uris=uri) == expected
+def test_lookup_uris(uri, expected, libraryprovider):
+    assert libraryprovider.lookup(uris=uri) == expected
+
+
+@pytest.mark.parametrize('uri,expected', [
+    (
+        'emby:track:123',
+        'https://foo.bar:443/Audio/123/stream.mp3?format=json'
+    ),
+    (
+        'emby:foobar',
+        None
+    )
+])
+def test_translate_uri(playbackprovider, uri, expected):
+    assert playbackprovider.translate_uri(uri) == expected
