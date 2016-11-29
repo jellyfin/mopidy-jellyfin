@@ -14,6 +14,11 @@ Mopidy-Emby
     :target: https://coveralls.io/r/xsteadfastx/mopidy-emby
     :alt: Test coverage
 
+.. image:: https://img.shields.io/badge/SayThanks.io-%E2%98%BC-1EAEDB.svg
+    :target: https://saythanks.io/to/xsteadfastx
+    :alt: Say Thanks
+
+
 Mopidy extension for playing music from Emby
 
 
