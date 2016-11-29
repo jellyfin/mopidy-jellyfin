@@ -42,6 +42,12 @@ Mopidy-Emby to your Mopidy configuration file::
     password = password
 
 
+TODO
+====
+
+- Searching is not implemented right now
+
+
 Project resources
 =================
 
