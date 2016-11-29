@@ -156,7 +156,10 @@ class EmbyHandler(object):
         r = requests.get(url)
         user = [i for i in r.json() if i['Name'] == self.username]
 
-        return user
+        if user:
+            return user
+        else:
+            raise Exception('No Emby user {} found'.format(self.username))
 
     def _get_token(self):
         """Return token for a user.

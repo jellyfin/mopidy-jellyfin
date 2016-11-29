@@ -245,3 +245,43 @@ def test_lookup_uris(uri, expected, libraryprovider):
 ])
 def test_translate_uri(playbackprovider, uri, expected):
     assert playbackprovider.translate_uri(uri) == expected
+
+
+@pytest.mark.parametrize('data,user_id', [
+    ('tests/data/get_user0.json', '2ec276a2642e54a19b612b9418a8bd3b')
+])
+@mock.patch('mopidy_emby.backend.requests.get')
+@mock.patch('mopidy_emby.backend.EmbyHandler._get_token')
+@mock.patch('mopidy_emby.backend.EmbyHandler._create_headers')
+@mock.patch('mopidy_emby.backend.EmbyHandler._password_data')
+def test_get_user(password_mock, create_headers_mock, get_tocken_mock,
+                  get_mock, data, user_id, config):
+
+    mock_response = mock.Mock()
+    with open(data, 'r') as f:
+        mock_response.json.return_value = json.load(f)
+
+    get_mock.return_value = mock_response
+
+    emby = backend.EmbyHandler(config)
+
+    assert emby.user_id == user_id
+
+
+@mock.patch('mopidy_emby.backend.requests.get')
+@mock.patch('mopidy_emby.backend.EmbyHandler._get_token')
+@mock.patch('mopidy_emby.backend.EmbyHandler._create_headers')
+@mock.patch('mopidy_emby.backend.EmbyHandler._password_data')
+def test_get_user_exception(password_mock, create_headers_mock,
+                            get_tocken_mock, get_mock, config):
+
+    mock_response = mock.Mock()
+    with open('tests/data/get_user1.json', 'r') as f:
+        mock_response.json.return_value = json.load(f)
+
+    get_mock.return_value = mock_response
+
+    with pytest.raises(Exception) as execinfo:
+        backend.EmbyHandler(config)
+
+    assert 'No Emby user embyuser found' in str(execinfo.value)
