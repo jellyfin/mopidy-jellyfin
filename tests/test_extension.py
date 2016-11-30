@@ -324,3 +324,37 @@ def test_password_data(get_token_mock, get_user_mock, create_headers_mock,
         'password': '444b73bcd9dc4331104c5ef960ee240066f8a3e5',
         'passwordMd5': '1d549a7b47c46b7b0a90651360c5574c'
     }
+
+
+@pytest.mark.parametrize('token,headers', [
+    (
+        None,
+        {
+            'x-emby-authorization': ('MediaBrowser UserId="123", '
+                                     'Client="other", Device="mopidy", '
+                                     'DeviceId="mopidy", Version="0.0.0"')
+        }
+    ),
+    (
+        'f0d6b372b40b47299ed01b9b2d40489b',
+        {
+            'x-emby-authorization': ('MediaBrowser UserId="123", '
+                                     'Client="other", Device="mopidy", '
+                                     'DeviceId="mopidy", Version="0.0.0"'),
+            'x-mediabrowser-token': 'f0d6b372b40b47299ed01b9b2d40489b'
+        }
+    )
+])
+@mock.patch('mopidy_emby.backend.requests')
+@mock.patch('mopidy_emby.backend.EmbyHandler._password_data')
+@mock.patch('mopidy_emby.backend.EmbyHandler._get_user')
+@mock.patch('mopidy_emby.backend.EmbyHandler._get_token')
+def test_create_headers(get_token_mock, get_user_mock, password_data_mock,
+                        requests_mock, token, headers, config):
+
+    get_user_mock.return_value = [{'Id': 123}]
+    get_token_mock.return_value = token
+
+    emby = backend.EmbyHandler(config)
+
+    assert emby.headers == headers
