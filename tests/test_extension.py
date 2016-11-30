@@ -285,3 +285,26 @@ def test_get_user_exception(password_mock, create_headers_mock,
         backend.EmbyHandler(config)
 
     assert 'No Emby user embyuser found' in str(execinfo.value)
+
+
+@pytest.mark.parametrize('data,token', [
+    ('tests/data/get_token0.json', 'f0d6b372b40b47299ed01b9b2d40489b'),
+    ('tests/data/get_token1.json', None),
+])
+@mock.patch('mopidy_emby.backend.requests.post')
+@mock.patch('mopidy_emby.backend.EmbyHandler._create_headers')
+@mock.patch('mopidy_emby.backend.EmbyHandler._password_data')
+@mock.patch('mopidy_emby.backend.EmbyHandler._get_user')
+def test_get_token(get_user_mock, password_data_mock,
+                   create_headers_mock, post_mock, data,
+                   token, config):
+
+    mock_response = mock.Mock()
+    with open(data, 'r') as f:
+        mock_response.json.return_value = json.load(f)
+
+    post_mock.return_value = mock_response
+
+    emby = backend.EmbyHandler(config)
+
+    assert emby.token == token
