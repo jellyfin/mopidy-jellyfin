@@ -308,3 +308,19 @@ def test_get_token(get_user_mock, password_data_mock,
     emby = backend.EmbyHandler(config)
 
     assert emby.token == token
+
+
+@mock.patch('mopidy_emby.backend.requests')
+@mock.patch('mopidy_emby.backend.EmbyHandler._create_headers')
+@mock.patch('mopidy_emby.backend.EmbyHandler._get_user')
+@mock.patch('mopidy_emby.backend.EmbyHandler._get_token')
+def test_password_data(get_token_mock, get_user_mock, create_headers_mock,
+                       requests_mock, config):
+
+    emby = backend.EmbyHandler(config)
+
+    assert emby._password_data() == {
+        'username': 'embyuser',
+        'password': '444b73bcd9dc4331104c5ef960ee240066f8a3e5',
+        'passwordMd5': '1d549a7b47c46b7b0a90651360c5574c'
+    }
