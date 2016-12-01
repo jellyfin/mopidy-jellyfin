@@ -5,6 +5,7 @@ import logging
 import time
 
 from urllib import urlencode
+from urllib2 import quote
 from urlparse import parse_qs, urljoin, urlsplit, urlunsplit
 
 from mopidy import backend, httpclient, models
@@ -90,6 +91,30 @@ class EmbyLibraryProvider(backend.LibraryProvider):
                 track_id = parts[-1]
                 tracks = [self.backend.remote.get_track(track_id)]
 
+            elif uri.startswith('emby:album:') and len(parts) == 3:
+                album_id = parts[-1]
+                album_data = self.backend.remote.get_directory(album_id)
+                tracks = [
+                    self.backend.remote.get_track(i['Id'])
+                    for i in album_data.get('Items', [])
+                ]
+
+                tracks = sorted(tracks, key=lambda k: k.track_no)
+
+            elif uri.startswith('emby:artist:') and len(parts) == 3:
+                artist_id = parts[-1]
+                albums = self.backend.remote.get_directory(artist_id)
+                tracks = []
+
+                for album in albums.get('Items', []):
+                    album_data = self.backend.remote.get_directory(album['Id'])
+                    tracklist = [
+                        self.backend.remote.get_track(i['Id'])
+                        for i in album_data.get('Items', [])
+                    ]
+
+                    tracks.extend(sorted(tracklist, key=lambda k: k.track_no))
+
             else:
                 logger.info('Unknown Emby lookup URI: {}'.format(uri))
                 tracks = []
@@ -98,6 +123,9 @@ class EmbyLibraryProvider(backend.LibraryProvider):
 
         else:
             return {uri: self.lookup(uri=uri) for uri in uris}
+
+    def search(self, query=None, uris=None, exact=False):
+        return self.backend.remote.search(query)
 
 
 class cache(object):
@@ -322,6 +350,13 @@ class EmbyHandler(object):
 
     @cache()
     def get_directory(self, id):
+        """Get directory from Emby API.
+
+        :param id: Directory ID
+        :type id: int
+        :returns Directory
+        :rtype: dict
+        """
         return self.r_get(
             self.api_url(
                 '/Users/{}/Items?ParentId={}&SortOrder=Ascending'.format(
@@ -333,6 +368,13 @@ class EmbyHandler(object):
 
     @cache()
     def get_item(self, id):
+        """Get item from Emby API.
+
+        :param id: Item ID
+        :type id: int
+        :returns: Item
+        :rtype: dict
+        """
         data = self.r_get(
             self.api_url(
                 '/Users/{}/Items/{}'.format(self.user_id, id)
@@ -344,6 +386,13 @@ class EmbyHandler(object):
         return data
 
     def create_track(self, track):
+        """Create track from Emby API track dict.
+
+        :param track: Track from Emby API
+        :type track: dict
+        :returns: Track
+        :rtype: mopidy.models.Track
+        """
         # TODO: add more metadata
         return models.Track(
             uri='emby:track:{}'.format(
@@ -358,12 +407,26 @@ class EmbyHandler(object):
         )
 
     def create_album(self, track):
+        """Create album object from track.
+
+        :param track: Track
+        :type track: dict
+        :returns: Album
+        :rtype: mopidy.models.Album
+        """
         return models.Album(
             name=track.get('Album'),
             artists=self.create_artists(track)
         )
 
     def create_artists(self, track):
+        """Create artist object from track.
+
+        :param track: Track
+        :type track: dict
+        :returns: List of artists
+        :rtype: list of mopidy.models.Artist
+        """
         return [
             models.Artist(
                 name=artist['Name']
@@ -373,6 +436,127 @@ class EmbyHandler(object):
 
     @cache()
     def get_track(self, track_id):
+        """Get track.
+
+        :param track_id: ID of a Emby track
+        :type track_id: int
+        :returns: track
+        :rtype: mopidy.models.Track
+        """
         track = self.get_item(track_id)
 
         return self.create_track(track)
+
+    def _get_search(self, itemtype, term):
+        """Gets search data from Emby API.
+
+        :param itemtype: Type to search for
+        :param term: Search term
+        :type itemtype: str
+        :type term: str
+        :returns: List of result dicts
+        :rtype: list
+        """
+        if itemtype == 'any':
+            query = 'Audio,MusicAlbum,MusicArtist'
+        elif itemtype == 'artist':
+            query = 'MusicArtist'
+        elif itemtype == 'album':
+            query = 'MusicAlbum'
+        elif itemtype == 'track_name':
+            query = 'Audio'
+        else:
+            raise Exception('Emby search: no itemtype {}'.format())
+
+        data = self.r_get(
+            self.api_url(
+                ('/Search/Hints?SearchTerm={}&'
+                 'IncludeItemTypes={}').format(
+                     quote(term),
+                     query
+                )
+            )
+        )
+
+        return [i for i in data.get('SearchHints', [])]
+
+    @cache()
+    def search(self, query):
+        """Search Emby for a term.
+
+        :param query: Search query
+        :type query: dict
+        :returns: Search results
+        :rtype: mopidy.models.SearchResult
+        """
+        logger.debug('Searching in Emby for {}'.format(query))
+
+        # something to store the results in
+        data = []
+        tracks = []
+        albums = []
+        artists = []
+
+        for itemtype, term in query.items():
+
+            for item in term:
+
+                data.extend(
+                    self._get_search(itemtype, item)
+                )
+
+        # walk through all items and create stuff
+        for item in data:
+
+            if item['Type'] == 'Audio':
+
+                track_artists = [
+                    models.Artist(
+                        name=artist
+                    )
+                    for artist in item['Artists']
+                ]
+
+                tracks.append(
+                    models.Track(
+                        uri='emby:track:{}'.format(item['ItemId']),
+                        track_no=item.get('IndexNumber'),
+                        name=item.get('Name'),
+                        artists=track_artists,
+                        album=models.Album(
+                            name=item.get('Album'),
+                            artists=track_artists
+                        )
+                    )
+                )
+
+            elif item['Type'] == 'MusicAlbum':
+                album_artists = [
+                    models.Artist(
+                        name=artist
+                    )
+                    for artist in item['Artists']
+                ]
+
+                albums.append(
+                    models.Album(
+                        uri='emby:album:{}'.format(item['ItemId']),
+                        name=item.get('Name'),
+                        artists=album_artists
+                    )
+                )
+
+            elif item['Type'] == 'MusicArtist':
+                artists.append(
+                    models.Artist(
+                        uri='emby:artist:{}'.format(item['ItemId']),
+                        name=item.get('Name')
+                    )
+                )
+
+        return models.SearchResult(
+            uri='emby:search',
+            tracks=list(set(tracks)),
+            artists=list(set(artists)),
+            albums=list(set(albums))
+        )

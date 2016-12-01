@@ -4,7 +4,7 @@ import json
 
 import mock
 
-from mopidy.models import Album, Artist, Ref, Track
+from mopidy.models import Album, Artist, Ref, SearchResult, Track
 
 import pytest
 
@@ -218,7 +218,48 @@ def test_browse(uri, expected, libraryprovider):
 
 
 @pytest.mark.parametrize('uri,expected', [
-    ('emby:track:123', [{'Name': 'Foo', 'Id': 123}]),
+    ('emby:track:123', [
+        Track(
+            album=Album(
+                artists=[
+                    Artist(name='American Football')
+                ],
+                name='American Football'),
+            artists=[Artist(name='American Football')],
+            length=241162,
+            name='The One With the Tambourine',
+            track_no=1,
+            uri='emby:track:eb6c305bdb1e40d3b46909473c22d906'
+        )
+    ]),
+    ('emby:album:123', [
+        Track(
+            album=Album(
+                artists=[
+                    Artist(name='American Football')
+                ],
+                name='American Football'),
+            artists=[Artist(name='American Football')],
+            length=241162,
+            name='The One With the Tambourine',
+            track_no=1,
+            uri='emby:track:eb6c305bdb1e40d3b46909473c22d906'
+        )
+    ]),
+    ('emby:artist:123', [
+        Track(
+            album=Album(
+                artists=[
+                    Artist(name='American Football')
+                ],
+                name='American Football'),
+            artists=[Artist(name='American Football')],
+            length=241162,
+            name='The One With the Tambourine',
+            track_no=1,
+            uri='emby:track:eb6c305bdb1e40d3b46909473c22d906'
+        )
+    ]),
     ('emby:track', [])
 ])
 def test_lookup_uri(uri, expected, libraryprovider):
@@ -226,7 +267,20 @@ def test_lookup_uri(uri, expected, libraryprovider):
 
 
 @pytest.mark.parametrize('uri,expected', [
-    (['emby:track:123'], {'emby:track:123': [{'Name': 'Foo', 'Id': 123}]}),
+    (['emby:track:123'], {'emby:track:123': [
+        Track(
+            album=Album(
+                artists=[
+                    Artist(name='American Football')
+                ],
+                name='American Football'),
+            artists=[Artist(name='American Football')],
+            length=241162,
+            name='The One With the Tambourine',
+            track_no=1,
+            uri='emby:track:eb6c305bdb1e40d3b46909473c22d906'
+        )
+    ]}),
     (['emby:track'], {u'emby:track': []})
 ])
 def test_lookup_uris(uri, expected, libraryprovider):
@@ -358,3 +412,66 @@ def test_create_headers(get_token_mock, get_user_mock, password_data_mock,
     emby = backend.EmbyHandler(config)
 
     assert emby.headers == headers
+
+
+@pytest.mark.parametrize('query,data,expected', [
+    (
+        {'track_name': ['viva hate']},
+        'tests/data/search_audio0.json',
+        SearchResult(
+            tracks=[
+                Track(
+                    album=Album(
+                        artists=[Artist(name=u'Rainer Maria')],
+                        name=u'Past Worn Searching'
+                    ),
+                    artists=[Artist(name=u'Rainer Maria')],
+                    name='Viva Anger, Viva Hate',
+                    track_no=3,
+                    uri='emby:track:b5d600663238be5b41da4d8429db85f0'
+                )
+            ],
+            uri='emby:search'
+        )
+    ),
+    (
+        {'album': ['viva hate']},
+        'tests/data/search_album0.json',
+        SearchResult(
+            albums=[
+                Album(
+                    artists=[Artist(name=u'Morrissey')],
+                    name=u'Viva Hate',
+                    uri='emby:album:4bf594cb601ec46a0295729c4d0f7f80')
+            ],
+            uri='emby:search'
+        )
+    ),
+    (
+        {'artist': ['morrissey']},
+        'tests/data/search_artist0.json',
+        SearchResult(
+            artists=[
+                Artist(
+                    name=u'Morrissey',
+                    uri='emby:artist:0b74a057d86092f48698be681737c4ed'
+                ),
+                Artist(
+                    name=u'Morrissey & Siouxsie Sioux',
+                    uri='emby:artist:eb69a3f2db13691d24c6a9794926ddb8'
+                ),
+                Artist(
+                    name=u'Morrissey & Siouxsie Sioux',
+                    uri='emby:artist:32bbd3db105255b24a83d0d955179dc4'
+                )
+            ],
+            uri='emby:search'
+        )
+    )
+])
+@mock.patch('mopidy_emby.backend.EmbyHandler._get_search')
+def test_search(get_search_mock, query, data, expected, emby_client):
+    with open(data, 'r') as f:
+        get_search_mock.return_value = json.load(f)['SearchHints']
+
+    assert emby_client.search(query) == expected

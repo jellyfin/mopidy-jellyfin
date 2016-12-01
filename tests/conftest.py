@@ -1,5 +1,7 @@
 import mock
 
+import mopidy
+
 import pytest
 
 import mopidy_emby
@@ -44,9 +46,32 @@ def libraryprovider(backend_mock):
     backend_mock.remote.get_artists.return_value = ['Artistlist']
     backend_mock.remote.get_albums.return_value = ['Albumlist']
     backend_mock.remote.get_tracks.return_value = ['Tracklist']
-    backend_mock.remote.get_track.return_value = {
-        'Name': 'Foo',
-        'Id': 123
+    backend_mock.remote.get_track.return_value = mopidy.models.Track(
+        uri='emby:track:eb6c305bdb1e40d3b46909473c22d906',
+        name='The One With the Tambourine',
+        track_no=1,
+        genre=None,
+        artists=[
+            mopidy.models.Artist(
+                name='American Football'
+            )
+        ],
+        album=mopidy.models.Album(
+            name='American Football',
+            artists=[
+                mopidy.models.Artist(
+                    name='American Football'
+                )
+            ]
+        ),
+        length=2411620000 / 10000
+    )
+    backend_mock.remote.get_directory.return_value = {
+        'Items': [
+            {
+                'Id': 123
+            }
+        ]
     }
 
     return mopidy_emby.backend.EmbyLibraryProvider(backend_mock)

@@ -1,0 +1,30 @@
+{
+    "TotalRecordCount": 3, 
+    "SearchHints": [
+        {
+            "ItemId": "0b74a057d86092f48698be681737c4ed", 
+            "PrimaryImageTag": "349b3eab6866b8a805ed93f1e3725196", 
+            "Name": "Morrissey", 
+            "BackdropImageItemId": "0b74a057d86092f48698be681737c4ed", 
+            "BackdropImageTag": "f993d3d55b1ced602bd20a9c6b005b2d", 
+            "RunTimeTicks": 451146520000, 
+            "PrimaryImageAspectRatio": 1, 
+            "Type": "MusicArtist", 
+            "MatchedTerm": "morrissey"
+        }, 
+        {
+            "ItemId": "32bbd3db105255b24a83d0d955179dc4", 
+            "Type": "MusicArtist", 
+            "Name": "Morrissey & Siouxsie Sioux", 
+            "RunTimeTicks": 0, 
+            "MatchedTerm": "morrissey"
+        }, 
+        {
+            "ItemId": "eb69a3f2db13691d24c6a9794926ddb8", 
+            "Type": "MusicArtist", 
+            "Name": "Morrissey & Siouxsie Sioux", 
+            "RunTimeTicks": 0, 
+            "MatchedTerm": "morrissey"
+        }
+    ]
+}

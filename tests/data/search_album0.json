@@ -1,0 +1,22 @@
+{
+    "TotalRecordCount": 1, 
+    "SearchHints": [
+        {
+            "ItemId": "4bf594cb601ec46a0295729c4d0f7f80", 
+            "PrimaryImageTag": "d1f6e92326dc86a9b5233d39aec00aaf", 
+            "Name": "Viva Hate", 
+            "SongCount": 12, 
+            "BackdropImageItemId": "0b74a057d86092f48698be681737c4ed", 
+            "BackdropImageTag": "f993d3d55b1ced602bd20a9c6b005b2d", 
+            "AlbumArtist": "Morrissey", 
+            "ProductionYear": 1988, 
+            "RunTimeTicks": 25437310000, 
+            "Artists": [
+                "Morrissey"
+            ], 
+            "PrimaryImageAspectRatio": 0.994, 
+            "Type": "MusicAlbum", 
+            "MatchedTerm": "viva hate"
+        }
+    ]
+}

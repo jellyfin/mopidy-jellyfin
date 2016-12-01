@@ -1,0 +1,23 @@
+{
+    "TotalRecordCount": 1, 
+    "SearchHints": [
+        {
+            "ItemId": "b5d600663238be5b41da4d8429db85f0", 
+            "Album": "Past Worn Searching", 
+            "IndexNumber": 3, 
+            "Name": "Viva Anger, Viva Hate", 
+            "MediaType": "Audio", 
+            "PrimaryImageAspectRatio": 1, 
+            "AlbumArtist": "Rainer Maria", 
+            "ProductionYear": 1997, 
+            "RunTimeTicks": 1917200000, 
+            "Artists": [
+                "Rainer Maria"
+            ], 
+            "PrimaryImageTag": "6a5a9c0089eb53c50559e758e87a37e0", 
+            "Type": "Audio", 
+            "ParentIndexNumber": 1, 
+            "MatchedTerm": "viva hate"
+        }
+    ]
+}
