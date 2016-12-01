@@ -63,8 +63,8 @@ Project resources
 Credits
 =======
 
-- Original author: `Marvin Steadfast <https://github.com/xsteadfastx`__
-- Current maintainer: `Marvin Steadfast <https://github.com/xsteadfastx`__
+- Original author: `Marvin Steadfast <https://github.com/xsteadfastx>`_
+- Current maintainer: `Marvin Steadfast <https://github.com/xsteadfastx>`_
 - `Contributors <https://github.com/xsteadfastx/mopidy-emby/graphs/contributors>`_
 
 
