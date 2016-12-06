@@ -61,6 +61,24 @@ def test_get_music_root(r_get_mock, data, expected, emby_client):
     assert emby_client.get_music_root() == expected
 
 
+@pytest.mark.parametrize('data,expected', [
+    (
+        'tests/data/get_music_root1.json',
+        'Emby: Cant find music root directory'
+    )
+])
+@mock.patch('mopidy_emby.backend.EmbyHandler.r_get')
+def test_get_music_root_cant_find(r_get_mock, data, expected, emby_client):
+
+    with open(data, 'r') as f:
+        r_get_mock.return_value = json.load(f)
+
+    with pytest.raises(Exception) as execinfo:
+        print emby_client.get_music_root()
+
+    assert expected in str(execinfo.value)
+
+
 @mock.patch('mopidy_emby.backend.EmbyHandler.get_music_root')
 @mock.patch('mopidy_emby.backend.EmbyHandler.r_get')
 def test_get_artists(r_get_mock, get_music_root_mock, emby_client):
@@ -458,11 +476,11 @@ def test_create_headers(get_token_mock, get_user_mock, password_data_mock,
                 ),
                 Artist(
                     name=u'Morrissey & Siouxsie Sioux',
-                    uri='emby:artist:eb69a3f2db13691d24c6a9794926ddb8'
+                    uri='emby:artist:32bbd3db105255b24a83d0d955179dc4'
                 ),
                 Artist(
                     name=u'Morrissey & Siouxsie Sioux',
-                    uri='emby:artist:32bbd3db105255b24a83d0d955179dc4'
+                    uri='emby:artist:eb69a3f2db13691d24c6a9794926ddb8'
                 )
             ],
             uri='emby:search'

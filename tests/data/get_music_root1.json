@@ -1,0 +1,168 @@
+{
+    "Items": [
+        {
+            "UserData": {
+                "PlayCount": 0,
+                "Key": "a8bac34c-9d1b-9b82-f4f1-bf249efc0bc8",
+                "PlaybackPositionTicks": 0,
+                "IsFavorite": false,
+                "Played": false
+            },
+            "CollectionType": "boxsets",
+            "Name": "Collections",
+            "PlayAccess": "Full",
+            "HasDynamicCategories": false,
+            "LocationType": "FileSystem",
+            "OriginalCollectionType": "boxsets",
+            "IsFolder": true,
+            "ChildCount": 2,
+            "ImageTags": {
+                "Primary": "0f93f8b47cb980dd7b0fc06508362e36",
+                "Thumb": "a10b9301a8e64e1c576ef47e30a57c83"
+            },
+            "DisplayPreferencesId": "ade3e0c1ed24003d7bf29cb63bfed619",
+            "PrimaryImageAspectRatio": 1.77777777777778,
+            "ServerId": "1efa5077976bfa92bc71652404f646ec",
+            "Type": "CollectionFolder",
+            "Id": "a8bac34c9d1b9b82f4f1bf249efc0bc8",
+            "BackdropImageTags": []
+        },
+        {
+            "UserData": {
+                "PlayCount": 0,
+                "Key": "cc93e084-c95d-cfbc-da68-fcb43bc1900c",
+                "PlaybackPositionTicks": 0,
+                "IsFavorite": false,
+                "Played": false
+            },
+            "CollectionType": "movies",
+            "Name": "Movies",
+            "PlayAccess": "Full",
+            "HasDynamicCategories": false,
+            "LocationType": "FileSystem",
+            "OriginalCollectionType": "movies",
+            "IsFolder": true,
+            "ChildCount": 1,
+            "ImageTags": {
+                "Primary": "f04f2a002aca8b0f2a556e94b35b1872",
+                "Thumb": "10adcccdd9ef475109b501954048725c"
+            },
+            "DisplayPreferencesId": "cc93e084c95dcfbcda68fcb43bc1900c",
+            "PrimaryImageAspectRatio": 1.77777777777778,
+            "ServerId": "1efa5077976bfa92bc71652404f646ec",
+            "Type": "CollectionFolder",
+            "Id": "cc93e084c95dcfbcda68fcb43bc1900c",
+            "BackdropImageTags": []
+        },
+        {
+            "UserData": {
+                "PlayCount": 0,
+                "Key": "6aaac867-c6c1-e575-521c-5675069b245d",
+                "PlaybackPositionTicks": 0,
+                "IsFavorite": false,
+                "Played": false
+            },
+            "CollectionType": "musicvideos",
+            "Name": "Music videos",
+            "PlayAccess": "Full",
+            "HasDynamicCategories": false,
+            "LocationType": "FileSystem",
+            "OriginalCollectionType": "musicvideos",
+            "IsFolder": true,
+            "ChildCount": 5,
+            "ImageTags": {
+                "Primary": "f680e44cbb9de9849495080e8a847b68"
+            },
+            "DisplayPreferencesId": "6aaac867c6c1e575521c5675069b245d",
+            "PrimaryImageAspectRatio": 1.77777777777778,
+            "ServerId": "1efa5077976bfa92bc71652404f646ec",
+            "Type": "CollectionFolder",
+            "Id": "6aaac867c6c1e575521c5675069b245d",
+            "BackdropImageTags": []
+        },
+        {
+            "UserData": {
+                "PlayCount": 0,
+                "Key": "b5b66e89-d310-cb38-04c1-56d69ce50f36",
+                "PlaybackPositionTicks": 0,
+                "IsFavorite": false,
+                "Played": false
+            },
+            "SourceType": "Channel",
+            "PlayAccess": "Full",
+            "LocationType": "FileSystem",
+            "ChannelId": "b5b66e89d310cb3804c156d69ce50f36",
+            "IsFolder": true,
+            "BackdropImageTags": [
+                "51a03c975ad355fe70694775f0b7154b"
+            ],
+            "ImageTags": {
+                "Thumb": "e66ba5970dac0897b1dd160f1e38a04a",
+                "Primary": "e6f23fad76b2b7558ae1a5462fe37415"
+            },
+            "DisplayPreferencesId": "cf6ebf1a91eb92911606a18df6a41cf0",
+            "PrimaryImageAspectRatio": 0.715789473684211,
+            "ServerId": "1efa5077976bfa92bc71652404f646ec",
+            "ChannelName": "SoundCloud",
+            "Type": "Channel",
+            "Id": "b5b66e89d310cb3804c156d69ce50f36",
+            "Name": "SoundCloud"
+        },
+        {
+            "UserData": {
+                "PlayCount": 0,
+                "Key": "4f72d19e-53d4-4af6-a809-1b4d0bdaaee8",
+                "PlaybackPositionTicks": 0,
+                "IsFavorite": false,
+                "Played": false
+            },
+            "SourceType": "Channel",
+            "PlayAccess": "Full",
+            "LocationType": "FileSystem",
+            "ChannelId": "4f72d19e53d44af6a8091b4d0bdaaee8",
+            "IsFolder": true,
+            "BackdropImageTags": [
+                "73bbb0fd8ec96b137fb9956e7c804dc2"
+            ],
+            "ImageTags": {
+                "Thumb": "4bc68e01edceb4ac166e4e52396a32d4",
+                "Primary": "fbe224166b3f62e72c3a814376d6883e"
+            },
+            "DisplayPreferencesId": "cf6ebf1a91eb92911606a18df6a41cf0",
+            "PrimaryImageAspectRatio": 0.715789473684211,
+            "ServerId": "1efa5077976bfa92bc71652404f646ec",
+            "ChannelName": "TuneIn",
+            "Type": "Channel",
+            "Id": "4f72d19e53d44af6a8091b4d0bdaaee8",
+            "Name": "TuneIn"
+        },
+        {
+            "UserData": {
+                "PlayCount": 0,
+                "Key": "ba191c02-59d1-71f2-c516-af60dc723619",
+                "PlaybackPositionTicks": 0,
+                "IsFavorite": false,
+                "Played": false
+            },
+            "CollectionType": "tvshows",
+            "Name": "TV shows",
+            "PlayAccess": "Full",
+            "HasDynamicCategories": false,
+            "LocationType": "FileSystem",
+            "OriginalCollectionType": "tvshows",
+            "IsFolder": true,
+            "ChildCount": 1,
+            "ImageTags": {
+                "Primary": "5446a9388a4e6e561a3ea170e0208d7f",
+                "Thumb": "b97f138faee8fb619e62fd7627444109"
+            },
+            "DisplayPreferencesId": "ba191c0259d171f2c516af60dc723619",
+            "PrimaryImageAspectRatio": 1.77777777777778,
+            "ServerId": "1efa5077976bfa92bc71652404f646ec",
+            "Type": "CollectionFolder",
+            "Id": "ba191c0259d171f2c516af60dc723619",
+            "BackdropImageTags": []
+        }
+    ],
+    "TotalRecordCount": 7
+}

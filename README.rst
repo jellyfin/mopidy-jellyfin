@@ -71,6 +71,12 @@ Credits
 Changelog
 =========
 
+v0.1.3
+----------------------------------------
+
+- Throws exception if no music root directory can be found
+- SearchResults doesnt use set() no more for killing duplets
+
 v0.1.2
 ----------------------------------------
 

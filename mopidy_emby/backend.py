@@ -299,7 +299,19 @@ class EmbyHandler(object):
         data = self.r_get(url)
         id = [i['Id'] for i in data['Items'] if i['Name'] == 'Music']
 
-        return id[0]
+        if id:
+            logging.debug(
+                'Emby: Found music root dir with ID: {}'.format(id[0])
+            )
+            return id[0]
+
+        else:
+            logging.debug(
+                'Emby: All directories found: {}'.format(
+                    [i['Name'] for i in data['Items']]
+                )
+            )
+            raise Exception('Emby: Cant find music root directory')
 
     def get_artists(self):
         music_root = self.get_music_root()
@@ -556,7 +568,7 @@ class EmbyHandler(object):
 
         return models.SearchResult(
             uri='emby:search',
-            tracks=list(set(tracks)),
-            artists=list(set(artists)),
-            albums=list(set(albums))
+            tracks=tracks,
+            artists=artists,
+            albums=albums
         )
