@@ -24,14 +24,14 @@ def config():
 
 @pytest.fixture
 def emby_client(config, mocker):
-    mocker.patch('mopidy_emby.backend.cache')
-    mocker.patch('mopidy_emby.backend.EmbyHandler._get_token')
-    mocker.patch('mopidy_emby.backend.EmbyHandler._create_headers')
-    mocker.patch('mopidy_emby.backend.EmbyHandler._get_user',
+    mocker.patch('mopidy_emby.remote.cache')
+    mocker.patch('mopidy_emby.remote.EmbyHandler._get_token')
+    mocker.patch('mopidy_emby.remote.EmbyHandler._create_headers')
+    mocker.patch('mopidy_emby.remote.EmbyHandler._get_user',
                  return_value=[{'Id': 'mock'}])
-    mocker.patch('mopidy_emby.backend.EmbyHandler._password_data')
+    mocker.patch('mopidy_emby.remote.EmbyHandler._password_data')
 
-    return mopidy_emby.backend.EmbyHandler(config)
+    return mopidy_emby.remote.EmbyHandler(config)
 
 
 @pytest.fixture
