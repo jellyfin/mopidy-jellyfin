@@ -71,6 +71,11 @@ Credits
 Changelog
 =========
 
+v0.2.1
+---------------------------------------
+
+- Looking for ``CollectionType`` instead of ``Name`` to find music root dir. Fixes `#1 <https://github.com/xsteadfastx/mopidy-emby/issues/1>`_
+
 v0.2.0
 ---------------------------------------
 

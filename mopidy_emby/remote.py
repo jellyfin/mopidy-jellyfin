@@ -187,7 +187,11 @@ class EmbyHandler(object):
         )
 
         data = self.r_get(url)
-        id = [i['Id'] for i in data['Items'] if i['Name'] == 'Music']
+
+        id = [i['Id']
+              for i in data['Items']
+              if 'CollectionType' in i.keys()
+              if i['CollectionType'] == 'music']
 
         if id:
             logging.debug(
@@ -198,7 +202,9 @@ class EmbyHandler(object):
         else:
             logging.debug(
                 'Emby: All directories found: {}'.format(
-                    [i['Name'] for i in data['Items']]
+                    [i['CollectionType']
+                     for i in data['Items']
+                     if 'CollectionType' in i.items()]
                 )
             )
             raise Exception('Emby: Cant find music root directory')
