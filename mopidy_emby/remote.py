@@ -148,8 +148,7 @@ class EmbyHandler(object):
                 )
                 counter += 1
 
-        # if everything goes wrong return a empty dict
-        return {}
+        raise Exception('Cant connect to Emby API')
 
     def api_url(self, endpoint):
         """Returns a joined url.

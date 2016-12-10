@@ -380,3 +380,21 @@ def test_search(get_search_mock, query, data, expected, emby_client):
         get_search_mock.return_value = json.load(f)['SearchHints']
 
     assert emby_client.search(query) == expected
+
+
+@mock.patch('mopidy_emby.backend.EmbyHandler._get_session')
+def test_r_get(session_mock, emby_client):
+    data = {'foo': 'bar'}
+    session_mock.return_value.get.return_value.json.return_value = data
+
+    assert emby_client.r_get('http://foo.bar') == data
+
+
+@mock.patch('mopidy_emby.remote.EmbyHandler._get_session')
+def test_r_get_exception(session_mock, emby_client):
+    session_mock.return_value.get.side_effect = Exception()
+
+    with pytest.raises(Exception) as execinfo:
+        emby_client.r_get('http://foo.bar')
+
+    assert 'Cant connect to Emby API' in str(execinfo.value)

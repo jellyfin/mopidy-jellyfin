@@ -71,6 +71,11 @@ Credits
 Changelog
 =========
 
+v0.2.2
+---------------------------------------
+
+- ``mopidy_emby.remote.EmbyHandler.r_get`` throws now a exception if cant connect
+
 v0.2.1
 ---------------------------------------
 
