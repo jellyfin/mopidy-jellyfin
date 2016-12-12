@@ -150,6 +150,13 @@ class EmbyHandler(object):
 
         raise Exception('Cant connect to Emby API')
 
+    def r_post(self, url):
+        session = self._get_session()
+        session.headers.update(self.headers)
+        r = session.post(url)
+
+        return r.json()
+
     def api_url(self, endpoint):
         """Returns a joined url.
 
@@ -310,7 +317,7 @@ class EmbyHandler(object):
             genre=track.get('Genre'),
             artists=self.create_artists(track),
             album=self.create_album(track),
-            length=track['RunTimeTicks'] / 10000
+            length=self.ticks_to_milliseconds(track['RunTimeTicks'])
         )
 
     def create_album(self, track):
@@ -467,3 +474,65 @@ class EmbyHandler(object):
             artists=artists,
             albums=albums
         )
+
+    @cache()
+    def get_session_id(self):
+        """Get Emby session ID.
+        """
+        data = self.r_get(
+            self.api_url(
+                '/Sessions'
+            )
+        )
+
+        ids = [i.get('Id') for i in data if i.get('DeviceName') == 'mopidy']
+
+        if ids:
+            return ids[0]
+
+    @staticmethod
+    def ticks_to_milliseconds(ticks):
+        """Converts Emby track length ticks to milliseconds.
+
+        :param ticks: Ticks
+        :type ticks: int
+        :returns: Milliseconds
+        :rtype: int
+        """
+        return ticks / 10000
+
+    @staticmethod
+    def milliseconds_to_ticks(milliseconds):
+        """Converts milliseconds to ticks.
+
+        :param milliseconds: Milliseconds
+        :type milliseconds: int
+        :returns: Ticks
+        :rtype: int
+        """
+        return milliseconds * 10000
+
+    def seek(self, time_position):
+        session_id = self.get_session_id()
+
+        endpoint = '/Sessions/{}/Playing/seek?SeekPositionTicks={}'.format(
+            session_id,
+            self.milliseconds_to_ticks(time_position)
+        )
+
+        url = self.api_url(endpoint)
+
+        try:
+            r = self.r_post(url)
+            logging.debug('Emby seek response: {}'.format(r))
+
+            return True
+
+        except Exception as e:
+
+            logger.debug('Emby could not seek because of: {}'.format(e))
+
+            return False
+
+    def post_play(self):
+        pass

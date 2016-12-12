@@ -398,3 +398,31 @@ def test_r_get_exception(session_mock, emby_client):
         emby_client.r_get('http://foo.bar')
 
     assert 'Cant connect to Emby API' in str(execinfo.value)
+
+
+@pytest.mark.parametrize('data,id', [
+    ('tests/data/get_session_id0.json', '3c2a2ca3b7fa1e91bfc8ceb56a769433'),
+    ('tests/data/get_session_id1.json', None),
+])
+@mock.patch('mopidy_emby.remote.EmbyHandler.r_get')
+def test_get_session_id(r_get_mock, emby_client, data, id):
+    with open(data, 'r') as f:
+        r_get_mock.return_value = json.load(f)
+
+    assert emby_client.get_session_id() == id
+
+
+@pytest.mark.parametrize('ticks,milliseconds', [
+    (2010380000, 201038),
+    (2508020000, 250802),
+])
+def test_ticks_to_milliseconds(ticks, milliseconds, emby_client):
+    assert emby_client.ticks_to_milliseconds(ticks) == milliseconds
+
+
+@pytest.mark.parametrize('milliseconds,ticks', [
+    (201038, 2010380000),
+    (250802, 2508020000),
+])
+def test_milliseconds_to_ticks(milliseconds, ticks, emby_client):
+    assert emby_client.milliseconds_to_ticks(milliseconds) == ticks

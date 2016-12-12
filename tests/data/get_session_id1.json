@@ -1,0 +1,80 @@
+[
+    {
+        "UserName": "marvin",
+        "DeviceName": "GTI9195",
+        "ApplicationVersion": "2.8.27",
+        "QueueableMediaTypes": [],
+        "LastActivityDate": "2016-12-12T11:45:59.0177010Z",
+        "UserId": "2ec276a2642e54a19b612b9418a8bd3b",
+        "SupportsRemoteControl": false,
+        "Client": "Emby for Android Mobile",
+        "SupportedCommands": [
+            "GoHome",
+            "GoToSettings",
+            "VolumeUp",
+            "VolumeDown",
+            "Mute",
+            "Unmute",
+            "ToggleMute",
+            "SetVolume",
+            "SetAudioStreamIndex",
+            "SetSubtitleStreamIndex",
+            "DisplayContent",
+            "GoToSearch",
+            "DisplayMessage",
+            "SetRepeatMode"
+        ],
+        "AdditionalUsers": [],
+        "PlayableMediaTypes": [
+            "Audio",
+            "Video"
+        ],
+        "PlayState": {
+            "CanSeek": false,
+            "IsMuted": false,
+            "RepeatMode": "RepeatNone",
+            "IsPaused": false
+        },
+        "Id": "359e4bdf9378401b109a51b1460a1343",
+        "DeviceId": "dc91edc0-98ee-2da9-3577-360598723498"
+    },
+    {
+        "UserName": "christine",
+        "DeviceName": "Chrome 54.0.2840.99",
+        "ApplicationVersion": "3.0.8500.0",
+        "QueueableMediaTypes": [],
+        "LastActivityDate": "2016-12-12T10:44:39.1177630Z",
+        "UserId": "d916e0d058f246f9bb4bf7e91ce3f32e",
+        "SupportsRemoteControl": true,
+        "Client": "Emby Mobile",
+        "SupportedCommands": [
+            "GoHome",
+            "GoToSettings",
+            "VolumeUp",
+            "VolumeDown",
+            "Mute",
+            "Unmute",
+            "ToggleMute",
+            "SetVolume",
+            "SetAudioStreamIndex",
+            "SetSubtitleStreamIndex",
+            "DisplayContent",
+            "GoToSearch",
+            "DisplayMessage",
+            "SetRepeatMode"
+        ],
+        "AdditionalUsers": [],
+        "PlayableMediaTypes": [
+            "Audio",
+            "Video"
+        ],
+        "PlayState": {
+            "CanSeek": false,
+            "IsMuted": false,
+            "RepeatMode": "RepeatNone",
+            "IsPaused": false
+        },
+        "Id": "8e53c1fad9ed36170eb125c3ed854a57",
+        "DeviceId": "25a88b2a44c69d6ae95e9f7c7ad871bbf280bd90"
+    }
+]

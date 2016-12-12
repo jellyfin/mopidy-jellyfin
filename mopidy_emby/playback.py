@@ -24,3 +24,9 @@ class EmbyPlaybackProvider(backend.PlaybackProvider):
 
         else:
             return None
+
+    def play(self):
+        pass
+
+    def seek(self, time_position):
+        return self.backend.remote.seek(time_position)
