@@ -6,12 +6,15 @@ import pytest
 @pytest.mark.parametrize('uri,expected', [
     (
         'emby:track:123',
-        'https://foo.bar:443/Audio/123/stream.mp3?format=json'
+        [
+            'https://foo.bar:443/Audio/123/stream?static=true&format=json',
+            'https://foo.bar:443/Audio/123/stream?format=json&static=true',
+        ]
     ),
     (
         'emby:foobar',
-        None
+        [None]
     )
 ])
 def test_translate_uri(playbackprovider, uri, expected):
-    assert playbackprovider.translate_uri(uri) == expected
+    assert playbackprovider.translate_uri(uri) in expected

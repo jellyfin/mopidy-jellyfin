@@ -475,21 +475,6 @@ class EmbyHandler(object):
             albums=albums
         )
 
-    @cache()
-    def get_session_id(self):
-        """Get Emby session ID.
-        """
-        data = self.r_get(
-            self.api_url(
-                '/Sessions'
-            )
-        )
-
-        ids = [i.get('Id') for i in data if i.get('DeviceName') == 'mopidy']
-
-        if ids:
-            return ids[0]
-
     @staticmethod
     def ticks_to_milliseconds(ticks):
         """Converts Emby track length ticks to milliseconds.
@@ -511,28 +496,3 @@ class EmbyHandler(object):
         :rtype: int
         """
         return milliseconds * 10000
-
-    def seek(self, time_position):
-        session_id = self.get_session_id()
-
-        endpoint = '/Sessions/{}/Playing/seek?SeekPositionTicks={}'.format(
-            session_id,
-            self.milliseconds_to_ticks(time_position)
-        )
-
-        url = self.api_url(endpoint)
-
-        try:
-            r = self.r_post(url)
-            logging.debug('Emby seek response: {}'.format(r))
-
-            return True
-
-        except Exception as e:
-
-            logger.debug('Emby could not seek because of: {}'.format(e))
-
-            return False
-
-    def post_play(self):
-        pass

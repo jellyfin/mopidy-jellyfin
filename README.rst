@@ -71,6 +71,11 @@ Credits
 Changelog
 =========
 
+v0.2.3
+---------------------------------------
+
+- Emby streaming is using the static option now. This make seeking possible. This let Emby stream the original file instead of a converted mp3. Thanks to `ebr <https://emby.media/community/index.php?/topic/42501-seek-in-a-stream-from-the-api/>`_.
+
 v0.2.2
 ---------------------------------------
 

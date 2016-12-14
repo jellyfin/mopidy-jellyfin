@@ -15,7 +15,7 @@ class EmbyPlaybackProvider(backend.PlaybackProvider):
             id = uri.split(':')[-1]
 
             track_url = self.backend.remote.api_url(
-                '/Audio/{}/stream.mp3'.format(id)
+                '/Audio/{}/stream?static=true'.format(id)
             )
 
             logger.debug('Emby track streaming url: {}'.format(track_url))
@@ -24,9 +24,3 @@ class EmbyPlaybackProvider(backend.PlaybackProvider):
 
         else:
             return None
-
-    def play(self):
-        pass
-
-    def seek(self, time_position):
-        return self.backend.remote.seek(time_position)

@@ -400,18 +400,6 @@ def test_r_get_exception(session_mock, emby_client):
     assert 'Cant connect to Emby API' in str(execinfo.value)
 
 
-@pytest.mark.parametrize('data,id', [
-    ('tests/data/get_session_id0.json', '3c2a2ca3b7fa1e91bfc8ceb56a769433'),
-    ('tests/data/get_session_id1.json', None),
-])
-@mock.patch('mopidy_emby.remote.EmbyHandler.r_get')
-def test_get_session_id(r_get_mock, emby_client, data, id):
-    with open(data, 'r') as f:
-        r_get_mock.return_value = json.load(f)
-
-    assert emby_client.get_session_id() == id
-
-
 @pytest.mark.parametrize('ticks,milliseconds', [
     (2010380000, 201038),
     (2508020000, 250802),
