@@ -8,6 +8,7 @@ logger = logging.getLogger(__name__)
 
 
 class cache(object):
+    # stolen from mopidy-soundcloud <3
 
     def __init__(self, ctl=8, ttl=3600):
         self.cache = {}
