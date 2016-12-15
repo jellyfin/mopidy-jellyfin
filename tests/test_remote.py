@@ -8,6 +8,8 @@ from mopidy.models import Album, Artist, Ref, SearchResult, Track
 
 import pytest
 
+import requests
+
 from mopidy_emby import backend
 
 
@@ -414,3 +416,48 @@ def test_ticks_to_milliseconds(ticks, milliseconds, emby_client):
 ])
 def test_milliseconds_to_ticks(milliseconds, ticks, emby_client):
     assert emby_client.milliseconds_to_ticks(milliseconds) == ticks
+
+
+def test__get_session(emby_client):
+    assert isinstance(emby_client._get_session(), requests.sessions.Session)
+
+
+@mock.patch('mopidy_emby.backend.EmbyHandler.r_get')
+@pytest.mark.parametrize('data,expected', [
+    (
+        'tests/data/track0.json',
+        [
+            'Album',
+            'Genres',
+        ]
+    )
+])
+def test_get_item(r_get_mock, data, expected, emby_client):
+    with open(data, 'r') as f:
+        r_get_mock.return_value = json.load(f)
+
+    item_keys = emby_client.get_item(0).keys()
+
+    for key in expected:
+        assert key in item_keys
+
+
+@mock.patch('mopidy_emby.backend.EmbyHandler.r_get')
+@pytest.mark.parametrize('data,expected', [
+    (
+        'tests/data/track0.json',
+        Track(
+            album=Album(artists=[Artist(name=u'Chairlift')], name=u'Moth'),
+            artists=[Artist(name=u'Chairlift')],
+            length=295915,
+            name=u'Ottawa to Osaka',
+            track_no=6,
+            uri='emby:track:18e5a9871e6a4a2294d5af998457ca16'
+        )
+    )
+])
+def test_get_track(r_get_mock, data, expected, emby_client):
+    with open(data, 'r') as f:
+        r_get_mock.return_value = json.load(f)
+
+    assert emby_client.get_track(0) == expected

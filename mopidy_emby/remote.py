@@ -150,13 +150,6 @@ class EmbyHandler(object):
 
         raise Exception('Cant connect to Emby API')
 
-    def r_post(self, url):
-        session = self._get_session()
-        session.headers.update(self.headers)
-        r = session.post(url)
-
-        return r.json()
-
     def api_url(self, endpoint):
         """Returns a joined url.
 
