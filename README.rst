@@ -71,6 +71,12 @@ Credits
 Changelog
 =========
 
+v0.2.4
+---------------------------------------
+
+- more testing
+- fixed bug in throwing the exception in ``mopidy_emby.remote.EmbyHandler.__get_search``
+
 v0.2.3
 ---------------------------------------
 
