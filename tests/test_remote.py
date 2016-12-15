@@ -461,3 +461,44 @@ def test_get_track(r_get_mock, data, expected, emby_client):
         r_get_mock.return_value = json.load(f)
 
     assert emby_client.get_track(0) == expected
+
+
+@pytest.mark.parametrize('itemtype,url', [
+    (
+        'any',
+        ('/Search/Hints?SearchTerm=viva%20hate'
+         '&IncludeItemTypes=Audio,MusicAlbum,MusicArtist')
+    ),
+    (
+        'artist',
+        ('/Search/Hints?SearchTerm=viva%20hate'
+         '&IncludeItemTypes=MusicArtist')
+    ),
+    (
+        'album',
+        ('/Search/Hints?SearchTerm=viva%20hate'
+         '&IncludeItemTypes=MusicAlbum')
+    ),
+    (
+        'track_name',
+        ('/Search/Hints?SearchTerm=viva%20hate'
+         '&IncludeItemTypes=Audio')
+    ),
+])
+@mock.patch('mopidy_emby.backend.EmbyHandler.r_get')
+@mock.patch('mopidy_emby.backend.EmbyHandler.api_url')
+def test__get_search(api_url_mock, r_get_mock, itemtype, url, emby_client):
+    with open('tests/data/search_audio0.json', 'r') as f:
+        r_get_mock.return_value = json.load(f)
+
+    emby_client._get_search(itemtype, 'viva hate')
+
+    api_url_mock.assert_called_with(url)
+
+
+@mock.patch('mopidy_emby.backend.EmbyHandler.r_get')
+def test__get_search_exception(r_get_mock, emby_client):
+    with pytest.raises(Exception) as execinfo:
+        emby_client._get_search('foo', 'bar')
+
+    assert 'Emby search: no itemtype foo' in str(execinfo.value)
