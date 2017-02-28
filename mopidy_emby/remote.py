@@ -105,9 +105,15 @@ class EmbyHandler(object):
         session = self._get_session()
         session.headers.update(self.headers)
         while counter <= 5:
+
             try:
                 r = session.get(url)
-                return r.json()
+                rv = r.json()
+
+                logger.debug(str(rv))
+
+                return rv
+
             except Exception as e:
                 logger.info(
                     'Emby connection on try {} with problem: {}'.format(
