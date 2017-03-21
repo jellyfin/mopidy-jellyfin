@@ -1,0 +1,151 @@
+{
+    "Items": [
+        {
+            "Album": "Dear You", 
+            "Container": "flac", 
+            "LocationType": "FileSystem", 
+            "ArtistItems": [
+                {
+                    "Name": "Jawbreaker", 
+                    "Id": "c35d160230ff74e5cab4d22ea6b37b82"
+                }
+            ], 
+            "ParentLogoItemId": "c35d160230ff74e5cab4d22ea6b37b82", 
+            "ServerId": "1efa5077976bfa92bc71652404f646ec", 
+            "ExtraType": "0", 
+            "Type": "Audio", 
+            "ParentIndexNumber": 1, 
+            "PlayAccess": "Full", 
+            "ImageTags": {
+                "Primary": "abc26237c6174628bb167bfdcfc1311c"
+            }, 
+            "IsFolder": false, 
+            "ParentLogoImageTag": "331cbd04916aa8e6403a025fe5b495d8", 
+            "AlbumPrimaryImageTag": "cd514782edae76b587113f5c68050076", 
+            "PremiereDate": "1995-09-12T00:00:00.0000000Z", 
+            "ProductionYear": 1995, 
+            "BackdropImageTags": [], 
+            "Name": "Sluttering (May 4th)", 
+            "Artists": [
+                "Jawbreaker"
+            ], 
+            "MediaType": "Audio", 
+            "AlbumArtist": "Jawbreaker", 
+            "UserData": {
+                "PlayCount": 0, 
+                "Key": "MusicAlbum-MusicBrainzReleaseGroup-2a4d791d-b328-3212-8bef-edc98c7de3f70001 - 0011 - ", 
+                "PlaybackPositionTicks": 0, 
+                "IsFavorite": false, 
+                "Played": false
+            }, 
+            "IndexNumber": 11, 
+            "AlbumId": "a747de6e603c4b6bf6c410b939f6558b", 
+            "RunTimeTicks": 2541070000, 
+            "AlbumArtists": [
+                {
+                    "Name": "Jawbreaker", 
+                    "Id": "c35d160230ff74e5cab4d22ea6b37b82"
+                }
+            ], 
+            "Id": "057801bc10cf08ce96e1e19bf98c407f"
+        }, 
+        {
+            "Album": "Dear You", 
+            "Container": "flac", 
+            "LocationType": "FileSystem", 
+            "ArtistItems": [
+                {
+                    "Name": "Jawbreaker", 
+                    "Id": "c35d160230ff74e5cab4d22ea6b37b82"
+                }
+            ], 
+            "ParentLogoItemId": "c35d160230ff74e5cab4d22ea6b37b82", 
+            "ServerId": "1efa5077976bfa92bc71652404f646ec", 
+            "ExtraType": "0", 
+            "Type": "Audio", 
+            "ParentIndexNumber": 1, 
+            "PlayAccess": "Full", 
+            "ImageTags": {
+                "Primary": "a10e414b7e6110155cef4a408a7a3e38"
+            }, 
+            "IsFolder": false, 
+            "ParentLogoImageTag": "331cbd04916aa8e6403a025fe5b495d8", 
+            "AlbumPrimaryImageTag": "cd514782edae76b587113f5c68050076", 
+            "PremiereDate": "1995-09-12T00:00:00.0000000Z", 
+            "ProductionYear": 1995, 
+            "BackdropImageTags": [], 
+            "Name": "Bad Scene, Everyone\u2019s Fault", 
+            "Artists": [
+                "Jawbreaker"
+            ], 
+            "MediaType": "Audio", 
+            "AlbumArtist": "Jawbreaker", 
+            "UserData": {
+                "PlayCount": 0, 
+                "Key": "MusicAlbum-MusicBrainzReleaseGroup-2a4d791d-b328-3212-8bef-edc98c7de3f70001 - 0010 - ", 
+                "PlaybackPositionTicks": 0, 
+                "IsFavorite": false, 
+                "Played": false
+            }, 
+            "IndexNumber": 10, 
+            "AlbumId": "a747de6e603c4b6bf6c410b939f6558b", 
+            "RunTimeTicks": 1311330000, 
+            "AlbumArtists": [
+                {
+                    "Name": "Jawbreaker", 
+                    "Id": "c35d160230ff74e5cab4d22ea6b37b82"
+                }
+            ], 
+            "Id": "0a24ce6c243f2f3a81fa0f99625630b4"
+        },
+        {
+            "Album": "24 Hour Revenge Therapy", 
+            "Container": "flac", 
+            "LocationType": "FileSystem", 
+            "ArtistItems": [
+                {
+                    "Name": "Jawbreaker", 
+                    "Id": "c35d160230ff74e5cab4d22ea6b37b82"
+                }
+            ], 
+            "ParentLogoItemId": "c35d160230ff74e5cab4d22ea6b37b82", 
+            "ServerId": "1efa5077976bfa92bc71652404f646ec", 
+            "Type": "Audio", 
+            "ParentIndexNumber": 1, 
+            "PlayAccess": "Full", 
+            "AlbumId": "332a27ea1a1c66925f5419dcccb44bfa", 
+            "IsFolder": false, 
+            "ParentLogoImageTag": "331cbd04916aa8e6403a025fe5b495d8", 
+            "AlbumPrimaryImageTag": "0f4f411bf873b974febc630f11255193", 
+            "ProductionYear": 1994, 
+            "BackdropImageTags": [], 
+            "Name": "The Boat Dreams From The Hill", 
+            "Artists": [
+                "Jawbreaker"
+            ], 
+            "MediaType": "Audio", 
+            "AlbumArtist": "Jawbreaker", 
+            "UserData": {
+                "IsFavorite": false, 
+                "Played": true, 
+                "LastPlayedDate": "2016-07-28T12:50:20.2712960Z", 
+                "PlaybackPositionTicks": 0, 
+                "Key": "MusicAlbum-MusicBrainzReleaseGroup-87f60917-1ce9-3e93-92c3-a3e4184e46ca0001 - 0001 - ", 
+                "PlayCount": 3
+            }, 
+            "IndexNumber": 1, 
+            "ImageTags": {
+                "Primary": "39d33a64f930ef7c3ed6339de6127628"
+            }, 
+            "RunTimeTicks": 1598400000, 
+            "AlbumArtists": [
+                {
+                    "Name": "Jawbreaker", 
+                    "Id": "c35d160230ff74e5cab4d22ea6b37b82"
+                }
+            ], 
+            "Id": "05321ccb30ff9e43bf8070cd5f70c783"
+        } 
+    ], 
+    "TotalRecordCount": 3
+}

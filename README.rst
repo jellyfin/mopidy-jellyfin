@@ -71,6 +71,12 @@ Credits
 Changelog
 =========
 
+v0.2.5
+---------------------------------------
+
+- debug output for r_get data
+- fixed artist lookup
+
 v0.2.4
 ---------------------------------------
 

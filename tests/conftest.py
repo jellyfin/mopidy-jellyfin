@@ -74,6 +74,7 @@ def libraryprovider(backend_mock):
             }
         ]
     }
+    backend_mock.remote.lookup_artist.return_value = ['track1', 'track2']
 
     return mopidy_emby.backend.EmbyLibraryProvider(backend_mock)
 

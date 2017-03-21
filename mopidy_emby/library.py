@@ -61,17 +61,8 @@ class EmbyLibraryProvider(backend.LibraryProvider):
 
             elif uri.startswith('emby:artist:') and len(parts) == 3:
                 artist_id = parts[-1]
-                albums = self.backend.remote.get_directory(artist_id)
-                tracks = []
 
-                for album in albums.get('Items', []):
-                    album_data = self.backend.remote.get_directory(album['Id'])
-                    tracklist = [
-                        self.backend.remote.get_track(i['Id'])
-                        for i in album_data.get('Items', [])
-                    ]
-
-                    tracks.extend(sorted(tracklist, key=lambda k: k.track_no))
+                tracks = self.backend.remote.lookup_artist(artist_id)
 
             else:
                 logger.info('Unknown Emby lookup URI: {}'.format(uri))

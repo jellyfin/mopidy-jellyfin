@@ -502,3 +502,57 @@ def test__get_search_exception(r_get_mock, emby_client):
         emby_client._get_search('foo', 'bar')
 
     assert 'Emby search: no itemtype foo' in str(execinfo.value)
+
+
+@mock.patch('mopidy_emby.backend.EmbyHandler.r_get')
+def test_lookup_artist(r_get_mock, emby_client):
+    with open('tests/data/lookup_artist0.json', 'r') as f:
+        r_get_mock.return_value = json.load(f)
+
+    assert emby_client.lookup_artist(0) == [
+        Track(
+            album=Album(
+                artists=[Artist(name=u'Jawbreaker')],
+                name=u'24 Hour Revenge Therapy'
+            ),
+            artists=[
+                Artist(
+                    name=u'Jawbreaker'
+                )
+            ],
+            length=159840,
+            name=u'The Boat Dreams From The Hill',
+            track_no=1,
+            uri='emby:track:05321ccb30ff9e43bf8070cd5f70c783'
+        ),
+        Track(
+            album=Album(
+                artists=[Artist(name=u'Jawbreaker')],
+                name=u'Dear You'
+            ),
+            artists=[
+                Artist(
+                    name=u'Jawbreaker'
+                )
+            ],
+            length=131133,
+            name=u'Bad Scene, Everyone\u2019s Fault',
+            track_no=10,
+            uri='emby:track:0a24ce6c243f2f3a81fa0f99625630b4'
+        ),
+        Track(
+            album=Album(
+                artists=[Artist(name=u'Jawbreaker')],
+                name=u'Dear You'
+            ),
+            artists=[
+                Artist(
+                    name=u'Jawbreaker'
+                )
+            ],
+            length=254107,
+            name=u'Sluttering (May 4th)',
+            track_no=11,
+            uri='emby:track:057801bc10cf08ce96e1e19bf98c407f'
+        )
+     ]

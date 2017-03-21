@@ -1,7 +1,10 @@
 from __future__ import unicode_literals
 
 import hashlib
+
 import logging
+
+from collections import OrderedDict, defaultdict
 
 from urllib import urlencode
 from urllib2 import quote
@@ -441,6 +444,41 @@ class EmbyHandler(object):
             artists=artists,
             albums=albums
         )
+
+    def lookup_artist(self, artist_id):
+        """Lookup all artist tracks and sort them.
+
+        :param artist_id: Artist ID
+        :type artist_id: int
+        :returns: List of tracks
+        :rtype: list
+        """
+        url = self.api_url(
+            (
+                '/Users/{}/Items?SortOrder=Ascending&ArtistIds={}'
+                '&Recursive=true&IncludeItemTypes=Audio'
+            ).format(self.user_id, artist_id)
+        )
+
+        items = self.r_get(url)
+
+        # sort tracks into album keys
+        album_dict = defaultdict(list)
+        for track in items['Items']:
+            album_dict[track['Album']].append(track)
+
+        # order albums in alphabet
+        album_dict = OrderedDict(sorted(album_dict.items()))
+
+        # sort tracks in album dict
+        tracks = []
+        for album, track_list in album_dict.items():
+            track_list.sort(key=lambda k: k['IndexNumber'])
+
+            # add tracks to list
+            tracks.extend(track_list)
+
+        return [self.create_track(i) for i in tracks]
 
     @staticmethod
     def ticks_to_milliseconds(ticks):
