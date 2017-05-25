@@ -24,9 +24,11 @@ class Extension(ext.Extension):
     def get_config_schema(self):
         schema = super(Extension, self).get_config_schema()
         schema['username'] = config.String()
+        schema['user_id'] = config.String(optional=True)
         schema['password'] = config.Secret()
         schema['hostname'] = config.String()
         schema['port'] = config.Port()
+
         return schema
 
     def setup(self, registry):

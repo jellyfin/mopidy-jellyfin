@@ -29,10 +29,11 @@ class EmbyHandler(object):
         self.username = config['emby']['username']
         self.password = config['emby']['password']
         self.proxy = config['proxy']
+        self.user_id = config['emby'].get('user_id', False)
 
         # create authentication headers
         self.auth_data = self._password_data()
-        self.user_id = self._get_user()[0]['Id']
+        self.user_id = self.user_id or self._get_user()[0]['Id']
         self.headers = self._create_headers()
         self.token = self._get_token()
 
