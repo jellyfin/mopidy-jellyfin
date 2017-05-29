@@ -46,6 +46,8 @@ Mopidy-Emby to your Mopidy configuration file::
     username = username
     password = password
 
+Its also possible to add a users id with ``user_id = 0``.
+
 
 Project resources
 =================
@@ -64,6 +66,11 @@ Credits
 
 Changelog
 =========
+
+v0.2.6
+---------------------------------------
+
+- added config option to define a ``user_id``. This is useful if using a hidden user
 
 v0.2.5
 ---------------------------------------
