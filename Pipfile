@@ -1,0 +1,31 @@
+[[source]]
+
+url = "https://pypi.python.org/simple"
+verify_ssl = true
+name = "pypi"
+
+
+[packages]
+
+mopidy = "*"
+pykka = "*"
+requests = "*"
+
+
+[dev-packages]
+
+tox = "*"
+pytest = "*"
+pytest-sugar = "*"
+mock = "*"
+pytest-cov = "*"
+pytest-mock = "*"
+"flake8" = "*"
+"flake8-import-order" = "*"
+funcsigs = "*"
+mopidy-musicbox-webclient = "*"
+
+
+[requires]
+
+python_version = "2.7"
