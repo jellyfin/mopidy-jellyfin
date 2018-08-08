@@ -31,6 +31,12 @@ class EmbyHandler(object):
         self.proxy = config['proxy']
         self.user_id = config['emby'].get('user_id', False)
 
+        self.cert = None
+        client_cert = config['emby'].get('client_cert', None)
+        client_key = config['emby'].get('client_key', None)
+        if client_cert is not None and client_key is not None:
+            self.cert = (client_cert, client_key)
+
         # create authentication headers
         self.auth_data = self._password_data()
         self.user_id = self.user_id or self._get_user()[0]['Id']
@@ -43,7 +49,7 @@ class EmbyHandler(object):
         """Return user dict from server or None if there is no user.
         """
         url = self.api_url('/Users/Public')
-        r = requests.get(url)
+        r = requests.get(url, cert=self.cert)
         user = [i for i in r.json() if i['Name'] == self.username]
 
         if user:
@@ -55,7 +61,8 @@ class EmbyHandler(object):
         """Return token for a user.
         """
         url = self.api_url('/Users/AuthenticateByName')
-        r = requests.post(url, headers=self.headers, data=self.auth_data)
+        r = requests.post(
+                url, headers=self.headers, data=self.auth_data, cert=self.cert)
 
         return r.json().get('AccessToken')
 
@@ -99,6 +106,7 @@ class EmbyHandler(object):
         )
 
         session = requests.Session()
+        session.cert = self.cert
         session.proxies.update({'http': proxy, 'https': proxy})
         session.headers.update({'user-agent': full_user_agent})
 
