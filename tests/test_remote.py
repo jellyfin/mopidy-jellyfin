@@ -56,7 +56,7 @@ def test_get_music_root_cant_find(r_get_mock, data, expected, emby_client):
         r_get_mock.return_value = json.load(f)
 
     with pytest.raises(Exception) as execinfo:
-        print emby_client.get_music_root()
+        emby_client.get_music_root()
 
     assert expected in str(execinfo.value)
 
