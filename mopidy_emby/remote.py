@@ -1,11 +1,8 @@
 from __future__ import unicode_literals
 
 import hashlib
-
 import logging
-
 from collections import OrderedDict, defaultdict
-
 from urllib import urlencode
 from urllib2 import quote
 from urlparse import parse_qs, urljoin, urlsplit, urlunsplit
@@ -15,9 +12,7 @@ from mopidy import httpclient, models
 import requests
 
 import mopidy_emby
-
 from mopidy_emby.utils import cache
-
 
 logger = logging.getLogger(__name__)
 
