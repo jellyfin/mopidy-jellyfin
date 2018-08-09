@@ -28,6 +28,8 @@ class Extension(ext.Extension):
         schema['password'] = config.Secret()
         schema['hostname'] = config.String()
         schema['port'] = config.Port()
+        schema['client_cert'] = config.String(optional=True)
+        schema['client_key'] = config.String(optional=True)
 
         return schema
 
