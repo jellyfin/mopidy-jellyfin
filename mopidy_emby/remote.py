@@ -66,10 +66,7 @@ class EmbyHandler(object):
         """
         return {
             'username': self.username,
-            'password': hashlib.sha1(
-                self.password.encode('utf-8')).hexdigest(),
-            'passwordMd5': hashlib.md5(
-                self.password.encode('utf-8')).hexdigest()
+            'pw': self.password
         }
 
     def _create_headers(self, token=None):
