@@ -14,10 +14,10 @@ def get_version(filename):
 setup(
     name='Mopidy-Jellyfin',
     version=get_version('mopidy_jellyfin/__init__.py'),
-    url='https://github.com/xsteadfastx/mopidy-jellyfin',
+    url='https://github.com/mcarlton00/mopidy-jellyfin',
     license='Apache License, Version 2.0',
-    author='Marvin Steadfast',
-    author_email='marvin@xsteadfastx.org',
+    author='Marvin Steadfast,mcarlton00@gmail.com',
+    author_email='marvin@xsteadfastx.org,mcarlton00@gmail.com',
     description='Mopidy extension for playing music from jellyfin',
     long_description=open('README.rst').read(),
     packages=find_packages(exclude=['tests', 'tests.*']),
@@ -25,7 +25,7 @@ setup(
     include_package_data=True,
     install_requires=[
         'setuptools',
-        'Mopidy >= 1.0',
+        'Mopidy >= 2.0',
         'Pykka >= 1.1',
         'requests >= 2.0',
     ],
