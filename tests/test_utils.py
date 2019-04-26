@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 from mock import Mock
 
 
-from mopidy_emby import utils
+from mopidy_jellyfin import utils
 
 
 def test_decorator():

@@ -11,24 +11,24 @@ from mopidy import httpclient, models
 
 import requests
 
-import mopidy_emby
-from mopidy_emby.utils import cache
+import mopidy_jellyfin
+from mopidy_jellyfin.utils import cache
 
 logger = logging.getLogger(__name__)
 
 
-class EmbyHandler(object):
+class JellyfinHandler(object):
     def __init__(self, config):
-        self.hostname = config['emby']['hostname']
-        self.port = config['emby']['port']
-        self.username = config['emby']['username']
-        self.password = config['emby']['password']
+        self.hostname = config['jellyfin']['hostname']
+        self.port = config['jellyfin']['port']
+        self.username = config['jellyfin']['username']
+        self.password = config['jellyfin']['password']
         self.proxy = config['proxy']
-        self.user_id = config['emby'].get('user_id', False)
+        self.user_id = config['jellyfin'].get('user_id', False)
 
         self.cert = None
-        client_cert = config['emby'].get('client_cert', None)
-        client_key = config['emby'].get('client_key', None)
+        client_cert = config['jellyfin'].get('client_cert', None)
+        client_key = config['jellyfin'].get('client_key', None)
         if client_cert is not None and client_key is not None:
             self.cert = (client_cert, client_key)
 
@@ -50,12 +50,13 @@ class EmbyHandler(object):
         if user:
             return user
         else:
-            raise Exception('No Emby user {} found'.format(self.username))
+            raise Exception('No Jellyfin user {} found'.format(self.username))
 
     def _get_token(self):
         """Return token for a user.
         """
         url = self.api_url('/Users/AuthenticateByName')
+        logger.info(self.auth_data)
         r = requests.post(
                 url, headers=self.headers, data=self.auth_data, cert=self.cert)
 
@@ -66,11 +67,11 @@ class EmbyHandler(object):
         """
         return {
             'username': self.username,
-            'pw': self.password
+            'Pw': self.password
         }
 
     def _create_headers(self, token=None):
-        """Return header dict that is needed to talk to the Emby API.
+        """Return header dict that is needed to talk to the Jellyfin API.
         """
         headers = {}
 
@@ -93,7 +94,7 @@ class EmbyHandler(object):
         proxy = httpclient.format_proxy(self.proxy)
         full_user_agent = httpclient.format_user_agent(
             '/'.join(
-                (mopidy_emby.Extension.dist_name, mopidy_emby.__version__)
+                (mopidy_jellyfin.Extension.dist_name, mopidy_jellyfin.__version__)
             )
         )
 
@@ -120,18 +121,18 @@ class EmbyHandler(object):
 
             except Exception as e:
                 logger.info(
-                    'Emby connection on try {} with problem: {}'.format(
+                    'Jellyfin connection on try {} with problem: {}'.format(
                         counter, e
                     )
                 )
                 counter += 1
 
-        raise Exception('Cant connect to Emby API')
+        raise Exception('Cant connect to Jellyfin API')
 
     def api_url(self, endpoint):
         """Returns a joined url.
 
-        Takes host, port and endpoint and generates a valid emby API url.
+        Takes host, port and endpoint and generates a valid jellyfin API url.
         """
         # check if http or https is defined as host and create hostname
         hostname_list = [self.hostname]
@@ -172,19 +173,19 @@ class EmbyHandler(object):
 
         if id:
             logging.debug(
-                'Emby: Found music root dir with ID: {}'.format(id[0])
+                'Jellyfin: Found music root dir with ID: {}'.format(id[0])
             )
             return id[0]
 
         else:
             logging.debug(
-                'Emby: All directories found: {}'.format(
+                'Jellyfin: All directories found: {}'.format(
                     [i['CollectionType']
                      for i in data['Items']
                      if 'CollectionType' in i.items()]
                 )
             )
-            raise Exception('Emby: Cant find music root directory')
+            raise Exception('Jellyfin: Cant find music root directory')
 
     def get_artists(self):
         music_root = self.get_music_root()
@@ -195,7 +196,7 @@ class EmbyHandler(object):
 
         return [
             models.Ref.artist(
-                uri='emby:artist:{}'.format(i['Id']),
+                uri='jellyfin:artist:{}'.format(i['Id']),
                 name=i['Name']
             )
             for i in artists
@@ -209,7 +210,7 @@ class EmbyHandler(object):
         )
         return [
             models.Ref.album(
-                uri='emby:album:{}'.format(i['Id']),
+                uri='jellyfin:album:{}'.format(i['Id']),
                 name=i['Name']
             )
             for i in albums
@@ -224,7 +225,7 @@ class EmbyHandler(object):
 
         return [
             models.Ref.track(
-                uri='emby:track:{}'.format(
+                uri='jellyfin:track:{}'.format(
                     i['Id']
                 ),
                 name=i['Name']
@@ -235,7 +236,7 @@ class EmbyHandler(object):
 
     @cache()
     def get_directory(self, id):
-        """Get directory from Emby API.
+        """Get directory from Jellyfin API.
 
         :param id: Directory ID
         :type id: int
@@ -253,7 +254,7 @@ class EmbyHandler(object):
 
     @cache()
     def get_item(self, id):
-        """Get item from Emby API.
+        """Get item from Jellyfin API.
 
         :param id: Item ID
         :type id: int
@@ -266,21 +267,21 @@ class EmbyHandler(object):
             )
         )
 
-        logger.debug('Emby item: {}'.format(data))
+        logger.debug('Jellyfin item: {}'.format(data))
 
         return data
 
     def create_track(self, track):
-        """Create track from Emby API track dict.
+        """Create track from Jellyfin API track dict.
 
-        :param track: Track from Emby API
+        :param track: Track from Jellyfin API
         :type track: dict
         :returns: Track
         :rtype: mopidy.models.Track
         """
         # TODO: add more metadata
         return models.Track(
-            uri='emby:track:{}'.format(
+            uri='jellyfin:track:{}'.format(
                 track['Id']
             ),
             name=track.get('Name'),
@@ -323,7 +324,7 @@ class EmbyHandler(object):
     def get_track(self, track_id):
         """Get track.
 
-        :param track_id: ID of a Emby track
+        :param track_id: ID of a Jellyfin track
         :type track_id: int
         :returns: track
         :rtype: mopidy.models.Track
@@ -333,7 +334,7 @@ class EmbyHandler(object):
         return self.create_track(track)
 
     def _get_search(self, itemtype, term):
-        """Gets search data from Emby API.
+        """Gets search data from Jellyfin API.
 
         :param itemtype: Type to search for
         :param term: Search term
@@ -351,7 +352,7 @@ class EmbyHandler(object):
         elif itemtype == 'track_name':
             query = 'Audio'
         else:
-            raise Exception('Emby search: no itemtype {}'.format(itemtype))
+            raise Exception('Jellyfin search: no itemtype {}'.format(itemtype))
 
         data = self.r_get(
             self.api_url(
@@ -367,14 +368,14 @@ class EmbyHandler(object):
 
     @cache()
     def search(self, query):
-        """Search Emby for a term.
+        """Search Jellyfin for a term.
 
         :param query: Search query
         :type query: dict
         :returns: Search results
         :rtype: mopidy.models.SearchResult
         """
-        logger.debug('Searching in Emby for {}'.format(query))
+        logger.debug('Searching in Jellyfin for {}'.format(query))
 
         # something to store the results in
         data = []
@@ -404,7 +405,7 @@ class EmbyHandler(object):
 
                 tracks.append(
                     models.Track(
-                        uri='emby:track:{}'.format(item['ItemId']),
+                        uri='jellyfin:track:{}'.format(item['ItemId']),
                         track_no=item.get('IndexNumber'),
                         name=item.get('Name'),
                         artists=track_artists,
@@ -425,7 +426,7 @@ class EmbyHandler(object):
 
                 albums.append(
                     models.Album(
-                        uri='emby:album:{}'.format(item['ItemId']),
+                        uri='jellyfin:album:{}'.format(item['ItemId']),
                         name=item.get('Name'),
                         artists=album_artists
                     )
@@ -434,13 +435,13 @@ class EmbyHandler(object):
             elif item['Type'] == 'MusicArtist':
                 artists.append(
                     models.Artist(
-                        uri='emby:artist:{}'.format(item['ItemId']),
+                        uri='jellyfin:artist:{}'.format(item['ItemId']),
                         name=item.get('Name')
                     )
                 )
 
         return models.SearchResult(
-            uri='emby:search',
+            uri='jellyfin:search',
             tracks=tracks,
             artists=artists,
             albums=albums
@@ -483,7 +484,7 @@ class EmbyHandler(object):
 
     @staticmethod
     def ticks_to_milliseconds(ticks):
-        """Converts Emby track length ticks to milliseconds.
+        """Converts Jellyfin track length ticks to milliseconds.
 
         :param ticks: Ticks
         :type ticks: int

@@ -12,13 +12,13 @@ def get_version(filename):
 
 
 setup(
-    name='Mopidy-Emby',
-    version=get_version('mopidy_emby/__init__.py'),
-    url='https://github.com/xsteadfastx/mopidy-emby',
+    name='Mopidy-Jellyfin',
+    version=get_version('mopidy_jellyfin/__init__.py'),
+    url='https://github.com/xsteadfastx/mopidy-jellyfin',
     license='Apache License, Version 2.0',
     author='Marvin Steadfast',
     author_email='marvin@xsteadfastx.org',
-    description='Mopidy extension for playing music from Emby',
+    description='Mopidy extension for playing music from jellyfin',
     long_description=open('README.rst').read(),
     packages=find_packages(exclude=['tests', 'tests.*']),
     zip_safe=False,
@@ -31,7 +31,7 @@ setup(
     ],
     entry_points={
         'mopidy.ext': [
-            'emby = mopidy_emby:Extension',
+            'jellyfin = mopidy_jellyfin:Extension',
         ],
     },
     classifiers=[

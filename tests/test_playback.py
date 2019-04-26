@@ -5,14 +5,14 @@ import pytest
 
 @pytest.mark.parametrize('uri,expected', [
     (
-        'emby:track:123',
+        'jellyfin:track:123',
         [
             'https://foo.bar:443/Audio/123/stream?static=true&format=json',
             'https://foo.bar:443/Audio/123/stream?format=json&static=true',
         ]
     ),
     (
-        'emby:foobar',
+        'jellyfin:foobar',
         [None]
     )
 ])

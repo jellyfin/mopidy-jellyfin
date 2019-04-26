@@ -1,7 +1,7 @@
 {
     "ServerId": "1efa5077976bfa92bc71652404f646ec",
     "SessionInfo": {
-        "UserName": "embyuser",
+        "UserName": "jellyfinuser",
         "DeviceName": "mopidy",
         "ApplicationVersion": "0.0.0",
         "QueueableMediaTypes": [],
@@ -22,7 +22,7 @@
         "DeviceId": "mopidy"
     },
     "User": {
-        "Name": "embyuser",
+        "Name": "jellyfinuser",
         "HasConfiguredEasyPassword": false,
         "LastActivityDate": "2016-11-30T08:10:01.7344640Z",
         "HasPassword": true,

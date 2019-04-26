@@ -13,8 +13,8 @@ logger = logging.getLogger(__name__)
 
 class Extension(ext.Extension):
 
-    dist_name = 'Mopidy-Emby'
-    ext_name = 'emby'
+    dist_name = 'Mopidy-Jellyfin'
+    ext_name = 'jellyfin'
     version = __version__
 
     def get_default_config(self):
@@ -34,5 +34,5 @@ class Extension(ext.Extension):
         return schema
 
     def setup(self, registry):
-        from .backend import EmbyBackend
-        registry.add('backend', EmbyBackend)
+        from .backend import JellyfinBackend
+        registry.add('backend', JellyfinBackend)

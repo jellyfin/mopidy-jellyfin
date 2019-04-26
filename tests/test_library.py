@@ -6,16 +6,16 @@ import pytest
 
 
 @pytest.mark.parametrize('uri,expected', [
-    ('emby:', ['Artistlist']),
-    ('emby:artist:123', ['Albumlist']),
-    ('emby:album:123', ['Tracklist']),
+    ('jellyfin:', ['Artistlist']),
+    ('jellyfin:artist:123', ['Albumlist']),
+    ('jellyfin:album:123', ['Tracklist']),
 ])
 def test_browse(uri, expected, libraryprovider):
     assert libraryprovider.browse(uri) == expected
 
 
 @pytest.mark.parametrize('uri,expected', [
-    ('emby:track:123', [
+    ('jellyfin:track:123', [
         Track(
             album=Album(
                 artists=[
@@ -26,10 +26,10 @@ def test_browse(uri, expected, libraryprovider):
             length=241162,
             name='The One With the Tambourine',
             track_no=1,
-            uri='emby:track:eb6c305bdb1e40d3b46909473c22d906'
+            uri='jellyfin:track:eb6c305bdb1e40d3b46909473c22d906'
         )
     ]),
-    ('emby:album:123', [
+    ('jellyfin:album:123', [
         Track(
             album=Album(
                 artists=[
@@ -40,18 +40,18 @@ def test_browse(uri, expected, libraryprovider):
             length=241162,
             name='The One With the Tambourine',
             track_no=1,
-            uri='emby:track:eb6c305bdb1e40d3b46909473c22d906'
+            uri='jellyfin:track:eb6c305bdb1e40d3b46909473c22d906'
         )
     ]),
-    ('emby:artist:123', ['track1', 'track2']),
-    ('emby:track', [])
+    ('jellyfin:artist:123', ['track1', 'track2']),
+    ('jellyfin:track', [])
 ])
 def test_lookup_uri(uri, expected, libraryprovider):
     assert libraryprovider.lookup(uri=uri) == expected
 
 
 @pytest.mark.parametrize('uri,expected', [
-    (['emby:track:123'], {'emby:track:123': [
+    (['jellyfin:track:123'], {'jellyfin:track:123': [
         Track(
             album=Album(
                 artists=[
@@ -62,10 +62,10 @@ def test_lookup_uri(uri, expected, libraryprovider):
             length=241162,
             name='The One With the Tambourine',
             track_no=1,
-            uri='emby:track:eb6c305bdb1e40d3b46909473c22d906'
+            uri='jellyfin:track:eb6c305bdb1e40d3b46909473c22d906'
         )
     ]}),
-    (['emby:track'], {u'emby:track': []})
+    (['jellyfin:track'], {u'jellyfin:track': []})
 ])
 def test_lookup_uris(uri, expected, libraryprovider):
     assert libraryprovider.lookup(uris=uri) == expected

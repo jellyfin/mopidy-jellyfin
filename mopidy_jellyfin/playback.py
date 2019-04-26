@@ -8,17 +8,17 @@ from mopidy import backend
 logger = logging.getLogger(__name__)
 
 
-class EmbyPlaybackProvider(backend.PlaybackProvider):
+class JellyfinPlaybackProvider(backend.PlaybackProvider):
 
     def translate_uri(self, uri):
-        if uri.startswith('emby:track:') and len(uri.split(':')) == 3:
+        if uri.startswith('jellyfin:track:') and len(uri.split(':')) == 3:
             id = uri.split(':')[-1]
 
             track_url = self.backend.remote.api_url(
                 '/Audio/{}/stream?static=true'.format(id)
             )
 
-            logger.debug('Emby track streaming url: {}'.format(track_url))
+            logger.debug('Jellyfin track streaming url: {}'.format(track_url))
 
             return track_url
 

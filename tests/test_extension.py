@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
 
-from mopidy_emby import Extension
+from mopidy_jellyfin import Extension
 
 
 def test_get_default_config():
@@ -8,7 +8,7 @@ def test_get_default_config():
 
     config = ext.get_default_config()
 
-    assert '[emby]' in config
+    assert '[jellyfin]' in config
     assert 'enabled = true' in config
 
 
