@@ -14,16 +14,25 @@ class JellyfinLibraryProvider(backend.LibraryProvider):
                                           name='Jellyfin')
 
     def browse(self, uri):
-        # artistlist
+        # librarylist
         if uri == self.root_directory.uri:
-            logger.debug('Get Jellyfin artist list')
-            return self.backend.remote.get_artists()
+            logger.debug('Get Jellyfin library list')
+            return self.backend.remote.get_library_roots()
 
         # split uri
         parts = uri.split(':')
 
+        # artistlist
+        if uri.startswith('jellyfin:directory:') and len(parts) == 3:
+            logger.debug('Get Jellyfin artist list')
+            library_id = parts[-1]
+
+            return self.backend.remote.get_artists(library_id)
+
         # artists albums
         # uri: jellyfin:artist:<artist_id>
+        logger.debug('jellyfin: uri = ')
+        logger.debug(uri)
         if uri.startswith('jellyfin:artist:') and len(parts) == 3:
             logger.debug('Get Jellyfin album list')
             artist_id = parts[-1]

@@ -23,6 +23,7 @@ class JellyfinHandler(object):
         self.port = config['jellyfin']['port']
         self.username = config['jellyfin']['username']
         self.password = config['jellyfin']['password']
+        self.libraries = config['jellyfin'].get('libraries', "")
         self.proxy = config['proxy']
         self.user_id = config['jellyfin'].get('user_id', False)
 
@@ -166,16 +167,14 @@ class JellyfinHandler(object):
 
         data = self.r_get(url)
 
-        id = [i['Id']
-              for i in data['Items']
-              if 'CollectionType' in i.keys()
-              if i['CollectionType'] == 'music']
+        media_folders = [
+            {'Name': library['Name'], 'Id':library['Id']} for library in data['Items']
+              if library['Name'] in self.libraries
+        ]
 
-        if id:
-            logging.debug(
-                'Jellyfin: Found music root dir with ID: {}'.format(id[0])
-            )
-            return id[0]
+        if media_folders:
+            logging.debug('Jellyfin: Found libraries')
+            return media_folders
 
         else:
             logging.debug(
@@ -187,10 +186,21 @@ class JellyfinHandler(object):
             )
             raise Exception('Jellyfin: Cant find music root directory')
 
-    def get_artists(self):
-        music_root = self.get_music_root()
+    def get_library_roots(self):
+        libraries = self.get_music_root()
+
+        return [
+            models.Ref.directory(
+                uri='jellyfin:directory:{}'.format(i['Id']),
+                name=i['Name']
+            ) for i in libraries if i
+        ]
+
+    def get_artists(self, library_id):
+        #library_artists = self.get_directory(library_id)
+        #logger.debug(library_artists)
         artists = sorted(
-            self.get_directory(music_root)['Items'],
+            self.get_directory(library_id)['Items'],
             key=lambda k: k['Name']
         )
 
@@ -218,6 +228,7 @@ class JellyfinHandler(object):
         ]
 
     def get_tracks(self, album_id):
+        logger.debug('jellyfin: album_id - ' + album_id)
         tracks = sorted(
             self.get_directory(album_id)['Items'],
             key=lambda k: k['IndexNumber']
