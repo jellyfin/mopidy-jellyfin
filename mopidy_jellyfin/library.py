@@ -14,7 +14,7 @@ class JellyfinLibraryProvider(backend.LibraryProvider):
                                           name='Jellyfin')
 
     def browse(self, uri):
-        # librarylist
+        # display top level libraries
         if uri == self.root_directory.uri:
             logger.debug('Get Jellyfin library list')
             return self.backend.remote.get_library_roots()
@@ -22,30 +22,26 @@ class JellyfinLibraryProvider(backend.LibraryProvider):
         # split uri
         parts = uri.split(':')
 
-        # artistlist
+        # display artists
+        # uri: jellyfin:directory
         if uri.startswith('jellyfin:directory:') and len(parts) == 3:
             logger.debug('Get Jellyfin artist list')
             library_id = parts[-1]
 
             return self.backend.remote.get_artists(library_id)
 
-        # artists albums
-        # uri: jellyfin:artist:<artist_id>
-        logger.debug('jellyfin: uri = ')
-        logger.debug(uri)
-        if uri.startswith('jellyfin:artist:') and len(parts) == 3:
-            logger.debug('Get Jellyfin album list')
-            artist_id = parts[-1]
-
-            return self.backend.remote.get_albums(artist_id)
-
-        # tracklist
-        # uri: jellyfin:album:<album_id>
-        if uri.startswith('jellyfin:album:') and len(parts) == 3:
-            logger.debug('Get Jellyfin track list')
-            album_id = parts[-1]
-
-            return self.backend.remote.get_tracks(album_id)
+        # display albums or tracks based on type of parent object
+        # uri:
+        #   jellyfin:$library_name:artist
+        #   jellyfin:$library_name:album
+        elif uri.startswith('jellyfin:') and len(parts) == 3:
+            item_id = parts[-1]
+            item_type = self.backend.remote.get_item(item_id).get('Type')
+            logger.debug('Jellyfin item type: {}'.format(item_type))
+            if item_type == "Folder":
+                return self.backend.remote.get_albums(item_id)
+            elif item_type == "MusicAlbum":
+                return self.backend.remote.get_tracks(item_id)
 
         return []
 

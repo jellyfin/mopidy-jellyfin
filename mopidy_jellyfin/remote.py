@@ -231,7 +231,7 @@ class JellyfinHandler(object):
         logger.debug('jellyfin: album_id - ' + album_id)
         tracks = sorted(
             self.get_directory(album_id)['Items'],
-            key=lambda k: k['IndexNumber']
+            key=lambda k: (k.get('IndexNumber', 0), k.get('Name'))
         )
 
         return [
@@ -486,7 +486,7 @@ class JellyfinHandler(object):
         # sort tracks in album dict
         tracks = []
         for album, track_list in album_dict.items():
-            track_list.sort(key=lambda k: k['IndexNumber'])
+            track_list.sort(key=lambda k: (k.get('IndexNumber', 0),k.get('Name')))
 
             # add tracks to list
             tracks.extend(track_list)
