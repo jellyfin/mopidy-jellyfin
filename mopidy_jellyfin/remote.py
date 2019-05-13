@@ -57,7 +57,6 @@ class JellyfinHandler(object):
         """Return token for a user.
         """
         url = self.api_url('/Users/AuthenticateByName')
-        logger.info(self.auth_data)
         r = requests.post(
                 url, headers=self.headers, data=self.auth_data, cert=self.cert)
 
