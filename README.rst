@@ -12,8 +12,9 @@ Installation
 
 Install by running::
 
-    python2 setup.py install
+    pip2 install git+https://github.com/mcarlton00/mopidy-jellyfin#egg=mopidy-jellyfin
 
+Note that mopidy is still limited to python 2
 
 Configuration
 =============
@@ -26,7 +27,7 @@ Mopidy-Jellyfin to your Mopidy configuration file::
     port = Emby server port
     username = username
     password = password
-    libraries = Library1, Library2
+    libraries = Library1, Library2 (Optional: will default to "Music" if left undefined)
 
 Its also possible to add a users id with ``user_id = 0``.
 
