@@ -27,7 +27,7 @@ class Extension(ext.Extension):
         schema['user_id'] = config.String(optional=True)
         schema['password'] = config.Secret()
         schema['hostname'] = config.String()
-        schema['libraries'] = config.String()
+        schema['libraries'] = config.String(optional=True)
         schema['port'] = config.Port()
         schema['client_cert'] = config.String(optional=True)
         schema['client_key'] = config.String(optional=True)

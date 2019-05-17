@@ -23,7 +23,9 @@ class JellyfinHandler(object):
         self.port = config['jellyfin']['port']
         self.username = config['jellyfin']['username']
         self.password = config['jellyfin']['password']
-        self.libraries = config['jellyfin'].get('libraries', "")
+        self.libraries = config['jellyfin'].get('libraries')
+        if not self.libraries:
+            self.libraries = 'Music'
         self.proxy = config['proxy']
         self.user_id = config['jellyfin'].get('user_id', False)
 
