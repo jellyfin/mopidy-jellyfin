@@ -1,25 +1,10 @@
 ****************************
-Mopidy-Emby
+Mopidy-Jellyfin
 ****************************
 
-.. image:: https://img.shields.io/pypi/v/Mopidy-Emby.svg?style=flat
-    :target: https://pypi.python.org/pypi/Mopidy-Emby/
-    :alt: Latest PyPI version
+Mopidy extension for playing audio files from Jellyfin
 
-.. image:: https://img.shields.io/travis/xsteadfastx/mopidy-emby/master.svg?style=flat
-    :target: https://travis-ci.org/xsteadfastx/mopidy-emby
-    :alt: Travis CI build status
-
-.. image:: https://img.shields.io/coveralls/xsteadfastx/mopidy-emby/master.svg?style=flat
-    :target: https://coveralls.io/r/xsteadfastx/mopidy-emby
-    :alt: Test coverage
-
-.. image:: https://img.shields.io/badge/SayThanks.io-%E2%98%BC-1EAEDB.svg
-    :target: https://saythanks.io/to/xsteadfastx
-    :alt: Say Thanks
-
-
-Mopidy extension for playing music from Emby
+Note: Currently only supports the "Music" media type
 
 
 Installation
@@ -27,24 +12,21 @@ Installation
 
 Install by running::
 
-    pip install Mopidy-Emby
-
-or straight from GitHub::
-
-    pip install git+https://github.com/xsteadfastx/mopidy-emby#egg=mopidy-emby
+    python2 setup.py install
 
 
 Configuration
 =============
 
 Before starting Mopidy, you must add configuration for
-Mopidy-Emby to your Mopidy configuration file::
+Mopidy-Jellyfin to your Mopidy configuration file::
 
-    [emby]
+    [jellyfin]
     hostname = Emby server hostname
     port = Emby server port
     username = username
     password = password
+    libraries = Library1, Library2
 
 Its also possible to add a users id with ``user_id = 0``.
 
@@ -52,20 +34,27 @@ Its also possible to add a users id with ``user_id = 0``.
 Project resources
 =================
 
-- `Source code <https://github.com/xsteadfastx/mopidy-emby>`_
-- `Issue tracker <https://github.com/xsteadfastx/mopidy-emby/issues>`_
+- `Source code <https://github.com/mcarlton00/mopidy-jellyfin>`_
+- `Issue tracker <https://github.com/mcarlton00/mopidy-jellyfin/issues>`_
 
 
 Credits
 =======
 
 - Original author: `Marvin Steadfast <https://github.com/xsteadfastx>`_
-- Current maintainer: `Marvin Steadfast <https://github.com/xsteadfastx>`_
-- `Contributors <https://github.com/xsteadfastx/mopidy-emby/graphs/contributors>`_
+- Current maintainer: `Matt Carlton <https://github.com/mcarlton00>`_
+- `Contributors <https://github.com/mcarlton00/mopidy-jellyfin/graphs/contributors>`_
 
 
 Changelog
 =========
+
+v0.3.0
+---------------------------------------
+
+- Rebrand to Jellyfin
+- Patch auth method to work in Jellyfin
+- Add support for multiple audio libraries
 
 v0.2.6
 ---------------------------------------
