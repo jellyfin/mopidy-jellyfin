@@ -12,7 +12,7 @@ Installation
 
 Install by running::
 
-    pip2 install git+https://github.com/mcarlton00/mopidy-jellyfin#egg=mopidy-jellyfin
+    pip2 install Mopidy-Jellyfin
 
 Note that mopidy is still limited to python 2
 
