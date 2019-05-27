@@ -9,7 +9,8 @@ name = "pypi"
 
 mopidy = "*"
 pykka = "*"
-requests = "*"
+requests = ">2.20.0"
+urllib3 = ">1.24.2"
 
 
 [dev-packages]

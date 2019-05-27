@@ -50,6 +50,12 @@ Credits
 Changelog
 =========
 
+v0.3.1
+---------------------------------------
+
+- Address security vulnerability in dependencies
+- Add package to PyPI
+
 v0.3.0
 ---------------------------------------
 

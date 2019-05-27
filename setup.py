@@ -27,7 +27,7 @@ setup(
         'setuptools',
         'Mopidy >= 2.0',
         'Pykka >= 1.1',
-        'requests >= 2.0',
+        'requests >= 2.20',
     ],
     entry_points={
         'mopidy.ext': [
