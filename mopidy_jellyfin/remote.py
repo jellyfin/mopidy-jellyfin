@@ -197,6 +197,44 @@ class JellyfinHandler(object):
             ) for i in libraries if i
         ]
 
+    def get_playlists(self):
+        url = self.api_url(
+            '/Users/{}/Views'.format(self.user_id)
+        )
+
+        data = self.r_get(url)
+
+        library_id = [
+            library['Id'] for library in data['Items']
+              if library['Name'] == 'Playlists'
+        ][0]
+
+        raw_playlists = self.get_directory(library_id)
+
+        return [
+            models.Ref.playlist(
+                uri='jellyfin:playlists:{}'.format(i['Id']),
+                name='{}'.format(i['Name'])
+            ) for i in raw_playlists['Items'] if i
+        ]
+
+    def get_playlist_contents(self, playlist_id):
+        url = self.api_url(
+            '/Users/{}/Items?ParentId={}&SortOrder=Ascending'.format(self.user_id, playlist_id)
+        )
+
+        data = self.r_get(url)
+
+        contents = [
+            {
+                'Artist': i['AlbumArtist'],
+                'Title': i['Name'],
+                'Id': i['Id']
+            } for i in data['Items'] if i
+        ]
+
+        return contents
+
     def get_artists(self, library_id):
         #library_artists = self.get_directory(library_id)
         #logger.debug(library_artists)
