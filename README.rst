@@ -23,8 +23,8 @@ Before starting Mopidy, you must add configuration for
 Mopidy-Jellyfin to your Mopidy configuration file::
 
     [jellyfin]
-    hostname = Emby server hostname
-    port = Emby server port
+    hostname = Jellyfin server hostname
+    port = Jellyfin server port
     username = username
     password = password
     libraries = Library1, Library2 (Optional: will default to "Music" if left undefined)
