@@ -50,6 +50,12 @@ Credits
 Changelog
 =========
 
+v0.4.0
+---------------------------------------
+
+- Add playlist support
+- Improve client identification to Jellyfin
+
 v0.3.1
 ---------------------------------------
 
