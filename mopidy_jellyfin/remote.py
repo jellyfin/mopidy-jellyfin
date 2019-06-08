@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 import hashlib
 import logging
+import socket
 from collections import OrderedDict, defaultdict
 from urllib import urlencode
 from urllib2 import quote
@@ -79,11 +80,15 @@ class JellyfinHandler(object):
 
         authorization = (
             'MediaBrowser UserId="{user_id}", '
-            'Client="other", '
-            'Device="mopidy", '
-            'DeviceId="mopidy", '
-            'Version="0.0.0"'
-        ).format(user_id=self.user_id)
+            'Client="Mopidy", '
+            'Device="{name}", '
+            'DeviceId="{name}", '
+            'Version="{version}"'
+        ).format(
+            user_id=self.user_id,
+            name=socket.gethostname(),
+            version=mopidy_jellyfin.__version__
+        )
 
         headers['x-emby-authorization'] = authorization
 
