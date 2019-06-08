@@ -115,7 +115,10 @@ class JellyfinHandler(object):
 
             try:
                 r = session.get(url)
-                rv = r.json()
+                try:
+                    rv = r.json()
+                except:
+                    rv = {}
 
                 logger.debug(str(rv))
 
@@ -131,6 +134,70 @@ class JellyfinHandler(object):
 
         raise Exception('Cant connect to Jellyfin API')
 
+    def r_post(self, url, *args, **kwargs):
+        if args:
+            payload = args[0]
+        else:
+            payload = {}
+        counter = 0
+        session = self._get_session()
+        session.headers.update(self.headers)
+        while counter <= 5:
+
+            try:
+                r = session.post(url, payload)
+                if r.text:
+                    rv = r.json()
+                else:
+                    rv = r.text
+
+                logger.debug(rv)
+
+                return rv
+
+            except Exception as e:
+                logger.info(
+                    'Jellyfin connection on try {} with problem: {}'.format(
+                        counter, e
+                    )
+                )
+                counter += 1
+
+        raise Exception('Cant connect to Jellyfin API')
+
+    def r_delete(self, url):
+        counter = 0
+        session = self._get_session()
+        session.headers.update(self.headers)
+        while counter <= 5:
+
+            try:
+                r = session.delete(url)
+
+                logger.debug(str(r))
+
+                return r
+
+            except Exception as e:
+                logger.info(
+                    'Jellyfin connection on try {} with problem: {}'.format(
+                        counter, e
+                    )
+                )
+                counter += 1
+
+        raise Exception('Cant connect to Jellyfin API')
+
+    def api_url(self, endpoint):
+        """Returns a joined url.
+
+        Takes host, port and endpoint and generates a valid jellyfin API url.
+        """
+        # check if http or https is defined as host and create hostname
+        hostname_list = [self.hostname]
+        if self.hostname.startswith('http://') or \
+                self.hostname.startswith('https://'):
+            hostname = ''.join(hostname_list)
     def api_url(self, endpoint):
         """Returns a joined url.
 
@@ -207,7 +274,13 @@ class JellyfinHandler(object):
         library_id = [
             library['Id'] for library in data['Items']
               if library['Name'] == 'Playlists'
-        ][0]
+        ]
+
+        if library_id:
+            library_id = library_id[0]
+        else:
+            return []
+
 
         raw_playlists = self.get_directory(library_id)
 
@@ -219,21 +292,61 @@ class JellyfinHandler(object):
         ]
 
     def get_playlist_contents(self, playlist_id):
+        contents = []
         url = self.api_url(
-            '/Users/{}/Items?ParentId={}&SortOrder=Ascending'.format(self.user_id, playlist_id)
+            '/Playlists/{}/Items?UserId={}'.format(playlist_id, self.user_id)
         )
 
         data = self.r_get(url)
 
-        contents = [
-            {
-                'Artist': i['AlbumArtist'],
-                'Title': i['Name'],
-                'Id': i['Id']
-            } for i in data['Items'] if i
-        ]
+        if data:
+            contents = [
+                {
+                    'Artist': i['AlbumArtist'],
+                    'Title': i['Name'],
+                    'Id': i['Id'],
+                    'PlaylistItemId': i['PlaylistItemId']
+                } for i in data['Items'] if i
+            ]
 
         return contents
+
+    def create_playlist(self, name):
+        url = self.api_url('/Playlists')
+
+        payload = {
+            'Name': name,
+            'UserId': self.user_id,
+            'MediaType': 'Audio'
+        }
+
+        return self.r_post(url, payload)
+
+    def delete_playlist(self, playlist_id):
+        url = self.api_url('/Items/{}?UserId={}'.format(
+            playlist_id, self.user_id)
+        )
+
+        return self.r_delete(url)
+
+    def update_playlist(self, playlist_id, new_ids):
+        curr_tracks = self.get_playlist_contents(playlist_id)
+
+        curr_ids = [i['PlaylistItemId'] for i in curr_tracks]
+
+        del_url = self.api_url(
+            'Playlists/{}/Items?UserId={}&EntryIds={}'.format(
+                playlist_id, self.user_id, ','.join(str(i) for i in curr_ids))
+        )
+
+        clean = self.r_delete(del_url)
+
+        new_url = self.api_url(
+            '/Playlists/{}/Items?UserId={}&Ids={}'.format(
+                playlist_id, self.user_id, ','.join(new_ids))
+        )
+
+        populated = self.r_post(new_url)
 
     def get_artists(self, library_id):
         #library_artists = self.get_directory(library_id)
