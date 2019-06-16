@@ -28,7 +28,7 @@ class JellyfinLibraryProvider(backend.LibraryProvider):
             logger.debug('Get Jellyfin artist list')
             library_id = parts[-1]
 
-            return self.backend.remote.get_artists(library_id)
+            return self.backend.remote.browse_artists(library_id)
 
         # display albums or tracks based on type of parent object
         # uri:
@@ -38,10 +38,10 @@ class JellyfinLibraryProvider(backend.LibraryProvider):
             item_id = parts[-1]
             item_type = self.backend.remote.get_item(item_id).get('Type')
             logger.debug('Jellyfin item type: {}'.format(item_type))
-            if item_type == "Folder":
-                return self.backend.remote.get_albums(item_id)
+            if item_type == "MusicArtist":
+                return self.backend.remote.browse_albums(item_id)
             elif item_type == "MusicAlbum":
-                return self.backend.remote.get_tracks(item_id)
+                return self.backend.remote.browse_tracks(item_id)
 
         return []
 
