@@ -79,4 +79,12 @@ class JellyfinLibraryProvider(backend.LibraryProvider):
             return {uri: self.lookup(uri=uri) for uri in uris}
 
     def search(self, query=None, uris=None, exact=False):
+        if exact:
+            return self.backend.remote.exact_search(query)
         return self.backend.remote.search(query)
+
+    def get_distinct(self, field, query=None):
+
+        if field == 'artist':
+            return [artist.name for artist in self.backend.remote.get_artists()]
+        return []
