@@ -38,7 +38,7 @@ class JellyfinLibraryProvider(backend.LibraryProvider):
             item_id = parts[-1]
             item_type = self.backend.remote.get_item(item_id).get('Type')
             logger.debug('Jellyfin item type: {}'.format(item_type))
-            if item_type == "MusicArtist":
+            if item_type == "Folder":
                 return self.backend.remote.browse_albums(item_id)
             elif item_type == "MusicAlbum":
                 return self.backend.remote.browse_tracks(item_id)
@@ -79,7 +79,7 @@ class JellyfinLibraryProvider(backend.LibraryProvider):
             return {uri: self.lookup(uri=uri) for uri in uris}
 
     def search(self, query=None, uris=None, exact=False):
-        logger.debug('Jellyfin Search Query: {}'format(query))
+        logger.debug('Jellyfin Search Query: {}'.format(query))
         if exact:
             return self.backend.remote.exact_search(query)
         return self.backend.remote.search(query)

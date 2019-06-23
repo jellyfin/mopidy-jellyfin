@@ -356,11 +356,8 @@ class JellyfinHandler(object):
         populated = self.r_post(new_url)
 
     def browse_artists(self, library_id):
-        url = self.api_url('/Artists?ParentId={}&UserId={}'.format(
-            library_id, self.user_id)
-        )
-
-        artists = self.r_get(url)['Items']
+        logger.debug('jellyfin: library id - ' + library_id)
+        artists = self.get_directory(library_id)['Items']
 
         return [
             models.Ref.artist(
@@ -372,12 +369,8 @@ class JellyfinHandler(object):
         ]
 
     def browse_albums(self, artist_id):
-        url = self.api_url(
-            '/Items?AlbumArtistIds={}&UserId={}&IncludeItemTypes=MusicAlbum&Recursive=true'.format(
-                artist_id, self.user_id)
-        )
-
-        albums = self.r_get(url)['Items']
+        logger.debug('jellyfin: artist id - ' + artist_id)
+        albums = self.get_directory(artist_id)['Items']
 
         return [
             models.Ref.artist(
@@ -389,13 +382,8 @@ class JellyfinHandler(object):
         ]
 
     def browse_tracks(self, album_id):
-        logger.debug('jellyfin: album_id - ' + album_id)
-        url = self.api_url(
-            '/Items?AlbumIds={}&UserId={}&IncludeItemTypes=Audio&Recursive=true'.format(
-                album_id, self.user_id)
-        )
-
-        tracks = self.r_get(url)['Items']
+        logger.debug('jellyfin: album id - ' + album_id)
+        tracks = self.get_directory(album_id)['Items']
 
         return [
             models.Ref.track(
