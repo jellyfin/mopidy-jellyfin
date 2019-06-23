@@ -414,11 +414,12 @@ class JellyfinHandler(object):
 
         for library in libraries:
 
-            url = self.api_url('/Artists?ParentId={}&UserId={}'.format(
-                library['Id'], self.user_id)
-            )
+            if library['Name'] in self.libraries:
+                url = self.api_url('/Artists?ParentId={}&UserId={}'.format(
+                    library['Id'], self.user_id)
+                )
 
-            artists += self.r_get(url)['Items']
+                artists += self.r_get(url)['Items']
 
         return [
             models.Ref.artist(
@@ -541,7 +542,7 @@ class JellyfinHandler(object):
         """
         if itemtype == 'any':
             query = 'Audio,MusicAlbum,MusicArtist'
-        elif itemtype == 'artist':
+        elif itemtype == 'artist' or itemtype == 'albumartist':
             query = 'MusicArtist'
         elif itemtype == 'album':
             query = 'MusicAlbum'
@@ -645,53 +646,73 @@ class JellyfinHandler(object):
 
     @cache()
     def exact_search(self, query):
-        # something to store the results in
-        data = []
+        # Variable prep
         tracks = []
         albums = []
+        raw_artist = ''
         artist_ref = []
+        raw_albums = []
 
         # Get artist ID
-        raw_artist = query.get('artist')
-        artist = quote(raw_artist[0])
-        artist_ref = [ models.Artist(name = raw_artist[0]) ]
-        url = self.api_url(
-            '/Artists/{}?UserId={}'.format(
-                artist, self.user_id)
-        )
+        if 'artist' in query:
+            raw_artist = query.get('artist')
+        elif 'albumartist' in query:
+            raw_artist = query.get('albumartist')
 
-        artist_data = self.r_get(url)
-        artist_id = artist_data.get('Id')
-
-        # Get album list
-        url = self.api_url(
-            '/Items?AlbumArtistIds={}&UserId={}&IncludeItemTypes=MusicAlbum&Recursive=true'.format(
-                artist_id, self.user_id)
-        )
-
-        raw_albums = self.r_get(url)['Items']
-
-        albums = [
-            models.Album(
-                uri='jellyfin:album:{}'.format(item.get('Id')),
-                name=item.get('Name'),
-                artists=artist_ref
+        if raw_artist:
+            artist = quote(raw_artist[0])
+            artist_ref = [ models.Artist(name = raw_artist[0]) ]
+            url = self.api_url(
+                '/Artists/{}?UserId={}'.format(
+                    artist, self.user_id)
             )
-            for item in raw_albums
-        ]
+
+            artist_data = self.r_get(url)
+            artist_id = artist_data.get('Id')
+
+            # Get album list
+            url = self.api_url(
+                '/Items?AlbumArtistIds={}&UserId={}&IncludeItemTypes=MusicAlbum&Recursive=true'.format(
+                    artist_id, self.user_id)
+            )
+
+            result = self.r_get(url)
+            if result:
+                raw_albums = result['Items']
+
+            albums = [
+                models.Album(
+                    uri='jellyfin:album:{}'.format(item.get('Id')),
+                    name=item.get('Name'),
+                    artists=artist_ref
+                )
+                for item in raw_albums
+            ]
 
         # Get tracks
         if 'album' in query:
             album_name = query.get('album')[0]
-            album_id = [ i['Id'] for i in raw_albums if i['Name'] == album_name ][0]
+            album = quote(album_name)
+            if raw_albums:
+                album_id = [ i['Id'] for i in raw_albums if i['Name'] == album_name ][0]
+            else:
+                url = self.api_url(
+                    '/Items?Albums={}&UserId={}&IncludeItemTypes=Audio&Recursive=true'.format(
+                        album, self.user_id)
+                )
+                album_data = self.r_get(url)['Items']
 
+                album_id = album_data[0]['AlbumId']
 
             url = self.api_url(
                 '/Items?AlbumIds={}&UserId={}&IncludeItemTypes=Audio&Recursive=true'.format(
                     album_id, self.user_id)
             )
 
-            raw_tracks = self.r_get(url)['Items']
+            result = self.r_get(url)
+            if result:
+                raw_tracks = result['Items']
+
             tracks = [
                 models.Track(
                     uri='jellyfin:track:{}'.format(item['Id']),

@@ -79,12 +79,17 @@ class JellyfinLibraryProvider(backend.LibraryProvider):
             return {uri: self.lookup(uri=uri) for uri in uris}
 
     def search(self, query=None, uris=None, exact=False):
+        logger.debug('Jellyfin Search Query: {}'format(query))
         if exact:
             return self.backend.remote.exact_search(query)
         return self.backend.remote.search(query)
 
     def get_distinct(self, field, query=None):
-
-        if field == 'artist':
+        # Populates Media Library sections (Artists, Albums, etc)
+        # Mopidy internally calls search() with exact=True
+        if field == 'artist' or field == 'albumartist':
             return [artist.name for artist in self.backend.remote.get_artists()]
+        elif field == 'album':
+            thing = self.backend.remote.exact_search(query)
+            return [ album.name for album in thing.albums ]
         return []
