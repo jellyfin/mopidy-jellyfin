@@ -4,7 +4,7 @@ Mopidy-Jellyfin
 
 .. image:: https://img.shields.io/pypi/v/Mopidy-Jellyfin.svg?style=flat
     :target: https://pypi.python.org/pypi/Mopidy-Jellyfin/
-        :alt: Latest PyPI version
+    :alt: Latest PyPI version
 
 
 Mopidy extension for playing audio files from Jellyfin
