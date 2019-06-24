@@ -2,6 +2,10 @@
 Mopidy-Jellyfin
 ****************************
 
+.. image:: https://img.shields.io/pypi/v/Mopidy-Jellyfin.svg?style=flat
+    :target: https://pypi.python.org/pypi/Mopidy-Jellyfin/
+        :alt: Latest PyPI version
+
 Mopidy extension for playing audio files from Jellyfin
 
 Notes:
@@ -54,6 +58,13 @@ Credits
 
 Changelog
 =========
+
+v0.5.0
+---------------------------------------
+
+- Populate media library (Artists, Albums, etc)
+- Browse function will show all music type libraries
+- Media library is populated based on user's `libraries` setting
 
 v0.4.0
 ---------------------------------------
