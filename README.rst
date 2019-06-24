@@ -6,6 +6,7 @@ Mopidy-Jellyfin
     :target: https://pypi.python.org/pypi/Mopidy-Jellyfin/
         :alt: Latest PyPI version
 
+
 Mopidy extension for playing audio files from Jellyfin
 
 Notes:
@@ -37,8 +38,9 @@ Mopidy-Jellyfin to your Mopidy configuration file::
     password = password
     libraries = Library1, Library2 (Optional: will default to "Music" if left undefined)
 
-The libraries option determines what is populated into Mopidy's internal library.  Using the file browser will show all libraries with a 'music' type.
-Its also possible to add a users id with ``user_id = 0``.
+The `libraries` option determines what is populated into Mopidy's internal library (view by Artists/Album/etc).  Using the file browser will show all libraries in the Jellyfin server that have a 'music' type.
+
+It's also possible to add a users id with ``user_id = 0``.
 
 
 Project resources
@@ -51,13 +53,18 @@ Project resources
 Credits
 =======
 
-- Original author: `Marvin Steadfast <https://github.com/xsteadfastx>`_
 - Current maintainer: `Matt Carlton <https://github.com/mcarlton00>`_
+- Original author: `Marvin Steadfast <https://github.com/xsteadfastx>`_
 - `Contributors <https://github.com/mcarlton00/mopidy-jellyfin/graphs/contributors>`_
 
 
 Changelog
 =========
+
+v0.5.1
+---------------------------------------
+
+- Doc updates
 
 v0.5.0
 ---------------------------------------
