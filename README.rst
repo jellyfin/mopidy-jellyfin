@@ -4,7 +4,11 @@ Mopidy-Jellyfin
 
 Mopidy extension for playing audio files from Jellyfin
 
-Note: Currently only supports the "Music" media type
+Notes:
+
+- Currently only supports the "Music" media type
+- Tested using `ncmpcpp <https://rybczak.net/ncmpcpp/>` and `M.A.L.P. <https://play.google.com/store/apps/details?id=org.gateshipone.malp>`
+- MPDroid on Android does not work properly
 
 
 Installation
@@ -29,6 +33,7 @@ Mopidy-Jellyfin to your Mopidy configuration file::
     password = password
     libraries = Library1, Library2 (Optional: will default to "Music" if left undefined)
 
+The libraries option determines what is populated into Mopidy's internal library.  Using the file browser will show all libraries with a 'music' type.
 Its also possible to add a users id with ``user_id = 0``.
 
 

@@ -244,7 +244,8 @@ class JellyfinHandler(object):
             {'Name': library['Name'],
              'Id':library['Id'],
              'CollectionType':library['CollectionType']}
-            for library in data['Items'] if library['Name'] in self.libraries
+            for library in data['Items']
+            if library['CollectionType'] == 'music'
         ]
 
         if media_folders:
