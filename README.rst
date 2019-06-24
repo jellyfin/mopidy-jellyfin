@@ -11,7 +11,7 @@ Mopidy extension for playing audio files from Jellyfin
 Notes:
 
 - Currently only supports the "Music" media type
-- Tested using `ncmpcpp <https://rybczak.net/ncmpcpp/>` and `M.A.L.P. <https://play.google.com/store/apps/details?id=org.gateshipone.malp>`
+- Tested using `ncmpcpp <https://rybczak.net/ncmpcpp/>`_ and `M.A.L.P. <https://play.google.com/store/apps/details?id=org.gateshipone.malp>`_
 - MPDroid on Android does not work properly
 
 
