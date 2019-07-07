@@ -544,7 +544,7 @@ class JellyfinHandler(object):
             self.api_url(
                 ('/Search/Hints?SearchTerm={}&'
                  'IncludeItemTypes={}').format(
-                     quote(term),
+                     quote(term.encode('utf8')),
                      query
                 )
             )
@@ -649,7 +649,7 @@ class JellyfinHandler(object):
             raw_artist = query.get('albumartist')
 
         if raw_artist:
-            artist = quote(raw_artist[0])
+            artist = quote(raw_artist[0].encode('utf8'))
             artist_ref = [ models.Artist(name = raw_artist[0]) ]
             url = self.api_url(
                 '/Artists/{}?UserId={}'.format(
@@ -680,8 +680,10 @@ class JellyfinHandler(object):
 
         # Get tracks
         if 'album' in query:
+            logger.info('jellyfin query: {}'.format(query))
             album_name = query.get('album')[0]
-            album = quote(album_name)
+            logger.info('jellyfin album name: {}'.format(album_name))
+            album = quote(album_name.encode('utf8'))
             if raw_albums:
                 album_id = [ i['Id'] for i in raw_albums if i['Name'] == album_name ][0]
             else:
