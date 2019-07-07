@@ -680,9 +680,7 @@ class JellyfinHandler(object):
 
         # Get tracks
         if 'album' in query:
-            logger.info('jellyfin query: {}'.format(query))
             album_name = query.get('album')[0]
-            logger.info('jellyfin album name: {}'.format(album_name))
             album = quote(album_name.encode('utf8'))
             if raw_albums:
                 album_id = [ i['Id'] for i in raw_albums if i['Name'] == album_name ][0]
