@@ -648,7 +648,48 @@ class JellyfinHandler(object):
         elif 'albumartist' in query:
             raw_artist = query.get('albumartist')
 
-        if raw_artist:
+        # Use if search query has both artist and album
+        if 'album' in query and raw_artist:
+            album_name = query.get('album')[0]
+            album = quote(album_name.encode('utf8'))
+            if raw_albums:
+                album_id = [ i['Id'] for i in raw_albums if i['Name'] == album_name ][0]
+            else:
+                url = self.api_url(
+                    '/Items?Albums={}&UserId={}&IncludeItemTypes=Audio&Recursive=true'.format(
+                        album, self.user_id)
+                )
+                album_data = self.r_get(url)['Items']
+
+                album_id = [ i['AlbumId'] for i in album_data if i['AlbumArtist'] == raw_artist[0] ][0]
+
+
+            url = self.api_url(
+                '/Items?AlbumIds={}&UserId={}&IncludeItemTypes=Audio&Recursive=true'.format(
+                    album_id, self.user_id)
+            )
+
+            result = self.r_get(url)
+            if result:
+                raw_tracks = result['Items']
+
+            tracks = [
+                models.Track(
+                    uri='jellyfin:track:{}'.format(item['Id']),
+                    track_no=item.get('IndexNumber'),
+                    name=item.get('Name'),
+                    artists=artist_ref,
+                    album=models.Album(
+                        name=item.get('Album'),
+                        artists=artist_ref
+                    )
+                )
+                for item in raw_tracks
+                if raw_artist[0] in item['Artists']
+            ]
+
+        # Use if query only has artist name
+        elif raw_artist:
             artist = quote(raw_artist[0].encode('utf8'))
             artist_ref = [ models.Artist(name = raw_artist[0]) ]
             url = self.api_url(
@@ -678,8 +719,8 @@ class JellyfinHandler(object):
                 for item in raw_albums
             ]
 
-        # Get tracks
-        if 'album' in query:
+        # Use if query only has an album name
+        elif 'album' in query:
             album_name = query.get('album')[0]
             album = quote(album_name.encode('utf8'))
             if raw_albums:
