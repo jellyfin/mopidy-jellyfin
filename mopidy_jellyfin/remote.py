@@ -650,10 +650,15 @@ class JellyfinHandler(object):
 
         # Use if search query has both artist and album
         if 'album' in query and raw_artist:
+            artist = quote(raw_artist[0].encode('utf8'))
+            artist_ref = [ models.Artist(name = raw_artist[0]) ]
             album_name = query.get('album')[0]
             album = quote(album_name.encode('utf8'))
             if raw_albums:
-                album_id = [ i['Id'] for i in raw_albums if i['Name'] == album_name ][0]
+                album_id = [ i['Id']
+                            for i in raw_albums
+                            if i['Name'] == album_name
+                           ][0]
             else:
                 url = self.api_url(
                     '/Items?Albums={}&UserId={}&IncludeItemTypes=Audio&Recursive=true'.format(
@@ -661,32 +666,12 @@ class JellyfinHandler(object):
                 )
                 album_data = self.r_get(url)['Items']
 
-                album_id = [ i['AlbumId'] for i in album_data if i['AlbumArtist'] == raw_artist[0] ][0]
+                album_id = [ i['AlbumId']
+                            for i in album_data
+                            if raw_artist[0] in i['Artists']
+                           ][0]
 
-
-            url = self.api_url(
-                '/Items?AlbumIds={}&UserId={}&IncludeItemTypes=Audio&Recursive=true'.format(
-                    album_id, self.user_id)
-            )
-
-            result = self.r_get(url)
-            if result:
-                raw_tracks = result['Items']
-
-            tracks = [
-                models.Track(
-                    uri='jellyfin:track:{}'.format(item['Id']),
-                    track_no=item.get('IndexNumber'),
-                    name=item.get('Name'),
-                    artists=artist_ref,
-                    album=models.Album(
-                        name=item.get('Album'),
-                        artists=artist_ref
-                    )
-                )
-                for item in raw_tracks
-                if raw_artist[0] in item['Artists']
-            ]
+            tracks = self.get_search_tracks(artist_ref, album_id)
 
         # Use if query only has artist name
         elif raw_artist:
@@ -710,6 +695,9 @@ class JellyfinHandler(object):
             if result:
                 raw_albums = result['Items']
 
+            for album in raw_albums:
+                tracks += self.get_search_tracks(artist_ref, album['Id'])
+
             albums = [
                 models.Album(
                     uri='jellyfin:album:{}'.format(item.get('Id')),
@@ -724,7 +712,10 @@ class JellyfinHandler(object):
             album_name = query.get('album')[0]
             album = quote(album_name.encode('utf8'))
             if raw_albums:
-                album_id = [ i['Id'] for i in raw_albums if i['Name'] == album_name ][0]
+                album_id = [ i['Id']
+                            for i in raw_albums
+                            if i['Name'] == album_name
+                           ][0]
             else:
                 url = self.api_url(
                     '/Items?Albums={}&UserId={}&IncludeItemTypes=Audio&Recursive=true'.format(
@@ -734,6 +725,19 @@ class JellyfinHandler(object):
 
                 album_id = album_data[0]['AlbumId']
 
+                tracks = self.get_search_tracks(artist_ref, album_id)
+
+        return models.SearchResult(
+            uri='jellyfin:search',
+            tracks=tracks,
+            artists=artist_ref,
+            albums=albums
+        )
+
+    def get_search_tracks(self, artist_ref, album_id):
+        tracks = []
+
+        if artist_ref:
             url = self.api_url(
                 '/Items?AlbumIds={}&UserId={}&IncludeItemTypes=Audio&Recursive=true'.format(
                     album_id, self.user_id)
@@ -755,15 +759,10 @@ class JellyfinHandler(object):
                     )
                 )
                 for item in raw_tracks
+                if artist_ref[0].name in item.get('Artists')
             ]
 
-        return models.SearchResult(
-            uri='jellyfin:search',
-            tracks=tracks,
-            artists=artist_ref,
-            albums=albums
-        )
-
+        return tracks
 
     def lookup_artist(self, artist_id):
         """Lookup all artist tracks and sort them.
