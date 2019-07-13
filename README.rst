@@ -61,6 +61,13 @@ Credits
 Changelog
 =========
 
+v0.5.2
+---------------------------------------
+
+- Improve artist/album matching in media library
+- Fix traceback when browsing an artist or album that contains unicode characters
+- Add support to browse "All Tracks" of a given artist
+
 v0.5.1
 ---------------------------------------
 
