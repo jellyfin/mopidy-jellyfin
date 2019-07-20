@@ -667,9 +667,11 @@ class JellyfinHandler(object):
                 album_data = self.r_get(url)['Items']
 
                 album_id = [ i['AlbumId']
-                            for i in album_data
-                            if raw_artist[0] in i['Artists']
-                           ][0]
+                    for i in album_data
+                    if raw_artist[0].lower() in (
+                        artist.lower() for artist in i['Artists']
+                    )
+                ][0]
 
             tracks = self.get_search_tracks(artist_ref, album_id)
 
@@ -759,7 +761,8 @@ class JellyfinHandler(object):
                     )
                 )
                 for item in raw_tracks
-                if artist_ref[0].name in item.get('Artists')
+                if artist_ref[0].name.lower() in (
+                    artist.lower() for artist in item.get('Artists'))
             ]
 
         return tracks
