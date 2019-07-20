@@ -374,7 +374,7 @@ class JellyfinHandler(object):
         albums = self.get_directory(artist_id)['Items']
 
         return [
-            models.Ref.artist(
+            models.Ref.album(
                 uri='jellyfin:album:{}'.format(i['Id']),
                 name=i['Name']
             )
