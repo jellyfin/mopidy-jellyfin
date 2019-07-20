@@ -677,7 +677,8 @@ class JellyfinHandler(object):
 
         # Use if query only has artist name
         elif raw_artist:
-            artist = quote(raw_artist[0].encode('utf8'))
+            # URL encode artist string
+            artist = quote(raw_artist[0].encode('utf8')).replace('/','-')
             artist_ref = [ models.Artist(name = raw_artist[0]) ]
             url = self.api_url(
                 '/Artists/{}?UserId={}'.format(
