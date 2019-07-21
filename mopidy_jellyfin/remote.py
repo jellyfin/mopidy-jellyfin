@@ -420,6 +420,53 @@ class JellyfinHandler(object):
             for artist in artists
         ]
 
+    def get_albums(self, query):
+        tracks = []
+        raw_artist = [""]
+        raw_albums = []
+
+        # Check query for artist name
+        if 'artist' in query:
+            raw_artist = query.get('artist')
+        elif 'albumartist' in query:
+            raw_artist = query.get('albumartist')
+
+        # URL encode artist string
+        artist = quote(raw_artist[0].encode('utf8')).replace('/','-')
+        artist_ref = [ models.Artist(name = raw_artist[0]) ]
+        url = self.api_url(
+            '/Artists/{}?UserId={}'.format(
+                artist, self.user_id)
+        )
+
+        # Pull out artist_id
+        artist_data = self.r_get(url)
+        artist_id = artist_data.get('Id')
+
+        # Get album list
+        url = self.api_url(
+            '/Items?AlbumArtistIds={}&UserId={}&IncludeItemTypes=MusicAlbum&Recursive=true'.format(
+                artist_id, self.user_id)
+        )
+
+        result = self.r_get(url)
+        if result:
+            raw_albums = result['Items']
+
+        for album in raw_albums:
+            tracks += self.get_search_tracks(artist_ref, album['Id'])
+
+        albums = [
+            models.Album(
+                uri='jellyfin:album:{}'.format(item.get('Id')),
+                name=item.get('Name'),
+                artists=artist_ref
+            )
+            for item in raw_albums
+        ]
+
+        return albums
+
     @cache()
     def get_directory(self, id):
         """Get directory from Jellyfin API.
@@ -637,12 +684,11 @@ class JellyfinHandler(object):
     def exact_search(self, query):
         # Variable prep
         tracks = []
-        albums = []
         raw_artist = ''
         artist_ref = []
         raw_albums = []
 
-        # Get artist ID
+        # Check query for artist name
         if 'artist' in query:
             raw_artist = query.get('artist')
         elif 'albumartist' in query:
@@ -701,15 +747,6 @@ class JellyfinHandler(object):
             for album in raw_albums:
                 tracks += self.get_search_tracks(artist_ref, album['Id'])
 
-            albums = [
-                models.Album(
-                    uri='jellyfin:album:{}'.format(item.get('Id')),
-                    name=item.get('Name'),
-                    artists=artist_ref
-                )
-                for item in raw_albums
-            ]
-
         # Use if query only has an album name
         elif 'album' in query:
             album_name = query.get('album')[0]
@@ -734,22 +771,22 @@ class JellyfinHandler(object):
             uri='jellyfin:search',
             tracks=tracks,
             artists=artist_ref,
-            albums=albums
         )
 
     def get_search_tracks(self, artist_ref, album_id):
         tracks = []
 
+        url = self.api_url(
+            '/Items?AlbumIds={}&UserId={}&IncludeItemTypes=Audio&Recursive=true'.format(
+                album_id, self.user_id)
+        )
+
+        result = self.r_get(url)
+        if result:
+            raw_tracks = result['Items']
+
         if artist_ref:
-            url = self.api_url(
-                '/Items?AlbumIds={}&UserId={}&IncludeItemTypes=Audio&Recursive=true'.format(
-                    album_id, self.user_id)
-            )
-
-            result = self.r_get(url)
-            if result:
-                raw_tracks = result['Items']
-
+            # If the artist was in the query, ensure all tracks belong to that artist
             tracks = [
                 models.Track(
                     uri='jellyfin:track:{}'.format(item['Id']),
@@ -764,6 +801,21 @@ class JellyfinHandler(object):
                 for item in raw_tracks
                 if artist_ref[0].name.lower() in (
                     artist.lower() for artist in item.get('Artists'))
+            ]
+        else:
+            # If the query doesn't contain an artist, return all tracks
+            tracks = [
+                models.Track(
+                    uri='jellyfin:track:{}'.format(item['Id']),
+                    track_no=item.get('IndexNumber'),
+                    name=item.get('Name'),
+                    artists=artist_ref,
+                    album=models.Album(
+                        name=item.get('Album'),
+                        artists=artist_ref
+                    )
+                )
+                for item in raw_tracks
             ]
 
         return tracks
