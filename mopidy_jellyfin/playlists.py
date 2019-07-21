@@ -2,12 +2,12 @@ from __future__ import unicode_literals
 
 import logging
 import operator
-import time
 
 from mopidy import backend
 from mopidy.models import Playlist, Ref
 
 logger = logging.getLogger(__name__)
+
 
 class JellyfinPlaylistsProvider(backend.PlaylistsProvider):
 
@@ -41,7 +41,9 @@ class JellyfinPlaylistsProvider(backend.PlaylistsProvider):
         if raw_playlists:
             for playlist in raw_playlists:
                 playlist_id = playlist.uri.split(':')[-1]
-                contents = self.backend.remote.get_playlist_contents(playlist_id)
+                contents = self.backend.remote.get_playlist_contents(
+                    playlist_id
+                )
                 tracks = [
                     self.backend.remote.get_track(track['Id'])
                     for track in contents
@@ -54,7 +56,6 @@ class JellyfinPlaylistsProvider(backend.PlaylistsProvider):
 
         self._playlists = playlists
         backend.BackendListener.send('playlists_loaded')
-
 
         return []
 
@@ -85,7 +86,7 @@ class JellyfinPlaylistsProvider(backend.PlaylistsProvider):
             i.uri.split(':')[-1] for i in playlist.tracks
         ]
 
-        data = self.backend.remote.update_playlist(
+        self.backend.remote.update_playlist(
             playlist_id, new_track_ids
         )
 

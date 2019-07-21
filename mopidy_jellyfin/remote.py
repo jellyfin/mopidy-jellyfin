@@ -1,6 +1,5 @@
 from __future__ import unicode_literals
 
-import hashlib
 import logging
 import socket
 from collections import OrderedDict, defaultdict
@@ -101,7 +100,10 @@ class JellyfinHandler(object):
         proxy = httpclient.format_proxy(self.proxy)
         full_user_agent = httpclient.format_user_agent(
             '/'.join(
-                (mopidy_jellyfin.Extension.dist_name, mopidy_jellyfin.__version__)
+                (
+                    mopidy_jellyfin.Extension.dist_name,
+                    mopidy_jellyfin.__version__
+                )
             )
         )
 
@@ -122,7 +124,10 @@ class JellyfinHandler(object):
                 r = session.get(url)
                 try:
                     rv = r.json()
-                except:
+                except Exception as e:
+                    logger.info(
+                        'Error parsing Jellyfin data: {}'.format(e)
+                    )
                     rv = {}
 
                 logger.debug(str(rv))
@@ -203,16 +208,6 @@ class JellyfinHandler(object):
         if self.hostname.startswith('http://') or \
                 self.hostname.startswith('https://'):
             hostname = ''.join(hostname_list)
-    def api_url(self, endpoint):
-        """Returns a joined url.
-
-        Takes host, port and endpoint and generates a valid jellyfin API url.
-        """
-        # check if http or https is defined as host and create hostname
-        hostname_list = [self.hostname]
-        if self.hostname.startswith('http://') or \
-                self.hostname.startswith('https://'):
-            hostname = ''.join(hostname_list)
         else:
             hostname_list.insert(0, 'http://')
             hostname = ''.join(hostname_list)
@@ -281,14 +276,13 @@ class JellyfinHandler(object):
 
         library_id = [
             library['Id'] for library in data['Items']
-              if library['Name'] == 'Playlists'
+            if library['Name'] == 'Playlists'
         ]
 
         if library_id:
             library_id = library_id[0]
         else:
             return []
-
 
         raw_playlists = self.get_directory(library_id)
 
@@ -331,8 +325,10 @@ class JellyfinHandler(object):
         return self.r_post(url, payload)
 
     def delete_playlist(self, playlist_id):
-        url = self.api_url('/Items/{}?UserId={}'.format(
-            playlist_id, self.user_id)
+        url = self.api_url(
+            '/Items/{}?UserId={}'.format(
+                playlist_id, self.user_id
+            )
         )
 
         return self.r_delete(url)
@@ -344,17 +340,19 @@ class JellyfinHandler(object):
 
         del_url = self.api_url(
             'Playlists/{}/Items?UserId={}&EntryIds={}'.format(
-                playlist_id, self.user_id, ','.join(str(i) for i in curr_ids))
+                playlist_id, self.user_id, ','.join(str(i) for i in curr_ids)
+            )
         )
 
-        clean = self.r_delete(del_url)
+        self.r_delete(del_url)
 
         new_url = self.api_url(
             '/Playlists/{}/Items?UserId={}&Ids={}'.format(
-                playlist_id, self.user_id, ','.join(new_ids))
+                playlist_id, self.user_id, ','.join(new_ids)
+            )
         )
 
-        populated = self.r_post(new_url)
+        self.r_post(new_url)
 
     def browse_artists(self, library_id):
         logger.debug('jellyfin: library id - ' + library_id)
@@ -404,8 +402,10 @@ class JellyfinHandler(object):
         for library in libraries:
 
             if library['Name'] in self.libraries:
-                url = self.api_url('/Artists?ParentId={}&UserId={}'.format(
-                    library['Id'], self.user_id)
+                url = self.api_url(
+                    '/Artists?ParentId={}&UserId={}'.format(
+                        library['Id'], self.user_id
+                    )
                 )
 
                 artists += self.r_get(url)['Items']
@@ -430,10 +430,12 @@ class JellyfinHandler(object):
             raw_artist = query.get('artist')
         elif 'albumartist' in query:
             raw_artist = query.get('albumartist')
+        else:
+            return []
 
         # URL encode artist string
-        artist = quote(raw_artist[0].encode('utf8')).replace('/','-')
-        artist_ref = [ models.Artist(name = raw_artist[0]) ]
+        artist = quote(raw_artist[0].encode('utf8')).replace('/', '-')
+        artist_ref = [models.Artist(name=raw_artist[0])]
         url = self.api_url(
             '/Artists/{}?UserId={}'.format(
                 artist, self.user_id)
@@ -445,8 +447,10 @@ class JellyfinHandler(object):
 
         # Get album list
         url = self.api_url(
-            '/Items?AlbumArtistIds={}&UserId={}&IncludeItemTypes=MusicAlbum&Recursive=true'.format(
-                artist_id, self.user_id)
+            '/Items?AlbumArtistIds={}&UserId={}&'
+            'IncludeItemTypes=MusicAlbum&Recursive=true'.format(
+                artist_id, self.user_id
+            )
         )
 
         result = self.r_get(url)
@@ -479,8 +483,7 @@ class JellyfinHandler(object):
         return self.r_get(
             self.api_url(
                 '/Users/{}/Items?ParentId={}&SortOrder=Ascending'.format(
-                    self.user_id,
-                    id
+                    self.user_id, id
                 )
             )
         )
@@ -697,22 +700,26 @@ class JellyfinHandler(object):
         # Use if search query has both artist and album
         if 'album' in query and raw_artist:
             artist = quote(raw_artist[0].encode('utf8'))
-            artist_ref = [ models.Artist(name = raw_artist[0]) ]
+            artist_ref = [models.Artist(name=raw_artist[0])]
             album_name = query.get('album')[0]
             album = quote(album_name.encode('utf8'))
             if raw_albums:
-                album_id = [ i['Id']
-                            for i in raw_albums
-                            if i['Name'] == album_name
-                           ][0]
+                album_id = [
+                    i['Id']
+                    for i in raw_albums
+                    if i['Name'] == album_name
+                ][0]
             else:
                 url = self.api_url(
-                    '/Items?Albums={}&UserId={}&IncludeItemTypes=Audio&Recursive=true'.format(
-                        album, self.user_id)
+                    '/Items?IncludeItemTypes=Audio&Recursive=true&'
+                    'Albums={}&UserId={}' .format(
+                         album, self.user_id
+                    )
                 )
                 album_data = self.r_get(url)['Items']
 
-                album_id = [ i['AlbumId']
+                album_id = [
+                    i['AlbumId']
                     for i in album_data
                     if raw_artist[0].lower() in (
                         artist.lower() for artist in i['Artists']
@@ -724,11 +731,12 @@ class JellyfinHandler(object):
         # Use if query only has artist name
         elif raw_artist:
             # URL encode artist string
-            artist = quote(raw_artist[0].encode('utf8')).replace('/','-')
-            artist_ref = [ models.Artist(name = raw_artist[0]) ]
+            artist = quote(raw_artist[0].encode('utf8')).replace('/', '-')
+            artist_ref = [models.Artist(name=raw_artist[0])]
             url = self.api_url(
                 '/Artists/{}?UserId={}'.format(
-                    artist, self.user_id)
+                    artist, self.user_id
+                )
             )
 
             artist_data = self.r_get(url)
@@ -736,8 +744,10 @@ class JellyfinHandler(object):
 
             # Get album list
             url = self.api_url(
-                '/Items?AlbumArtistIds={}&UserId={}&IncludeItemTypes=MusicAlbum&Recursive=true'.format(
-                    artist_id, self.user_id)
+                '/Items?IncludeItemTypes=MusicAlbum&Recursive=true&'
+                'AlbumArtistIds={}&UserId={}&'.format(
+                    artist_id, self.user_id
+                )
             )
 
             result = self.r_get(url)
@@ -752,14 +762,17 @@ class JellyfinHandler(object):
             album_name = query.get('album')[0]
             album = quote(album_name.encode('utf8'))
             if raw_albums:
-                album_id = [ i['Id']
-                            for i in raw_albums
-                            if i['Name'] == album_name
-                           ][0]
+                album_id = [
+                    i['Id']
+                    for i in raw_albums
+                    if i['Name'] == album_name
+                ][0]
             else:
                 url = self.api_url(
-                    '/Items?Albums={}&UserId={}&IncludeItemTypes=Audio&Recursive=true'.format(
-                        album, self.user_id)
+                    '/Items?IncludeItemTypes=Audio&Recursive=true&'
+                    'Albums={}&UserId={}&'.format(
+                        album, self.user_id
+                    )
                 )
                 album_data = self.r_get(url)['Items']
 
@@ -777,8 +790,10 @@ class JellyfinHandler(object):
         tracks = []
 
         url = self.api_url(
-            '/Items?AlbumIds={}&UserId={}&IncludeItemTypes=Audio&Recursive=true'.format(
-                album_id, self.user_id)
+            '/Items?IncludeItemTypes=Audio&Recursive=true&'
+            'AlbumIds={}&UserId={}&'.format(
+                album_id, self.user_id
+            )
         )
 
         result = self.r_get(url)
@@ -786,7 +801,8 @@ class JellyfinHandler(object):
             raw_tracks = result['Items']
 
         if artist_ref:
-            # If the artist was in the query, ensure all tracks belong to that artist
+            # If the artist was in the query,
+            # ensure all tracks belong to that artist
             tracks = [
                 models.Track(
                     uri='jellyfin:track:{}'.format(item['Id']),
@@ -848,7 +864,9 @@ class JellyfinHandler(object):
         # sort tracks in album dict
         tracks = []
         for album, track_list in album_dict.items():
-            track_list.sort(key=lambda k: (k.get('IndexNumber', 0),k.get('Name')))
+            track_list.sort(
+                key=lambda k: (k.get('IndexNumber', 0), k.get('Name'))
+            )
 
             # add tracks to list
             tracks.extend(track_list)

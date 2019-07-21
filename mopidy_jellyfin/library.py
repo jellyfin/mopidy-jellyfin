@@ -88,7 +88,11 @@ class JellyfinLibraryProvider(backend.LibraryProvider):
         # Populates Media Library sections (Artists, Albums, etc)
         # Mopidy internally calls search() with exact=True
         if field == 'artist' or field == 'albumartist':
-            return [artist.name for artist in self.backend.remote.get_artists()]
+            return [
+                artist.name for artist in self.backend.remote.get_artists()
+            ]
         elif field == 'album':
-            return [ album.name for album in self.backend.remote.get_albums(query) ]
+            return [
+                album.name for album in self.backend.remote.get_albums(query)
+            ]
         return []
