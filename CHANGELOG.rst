@@ -5,7 +5,8 @@ v0.5.3
 ---------------------------------------
 
 - Fix bug with artists/albums not matching if metadata has different capitalization
-- Artists that have special characters in their names
+- Artists that have special characters in their names load correctly
+- All Tracks no longer displays Albums in the wrong field (ncmpcpp only)
 - Browsing albums returns correct datatype
 - Address Flake8 errors
 
