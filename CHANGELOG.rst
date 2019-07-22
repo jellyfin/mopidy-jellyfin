@@ -7,7 +7,7 @@ v0.5.3
 - Fix bug with artists/albums not matching if metadata has different capitalization
 - Artists that have special characters in their names
 - Browsing albums returns correct datatype
-- AddresseFlake8 errors
+- Address Flake8 errors
 
 v0.5.2
 ---------------------------------------
