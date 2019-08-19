@@ -45,7 +45,7 @@ class JellyfinPlaylistsProvider(backend.PlaylistsProvider):
                     playlist_id
                 )
                 tracks = [
-                    self.backend.remote.get_track(track['Id'])
+                    self.backend.remote.get_track(track.get('Id'))
                     for track in contents
                 ]
                 playlists[playlist.uri] = Playlist(
@@ -64,7 +64,7 @@ class JellyfinPlaylistsProvider(backend.PlaylistsProvider):
         self.refresh()
 
         return Playlist(
-            uri='jellyfin:playlists:{}'.format(playlist['Id']),
+            uri='jellyfin:playlists:{}'.format(playlist.get('Id')),
             name=name,
             tracks=[]
         )
