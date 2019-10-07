@@ -13,6 +13,7 @@ Notes:
 
 - Currently only supports the "Music" media type
 - Tested using `ncmpcpp <https://rybczak.net/ncmpcpp/>`_ and `M.A.L.P. <https://play.google.com/store/apps/details?id=org.gateshipone.malp>`_
+    - There is some inconsistency in M.A.L.P. where you may have to go to the menu and select 'Show All Tracks' for the library to populate properly
 - MPDroid on Android does not work properly
 
 
