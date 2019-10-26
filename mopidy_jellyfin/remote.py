@@ -445,9 +445,6 @@ class JellyfinHandler(object):
         if result:
             raw_albums = result.get('Items')
 
-        for album in raw_albums:
-            tracks += self.get_search_tracks(artist_ref, album.get('Id'))
-
         albums = [
             models.Album(
                 uri='jellyfin:album:{}'.format(item.get('Id')),
@@ -731,19 +728,37 @@ class JellyfinHandler(object):
             artist_id = artist_data.get('Id')
 
             # Get album list
-            url = self.api_url(
+            album_url = self.api_url(
                 '/Items?IncludeItemTypes=MusicAlbum&Recursive=true&'
                 'AlbumArtistIds={}&UserId={}&'.format(
                     artist_id, self.user_id
                 )
             )
 
-            result = self.r_get(url)
-            if result:
-                raw_albums = result.get('Items')
+            album_data = self.r_get(album_url)
+            if album_data:
+                raw_albums = album_data.get('Items')
 
-            for album in raw_albums:
-                tracks += self.get_search_tracks(artist_ref, album.get('Id'))
+            track_url = self.api_url(
+                '/Items?IncludeItemTypes=Audio&Recursive=true&'
+                'AlbumArtistIds={}&UserId={}&'.format(
+                    artist_id, self.user_id
+                )
+            )
+
+            track_data = self.r_get(track_url)
+            if track_data:
+                tracks = [ models.Track(
+                    uri='jellyfin:track:{}'.format(track.get('Id')),
+                    track_no=track.get('IndexNumber'),
+                    name=track.get('Name'),
+                    artists=artist_ref,
+                    album=models.Album(
+                        name=track.get('Album'),
+                        artists=artist_ref
+                    )
+                ) for track in track_data.get('Items')
+                ]
 
         # Use if query only has an album name
         elif 'album' in query:
@@ -774,6 +789,7 @@ class JellyfinHandler(object):
             artists=artist_ref,
         )
 
+    @cache()
     def get_search_tracks(self, artist_ref, album_id):
         tracks = []
 
