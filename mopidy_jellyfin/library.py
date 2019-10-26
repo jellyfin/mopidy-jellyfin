@@ -58,8 +58,8 @@ class JellyfinLibraryProvider(backend.LibraryProvider):
                 album_id = parts[-1]
                 album_data = self.backend.remote.get_directory(album_id)
                 tracks = [
-                    self.backend.remote.get_track(i.get('Id'))
-                    for i in album_data.get('Items', [])
+                    self.backend.remote.get_track(track)
+                    for track in album_data.get('Items', [])
                 ]
 
                 tracks = sorted(tracks, key=lambda k: k.track_no)
@@ -73,7 +73,7 @@ class JellyfinLibraryProvider(backend.LibraryProvider):
                 logger.info('Unknown Jellyfin lookup URI: {}'.format(uri))
                 tracks = []
 
-            return [track for track in tracks if track]
+            return tracks
 
         else:
             return {uri: self.lookup(uri=uri) for uri in uris}
