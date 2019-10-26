@@ -1,6 +1,13 @@
 Changelog
 =========
 
+v0.5.4
+---------------------------------------
+
+- Slightly improved error handling
+- Optimized playlist logic
+- Optimized library population logic
+
 v0.5.3
 ---------------------------------------
 
