@@ -40,17 +40,18 @@ class JellyfinPlaylistsProvider(backend.PlaylistsProvider):
         raw_playlists = self.backend.remote.get_playlists()
         if raw_playlists:
             for playlist in raw_playlists:
-                playlist_id = playlist.uri.split(':')[-1]
+                playlist_id = playlist.get('Id')
+                playlist_uri = 'jellyfin:playlist:%s' % playlist.get('Id')
                 contents = self.backend.remote.get_playlist_contents(
                     playlist_id
                 )
                 tracks = [
-                    self.backend.remote.get_track(track.get('Id'))
+                    self.backend.remote.create_track(track)
                     for track in contents
                 ]
-                playlists[playlist.uri] = Playlist(
-                    uri=playlist.uri,
-                    name=playlist.name,
+                playlists[playlist_uri] = Playlist(
+                    uri='jellyfin:playlist:%s' % playlist.get('Id'),
+                    name=playlist.get('Name'),
                     tracks=tracks
                 )
 

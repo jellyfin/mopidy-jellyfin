@@ -290,32 +290,16 @@ class JellyfinHandler(object):
 
         raw_playlists = self.get_directory(library_id)
 
-        return [
-            models.Ref.playlist(
-                uri='jellyfin:playlists:{}'.format(i.get('Id')),
-                name='{}'.format(i.get('Name'))
-            ) for i in raw_playlists.get('Items') if i
-        ]
+        return raw_playlists.get('Items')
 
     def get_playlist_contents(self, playlist_id):
-        contents = []
         url = self.api_url(
             '/Playlists/{}/Items?UserId={}'.format(playlist_id, self.user_id)
         )
 
-        data = self.r_get(url)
+        data = self.r_get(url).get('Items')
 
-        if data:
-            contents = [
-                {
-                    'Artist': i.get('AlbumArtist'),
-                    'Title': i.get('Name'),
-                    'Id': i.get('Id'),
-                    'PlaylistItemId': i.get('PlaylistItemId')
-                } for i in data.get('Items') if i
-            ]
-
-        return contents
+        return data
 
     def create_playlist(self, name):
         url = self.api_url('/Playlists')
