@@ -17,22 +17,28 @@ class JellyfinPlaylistsProvider(backend.PlaylistsProvider):
         self.refresh()
 
     def as_list(self):
-        self.refresh()
         refs = [
             Ref.playlist(uri=i.uri, name=i.name)
             for i in self._playlists.values()]
+
         return sorted(refs, key=operator.attrgetter('name'))
 
     def get_items(self, uri):
-        self.refresh()
         playlist = self._playlists.get(uri)
         if not playlist:
             logger.info('Jellyfin: No playlists found')
             return None
+
         return [Ref.track(uri=i.uri, name=i.name) for i in playlist.tracks]
 
     def lookup(self, uri):
-        return self._playlists.get(uri)
+        playlist = self._playlists.get(uri)
+
+        return Playlist(
+            uri=playlist.uri,
+            name=playlist.name,
+            tracks=playlist.tracks
+        )
 
     def refresh(self):
         playlists = {}
@@ -91,6 +97,7 @@ class JellyfinPlaylistsProvider(backend.PlaylistsProvider):
             playlist_id, new_track_ids
         )
 
+        self.refresh()
         return Playlist(
             uri=playlist.uri,
             name=playlist.name,
