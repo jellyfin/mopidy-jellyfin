@@ -39,9 +39,19 @@ Mopidy-Jellyfin to your Mopidy configuration file::
     password = password
     libraries = Library1, Library2 (Optional: will default to "Music" if left undefined)
 
-The `libraries` option determines what is populated into Mopidy's internal library (view by Artists/Album/etc).  Using the file browser will show all libraries in the Jellyfin server that have a 'music' type.
+The ``libraries`` option determines what is populated into Mopidy's internal library (view by Artists/Album/etc).  Using the file browser will show all libraries in the Jellyfin server that have a 'music' type.
 
-It's also possible to add a users id with ``user_id = 0``.
+It's also possible to add a hidden user by adding ``user_id = $id_number`` in addition to the username.  The user_id can be found through the web UI by navigating to your profile in the Web client and looking at the URL: ``https://jellyfin.example.com/web/index.html#!/myprofile.html?userId=3920b99003194448a2a9d4f0bedd3d82``
+
+In this example, the config file will look like this::
+
+    [jellyfin]
+    hostname = Jellyfin server hostname
+    port = Jellyfin server port
+    username = username
+    password = password
+    user_id = 3920b99003194448a2a9d4f0bedd3d82
+    libraries = Library1, Library2 (Optional: will default to "Music" if left undefined)
 
 
 Project resources
