@@ -58,7 +58,7 @@ class JellyfinLibraryProvider(backend.LibraryProvider):
                 album_id = parts[-1]
                 album_data = self.backend.remote.get_directory(album_id)
                 tracks = [
-                    self.backend.remote.get_track(track)
+                    self.backend.remote.create_track(track)
                     for track in album_data.get('Items', [])
                 ]
 
