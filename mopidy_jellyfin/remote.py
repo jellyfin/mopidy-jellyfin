@@ -3,9 +3,13 @@ from __future__ import unicode_literals
 import logging
 import socket
 from collections import OrderedDict, defaultdict
-from urllib import urlencode
-from urllib2 import quote
-from urlparse import parse_qs, urljoin, urlsplit, urlunsplit
+import sys
+if sys.version.startswith('3'):
+    from urllib.parse import quote, urlencode, parse_qs, urljoin, urlsplit, urlunsplit
+else:
+    from urllib import urlencode
+    from urllib2 import quote
+    from urlparse import parse_qs, urljoin, urlsplit, urlunsplit
 
 from mopidy import httpclient, models
 
@@ -886,7 +890,7 @@ class JellyfinHandler(object):
         :returns: Milliseconds
         :rtype: int
         """
-        return ticks / 10000
+        return int(ticks / 10000)
 
     @staticmethod
     def milliseconds_to_ticks(milliseconds):
