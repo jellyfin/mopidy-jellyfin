@@ -775,7 +775,7 @@ class JellyfinHandler(object):
                 album_id = [
                     i.get('Id')
                     for i in raw_albums
-                    if i.get('Name') == album_name
+                    if i.get('Name') == unidecode(album_name)
                 ][0]
             else:
                 url = self.api_url(
