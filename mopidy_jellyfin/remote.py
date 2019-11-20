@@ -14,6 +14,7 @@ else:
 from mopidy import httpclient, models
 
 import requests
+from unidecode import unidecode
 
 import mopidy_jellyfin
 from mopidy_jellyfin.utils import cache
@@ -686,6 +687,8 @@ class JellyfinHandler(object):
         elif 'albumartist' in query:
             raw_artist = query.get('albumartist')
 
+        cleaned_artist = unidecode(raw_artist[0]).lower()
+
         # Use if search query has both artist and album
         if 'album' in query and raw_artist:
             artist = quote(raw_artist[0].encode('utf8'))
@@ -710,7 +713,7 @@ class JellyfinHandler(object):
                 album_id = [
                     i.get('AlbumId')
                     for i in album_data
-                    if raw_artist[0].lower() in (
+                    if cleaned_artist in (
                         artist.lower() for artist in i.get('Artists')
                     )
                 ][0]
@@ -823,7 +826,7 @@ class JellyfinHandler(object):
                     )
                 )
                 for item in raw_tracks
-                if artist_ref[0].name.lower() in (
+                if unidecode(artist_ref[0].name.lower()) in (
                     artist.lower() for artist in item.get('Artists'))
             ]
         else:
