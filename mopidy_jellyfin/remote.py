@@ -689,39 +689,8 @@ class JellyfinHandler(object):
 
         cleaned_artist = unidecode(raw_artist[0]).lower()
 
-        # Use if search query has both artist and album
-        if 'album' in query and raw_artist:
-            artist = quote(raw_artist[0].encode('utf8'))
-            artist_ref = [models.Artist(name=raw_artist[0])]
-            album_name = query.get('album')[0]
-            album = quote(album_name.encode('utf8'))
-            if raw_albums:
-                album_id = [
-                    i.get('Id')
-                    for i in raw_albums
-                    if i.get('Name') == album_name
-                ][0]
-            else:
-                url = self.api_url(
-                    '/Items?IncludeItemTypes=Audio&Recursive=true&'
-                    'Albums={}&UserId={}' .format(
-                         album, self.user_id
-                    )
-                )
-                album_data = self.r_get(url).get('Items')
-
-                album_id = [
-                    i.get('AlbumId')
-                    for i in album_data
-                    if cleaned_artist in (
-                        artist.lower() for artist in i.get('Artists')
-                    )
-                ][0]
-
-            tracks = self.get_search_tracks(artist_ref, album_id)
-
-        # Use if query only has artist name
-        elif raw_artist:
+        # Use if query has artist name
+        if raw_artist:
             # URL encode artist string
             artist = quote(raw_artist[0].encode('utf8')).replace('/', '-')
             artist_ref = [models.Artist(name=raw_artist[0])]
@@ -755,17 +724,33 @@ class JellyfinHandler(object):
 
             track_data = self.r_get(track_url)
             if track_data:
-                tracks = [ models.Track(
-                    uri='jellyfin:track:{}'.format(track.get('Id')),
-                    track_no=track.get('IndexNumber'),
-                    name=track.get('Name'),
-                    artists=artist_ref,
-                    album=models.Album(
-                        name=track.get('Album'),
-                        artists=artist_ref
-                    )
-                ) for track in track_data.get('Items')
-                ]
+                # If the query has an album, only match those tracks
+                if query.get('album'):
+                    tracks = [ models.Track(
+                        uri='jellyfin:track:{}'.format(track.get('Id')),
+                        track_no=track.get('IndexNumber'),
+                        name=track.get('Name'),
+                        artists=artist_ref,
+                        album=models.Album(
+                            name=track.get('Album'),
+                            artists=artist_ref
+                        )
+                    ) for track in track_data.get('Items')
+                        if track.get('Album') == query.get('album')[0]
+                    ]
+                # Otherwise return all tracks
+                else:
+                    tracks = [ models.Track(
+                        uri='jellyfin:track:{}'.format(track.get('Id')),
+                        track_no=track.get('IndexNumber'),
+                        name=track.get('Name'),
+                        artists=artist_ref,
+                        album=models.Album(
+                            name=track.get('Album'),
+                            artists=artist_ref
+                        )
+                    ) for track in track_data.get('Items')
+                    ]
 
         # Use if query only has an album name
         elif 'album' in query:
