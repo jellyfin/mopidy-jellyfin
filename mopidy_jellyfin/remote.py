@@ -1,22 +1,29 @@
 from __future__ import unicode_literals
 
+from mopidy import httpclient, models
+from mopidy_jellyfin.utils import cache
+import mopidy_jellyfin
+import requests
+from unidecode import unidecode
+
 import logging
 import socket
 from collections import OrderedDict, defaultdict
 import sys
 if sys.version.startswith('3'):
-    from urllib.parse import quote, urlencode, parse_qs, urljoin, urlsplit, urlunsplit
+    from urllib.parse import (
+        parse_qs,
+        quote,
+        urlencode,
+        urljoin,
+        urlsplit,
+        urlunsplit
+    )
 else:
     from urllib import urlencode
     from urllib2 import quote
     from urlparse import parse_qs, urljoin, urlsplit, urlunsplit
 
-from mopidy import httpclient, models
-
-import requests
-
-import mopidy_jellyfin
-from mopidy_jellyfin.utils import cache
 
 logger = logging.getLogger(__name__)
 
@@ -245,8 +252,8 @@ class JellyfinHandler(object):
 
         media_folders = [
             {'Name': library.get('Name'),
-             'Id':library.get('Id'),
-             'CollectionType':library.get('CollectionType')}
+             'Id': library.get('Id'),
+             'CollectionType': library.get('CollectionType')}
             for library in data.get('Items')
             if library.get('CollectionType') == 'music'
         ]
@@ -418,7 +425,6 @@ class JellyfinHandler(object):
 
     @cache()
     def get_albums(self, query):
-        tracks = []
         raw_artist = [""]
         raw_albums = []
 
@@ -691,6 +697,8 @@ class JellyfinHandler(object):
         elif 'albumartist' in query:
             raw_artist = query.get('albumartist')
 
+        cleaned_artist = unidecode(raw_artist[0]).lower()
+
         # Use if search query has both artist and album
         if 'album' in query and raw_artist:
             artist = quote(raw_artist[0].encode('utf8'))
@@ -715,7 +723,7 @@ class JellyfinHandler(object):
                 album_id = [
                     i.get('AlbumId')
                     for i in album_data
-                    if raw_artist[0].lower() in (
+                    if cleaned_artist in (
                         artist.lower() for artist in i.get('Artists')
                     )
                 ][0]
@@ -757,7 +765,7 @@ class JellyfinHandler(object):
 
             track_data = self.r_get(track_url)
             if track_data:
-                tracks = [ models.Track(
+                tracks = [models.Track(
                     uri='jellyfin:track:{}'.format(track.get('Id')),
                     track_no=track.get('IndexNumber'),
                     name=track.get('Name'),
@@ -777,7 +785,7 @@ class JellyfinHandler(object):
                 album_id = [
                     i.get('Id')
                     for i in raw_albums
-                    if i.get('Name') == album_name
+                    if i.get('Name') == unidecode(album_name)
                 ][0]
             else:
                 url = self.api_url(
@@ -828,7 +836,7 @@ class JellyfinHandler(object):
                     )
                 )
                 for item in raw_tracks
-                if artist_ref[0].name.lower() in (
+                if unidecode(artist_ref[0].name.lower()) in (
                     artist.lower() for artist in item.get('Artists'))
             ]
         else:
