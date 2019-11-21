@@ -346,6 +346,7 @@ class JellyfinHandler(object):
 
         self.r_post(new_url)
 
+    @cache()
     def browse_artists(self, library_id):
         logger.debug('jellyfin: library id - ' + library_id)
         artists = self.get_directory(library_id).get('Items')
@@ -359,6 +360,7 @@ class JellyfinHandler(object):
             if i
         ]
 
+    @cache()
     def browse_albums(self, artist_id):
         logger.debug('jellyfin: artist id - ' + artist_id)
         albums = self.get_directory(artist_id).get('Items')
@@ -372,6 +374,7 @@ class JellyfinHandler(object):
             if i
         ]
 
+    @cache()
     def browse_tracks(self, album_id):
         logger.debug('jellyfin: album id - ' + album_id)
         tracks = self.get_directory(album_id).get('Items')
@@ -387,6 +390,7 @@ class JellyfinHandler(object):
             if i
         ]
 
+    @cache()
     def get_artists(self):
         artists = []
         libraries = self.get_music_root()
@@ -412,6 +416,7 @@ class JellyfinHandler(object):
             for artist in artists
         ]
 
+    @cache()
     def get_albums(self, query):
         tracks = []
         raw_artist = [""]
