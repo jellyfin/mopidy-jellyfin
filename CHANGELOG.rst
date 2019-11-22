@@ -1,6 +1,16 @@
 Changelog
 =========
 
+v0.5.5
+---------------------------------------
+
+- Full support for Unicode in artist and albums name
+- Python 3 Support
+- Fixed bug in album searches being inefficient
+- Better caching
+- Added getting started development notes
+- Instructions for logging in as a hidden user
+
 v0.5.4
 ---------------------------------------
 
