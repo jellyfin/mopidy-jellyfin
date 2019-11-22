@@ -26,6 +26,7 @@ Install by running::
 
 Note that mopidy is still limited to python 2
 
+
 Configuration
 =============
 
@@ -53,6 +54,7 @@ In this example, the config file will look like this::
     user_id = 3920b99003194448a2a9d4f0bedd3d82
     libraries = Library1, Library2 (Optional: will default to "Music" if left undefined)
 
+
 Development
 ===========
 
@@ -76,8 +78,8 @@ Development
 Project resources
 =================
 
-- `Source code <https://github.com/mcarlton00/mopidy-jellyfin>`_
-- `Issue tracker <https://github.com/mcarlton00/mopidy-jellyfin/issues>`_
+- `Source code <https://github.com/jellyfin/mopidy-jellyfin>`_
+- `Issue tracker <https://github.com/jellyfin/mopidy-jellyfin/issues>`_
 
 
 Credits
@@ -85,4 +87,4 @@ Credits
 
 - Current maintainer: `Matt Carlton <https://github.com/mcarlton00>`_
 - Original author: `Marvin Steadfast <https://github.com/xsteadfastx>`_
-- `Contributors <https://github.com/mcarlton00/mopidy-jellyfin/graphs/contributors>`_
+- `Contributors <https://github.com/jellyfin/mopidy-jellyfin/graphs/contributors>`_
