@@ -53,6 +53,25 @@ In this example, the config file will look like this::
     user_id = 3920b99003194448a2a9d4f0bedd3d82
     libraries = Library1, Library2 (Optional: will default to "Music" if left undefined)
 
+Development
+===========
+
+1. Install mopidy to your host system, preferably using the native package manager.  This handles all of the required dependencies.
+
+2. Clone the repo to your local workstation
+
+   ``$ git clone git@github.com:jellyfin/mopidy-jellyfin.git && cd mopidy-jellyfin``
+
+2. Set up a virtualenv.  We need to include system packages since some things don't behave well inside of a virtualenv (such as ``PyGObject`` or interacting with pulseaudio).
+
+   ``$ virtualenv --python python2.7 --system-site-packages env``
+
+3. Install mopidy-jellyfin to the virtualenv.
+
+   ``$ env/bin/python setup.py develop```
+
+4. Do your thing.
+
 
 Project resources
 =================
