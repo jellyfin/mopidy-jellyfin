@@ -28,6 +28,7 @@ setup(
         'Mopidy >= 2.0',
         'Pykka >= 1.1',
         'requests >= 2.20',
+        'unidecode >= 1.1'
     ],
     entry_points={
         'mopidy.ext': [
