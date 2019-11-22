@@ -1,23 +1,28 @@
 from __future__ import unicode_literals
 
+from mopidy import httpclient, models
+from mopidy_jellyfin.utils import cache
+import mopidy_jellyfin
+import requests
+from unidecode import unidecode
+
 import logging
 import socket
 from collections import OrderedDict, defaultdict
 import sys
 if sys.version.startswith('3'):
-    from urllib.parse import quote, urlencode, parse_qs, urljoin, urlsplit, urlunsplit
+    from urllib.parse import (
+        parse_qs,
+        quote,
+        urlencode,
+        urljoin,
+        urlsplit,
+        urlunsplit
+    )
 else:
     from urllib import urlencode
     from urllib2 import quote
     from urlparse import parse_qs, urljoin, urlsplit, urlunsplit
-
-from mopidy import httpclient, models
-
-import requests
-from unidecode import unidecode
-
-import mopidy_jellyfin
-from mopidy_jellyfin.utils import cache
 
 logger = logging.getLogger(__name__)
 
@@ -246,8 +251,8 @@ class JellyfinHandler(object):
 
         media_folders = [
             {'Name': library.get('Name'),
-             'Id':library.get('Id'),
-             'CollectionType':library.get('CollectionType')}
+             'Id': library.get('Id'),
+             'CollectionType': library.get('CollectionType')}
             for library in data.get('Items')
             if library.get('CollectionType') == 'music'
         ]
@@ -347,6 +352,7 @@ class JellyfinHandler(object):
 
         self.r_post(new_url)
 
+    @cache()
     def browse_artists(self, library_id):
         logger.debug('jellyfin: library id - ' + library_id)
         artists = self.get_directory(library_id).get('Items')
@@ -360,6 +366,7 @@ class JellyfinHandler(object):
             if i
         ]
 
+    @cache()
     def browse_albums(self, artist_id):
         logger.debug('jellyfin: artist id - ' + artist_id)
         albums = self.get_directory(artist_id).get('Items')
@@ -373,6 +380,7 @@ class JellyfinHandler(object):
             if i
         ]
 
+    @cache()
     def browse_tracks(self, album_id):
         logger.debug('jellyfin: album id - ' + album_id)
         tracks = self.get_directory(album_id).get('Items')
@@ -388,6 +396,7 @@ class JellyfinHandler(object):
             if i
         ]
 
+    @cache()
     def get_artists(self):
         artists = []
         libraries = self.get_music_root()
@@ -413,8 +422,8 @@ class JellyfinHandler(object):
             for artist in artists
         ]
 
+    @cache()
     def get_albums(self, query):
-        tracks = []
         raw_artist = [""]
         raw_albums = []
 
