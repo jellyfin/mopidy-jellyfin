@@ -11,8 +11,9 @@ Mopidy extension for playing audio files from Jellyfin
 
 Notes:
 
-- Currently only supports the "Music" media type
-- Tested using `ncmpcpp <https://rybczak.net/ncmpcpp/>`_ and `M.A.L.P. <https://play.google.com/store/apps/details?id=org.gateshipone.malp>`_
+- Supports both "Music" and "Book" media types
+- Tested using `ncmpcpp <https://rybczak.net/ncmpcpp/>`_, `M.A.L.P. <https://play.google.com/store/apps/details?id=org.gateshipone.malp>`_, and various mopidy `web frontends <https://docs.mopidy.com/en/latest/ext/web/#ext-web>_`.
+    - When using ncmpcpp, it's recommended to set `mpd_connection_timeout = 30`, particularly if browsing folders that have a large number of items inside them
     - There is some inconsistency in M.A.L.P. where you may have to go to the menu and select 'Show All Tracks' for the library to populate properly
 - MPDroid on Android does not work properly
 
@@ -24,7 +25,7 @@ Install by running::
 
     pip2 install Mopidy-Jellyfin
 
-Note that mopidy is still limited to python 2
+Note that mopidy is officially still limited to python 2.  There is a prerelease of python 3 support that can be installed for testing purposes.  More information can be found `here <https://github.com/mopidy/mopidy/issues/779#issuecomment-552116742>`_
 
 
 Configuration
