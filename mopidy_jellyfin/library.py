@@ -22,26 +22,11 @@ class JellyfinLibraryProvider(backend.LibraryProvider):
         # split uri
         parts = uri.split(':')
 
-        # display artists
-        # uri: jellyfin:directory
-        if uri.startswith('jellyfin:directory:') and len(parts) == 3:
-            logger.debug('Get Jellyfin artist list')
-            library_id = parts[-1]
-
-            return self.backend.remote.browse_artists(library_id)
-
-        # display albums or tracks based on type of parent object
-        # uri:
-        #   jellyfin:$library_name:artist
-        #   jellyfin:$library_name:album
-        elif uri.startswith('jellyfin:') and len(parts) == 3:
+        # move one level lower in directory tree
+        if uri.startswith('jellyfin:') and len(parts) == 3:
             item_id = parts[-1]
             item_type = self.backend.remote.get_item(item_id).get('Type')
-            logger.debug('Jellyfin item type: {}'.format(item_type))
-            if item_type == "Folder":
-                return self.backend.remote.browse_albums(item_id)
-            elif item_type == "MusicAlbum":
-                return self.backend.remote.browse_tracks(item_id)
+            return self.backend.remote.browse_item(item_id)
 
         return []
 

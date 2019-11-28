@@ -254,7 +254,7 @@ class JellyfinHandler(object):
              'Id': library.get('Id'),
              'CollectionType': library.get('CollectionType')}
             for library in data.get('Items')
-            if library.get('CollectionType') == 'music'
+            if library.get('CollectionType') in ['books', 'music']
         ]
 
         if media_folders:
@@ -353,48 +353,37 @@ class JellyfinHandler(object):
         self.r_post(new_url)
 
     @cache()
-    def browse_artists(self, library_id):
-        logger.debug('jellyfin: library id - ' + library_id)
-        artists = self.get_directory(library_id).get('Items')
+    def browse_item(self, item_id):
+        contents = self.get_directory(item_id).get('Items')
+        ret_value = []
 
-        return [
-            models.Ref.artist(
-                uri='jellyfin:artist:{}'.format(i.get('Id')),
-                name=i.get('Name')
-            )
-            for i in artists
-            if i
-        ]
+        for item in contents:
+            if item.get('Type') == 'Audio':
+                ret_value.append(models.Ref.track(
+                    uri='jellyfin:track:{}'.format(
+                        item.get('Id')
+                    ),
+                    name=item.get('Name')
+                ))
+            elif item.get('Type') == 'AudioBook':
+                ret_value.append(models.Ref.track(
+                    uri='jellyfin:track:{}'.format(
+                        item.get('Id')
+                    ),
+                    name=item.get('Name')
+                ))
+            elif item.get('Type') == 'MusicAlbum':
+                ret_value.append(models.Ref.album(
+                    uri='jellyfin:album:{}'.format(item.get('Id')),
+                    name=item.get('Name')
+                ))
+            elif item.get('Type') == 'Folder':
+                ret_value.append(models.Ref.album(
+                    uri='jellyfin:album:{}'.format(item.get('Id')),
+                    name=item.get('Name')
+                ))
 
-    @cache()
-    def browse_albums(self, artist_id):
-        logger.debug('jellyfin: artist id - ' + artist_id)
-        albums = self.get_directory(artist_id).get('Items')
-
-        return [
-            models.Ref.album(
-                uri='jellyfin:album:{}'.format(i.get('Id')),
-                name=i.get('Name')
-            )
-            for i in albums
-            if i
-        ]
-
-    @cache()
-    def browse_tracks(self, album_id):
-        logger.debug('jellyfin: album id - ' + album_id)
-        tracks = self.get_directory(album_id).get('Items')
-
-        return [
-            models.Ref.track(
-                uri='jellyfin:track:{}'.format(
-                    i.get('Id')
-                ),
-                name=i.get('Name')
-            )
-            for i in tracks
-            if i
-        ]
+        return ret_value
 
     @cache()
     def get_artists(self):
