@@ -704,7 +704,7 @@ class JellyfinHandler(object):
             # Get album list
             album_url = self.api_url(
                 '/Items?IncludeItemTypes=MusicAlbum&Recursive=true&'
-                'AlbumArtistIds={}&UserId={}&'.format(
+                'ArtistIds={}&UserId={}&'.format(
                     artist_id, self.user_id
                 )
             )
@@ -715,7 +715,7 @@ class JellyfinHandler(object):
 
             track_url = self.api_url(
                 '/Items?IncludeItemTypes=Audio&Recursive=true&'
-                'AlbumArtistIds={}&UserId={}&'.format(
+                'ArtistIds={}&UserId={}&'.format(
                     artist_id, self.user_id
                 )
             )
