@@ -40,6 +40,7 @@ Mopidy-Jellyfin to your Mopidy configuration file::
     username = username
     password = password
     libraries = Library1, Library2 (Optional: will default to "Music" if left undefined)
+    albumartistsort = False (Optional: will default to True if left undefined)
 
 The ``libraries`` option determines what is populated into Mopidy's internal library (view by Artists/Album/etc).  Using the file browser will show all libraries in the Jellyfin server that have a 'music' type.
 
@@ -54,6 +55,7 @@ In this example, the config file will look like this::
     password = password
     user_id = 3920b99003194448a2a9d4f0bedd3d82
     libraries = Library1, Library2 (Optional: will default to "Music" if left undefined)
+    albumartistsort = False (Optional: will default to True if left undefined)
 
 
 Development
