@@ -28,6 +28,7 @@ class Extension(ext.Extension):
         schema['password'] = config.Secret()
         schema['hostname'] = config.String()
         schema['libraries'] = config.String(optional=True)
+        schema['albumartistsort'] = config.String(optional=True)
         schema['port'] = config.Port()
         schema['client_cert'] = config.String(optional=True)
         schema['client_key'] = config.String(optional=True)

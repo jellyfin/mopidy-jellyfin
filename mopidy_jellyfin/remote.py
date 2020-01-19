@@ -36,8 +36,16 @@ class JellyfinHandler(object):
             self.username = jellyfin.get('username')
             self.password = jellyfin.get('password')
             self.libraries = jellyfin.get('libraries')
+            # If no libraries are provided, default to 'Music'
             if not self.libraries:
                 self.libraries = 'Music'
+            self.albumartistsort = jellyfin.get('albumartistsort')
+            # If not overridden, default to using Album Artist sort method
+            # This _really_ shouldn't be necessary, but it is for reasons
+            if self.albumartistsort not in ['False', 'false']:
+                self.albumartistsort = True
+            else:
+                self.albumartistsort = False
             self.proxy = config['proxy']
             self.user_id = jellyfin.get('user_id', False)
 
@@ -393,11 +401,18 @@ class JellyfinHandler(object):
         for library in libraries:
 
             if library.get('Name') in self.libraries:
-                url = self.api_url(
-                    '/Artists?ParentId={}&UserId={}'.format(
-                        library.get('Id'), self.user_id
+                if self.albumartistsort:
+                    url = self.api_url(
+                        '/Artists/AlbumArtists?ParentId={}&UserId={}'.format(
+                            library.get('Id'), self.user_id
+                        )
                     )
-                )
+                else:
+                    url = self.api_url(
+                        '/Artists?ParentId={}&UserId={}'.format(
+                            library.get('Id'), self.user_id
+                        )
+                    )
 
                 artists += self.r_get(url).get('Items')
 
@@ -437,12 +452,20 @@ class JellyfinHandler(object):
         artist_id = artist_data.get('Id')
 
         # Get album list
-        url = self.api_url(
-            '/Items?AlbumArtistIds={}&UserId={}&'
-            'IncludeItemTypes=MusicAlbum&Recursive=true'.format(
-                artist_id, self.user_id
+        if self.albumartistsort:
+            url = self.api_url(
+                '/Items?AlbumArtistIds={}&UserId={}&'
+                'IncludeItemTypes=MusicAlbum&Recursive=true'.format(
+                    artist_id, self.user_id
+                )
             )
-        )
+        else:
+            url = self.api_url(
+                '/Items?ArtistIds={}&UserId={}&'
+                'IncludeItemTypes=MusicAlbum&Recursive=true'.format(
+                    artist_id, self.user_id
+                )
+            )
 
         result = self.r_get(url)
         if result:
@@ -702,23 +725,39 @@ class JellyfinHandler(object):
             artist_id = artist_data.get('Id')
 
             # Get album list
-            album_url = self.api_url(
-                '/Items?IncludeItemTypes=MusicAlbum&Recursive=true&'
-                'AlbumArtistIds={}&UserId={}&'.format(
-                    artist_id, self.user_id
+            if self.albumartistsort:
+                album_url = self.api_url(
+                    '/Items?IncludeItemTypes=MusicAlbum&Recursive=true&'
+                    'AlbumArtistIds={}&UserId={}&'.format(
+                        artist_id, self.user_id
+                    )
                 )
-            )
+            else:
+                album_url = self.api_url(
+                    '/Items?IncludeItemTypes=MusicAlbum&Recursive=true&'
+                    'ArtistIds={}&UserId={}&'.format(
+                        artist_id, self.user_id
+                    )
+                )
 
             album_data = self.r_get(album_url)
             if album_data:
                 raw_albums = album_data.get('Items')
 
-            track_url = self.api_url(
-                '/Items?IncludeItemTypes=Audio&Recursive=true&'
-                'AlbumArtistIds={}&UserId={}&'.format(
-                    artist_id, self.user_id
+            if self.albumartistsort:
+                track_url = self.api_url(
+                    '/Items?IncludeItemTypes=Audio&Recursive=true&'
+                    'AlbumArtistIds={}&UserId={}&'.format(
+                        artist_id, self.user_id
+                    )
                 )
-            )
+            else:
+                track_url = self.api_url(
+                    '/Items?IncludeItemTypes=Audio&Recursive=true&'
+                    'ArtistIds={}&UserId={}&'.format(
+                        artist_id, self.user_id
+                    )
+                )
 
             track_data = self.r_get(track_url)
             if track_data:
@@ -838,12 +877,20 @@ class JellyfinHandler(object):
         :returns: List of tracks
         :rtype: list
         """
-        url = self.api_url(
-            (
-                '/Users/{}/Items?SortOrder=Ascending&ArtistIds={}'
-                '&Recursive=true&IncludeItemTypes=Audio'
-            ).format(self.user_id, artist_id)
-        )
+        if self.albumartistsort:
+            url = self.api_url(
+                (
+                    '/Users/{}/Items?SortOrder=Ascending&AlbumArtistIds={}'
+                    '&Recursive=true&IncludeItemTypes=Audio'
+                ).format(self.user_id, artist_id)
+            )
+        else:
+            url = self.api_url(
+                (
+                    '/Users/{}/Items?SortOrder=Ascending&ArtistIds={}'
+                    '&Recursive=true&IncludeItemTypes=Audio'
+                ).format(self.user_id, artist_id)
+            )
 
         items = self.r_get(url)
 
