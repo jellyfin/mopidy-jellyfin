@@ -47,8 +47,10 @@ class JellyfinHandler(object):
             else:
                 self.albumartistsort = False
             self.proxy = config['proxy']
-            self.user_id = jellyfin.get('user_id', False)
-
+            if jellyfin.get('user_id', False):
+                logger.warn('Specifying user_id in the config file is '
+                            'depreciated. This will be removed in a future '
+                            'release')
             self.cert = None
             client_cert = jellyfin.get('client_cert', None)
             client_key = jellyfin.get('client_key', None)
@@ -59,9 +61,14 @@ class JellyfinHandler(object):
 
         # create authentication headers
         self.auth_data = self._password_data()
-        self.user_id = self.user_id or self._get_user()[0].get('Id')
+        #self.user_id = self._get_user()[0].get('Id')
         self.headers = self._create_headers()
-        self.token = self._get_token()
+        auth_details = self._login()
+        #import pdb; pdb.set_trace()
+        self.token = auth_details.get('AccessToken')
+        logger.info(self.token)
+        self.user_id = auth_details.get('User').get('Id')
+        logger.info(self.user_id)
 
         self.headers = self._create_headers(token=self.token)
 
@@ -77,14 +84,14 @@ class JellyfinHandler(object):
         else:
             raise Exception('No Jellyfin user {} found'.format(self.username))
 
-    def _get_token(self):
+    def _login(self):
         """Return token for a user.
         """
         url = self.api_url('/Users/AuthenticateByName')
         r = requests.post(
                 url, headers=self.headers, data=self.auth_data, cert=self.cert)
 
-        return r.json().get('AccessToken')
+        return r.json()
 
     def _password_data(self):
         """Returns a dict with username and its encoded password.
@@ -100,13 +107,12 @@ class JellyfinHandler(object):
         headers = {}
 
         authorization = (
-            'MediaBrowser UserId="{user_id}", '
+            'MediaBrowser , '
             'Client="Mopidy", '
             'Device="{name}", '
             'DeviceId="{name}", '
             'Version="{version}"'
         ).format(
-            user_id=self.user_id,
             name=socket.gethostname(),
             version=mopidy_jellyfin.__version__
         )
