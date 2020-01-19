@@ -61,15 +61,10 @@ class JellyfinHandler(object):
 
         # create authentication headers
         self.auth_data = self._password_data()
-        #self.user_id = self._get_user()[0].get('Id')
         self.headers = self._create_headers()
         auth_details = self._login()
-        #import pdb; pdb.set_trace()
         self.token = auth_details.get('AccessToken')
-        logger.info(self.token)
         self.user_id = auth_details.get('User').get('Id')
-        logger.info(self.user_id)
-
         self.headers = self._create_headers(token=self.token)
 
     def _get_user(self):
