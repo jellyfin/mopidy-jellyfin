@@ -36,7 +36,6 @@ Mopidy-Jellyfin to your Mopidy configuration file::
 
     [jellyfin]
     hostname = Jellyfin server hostname
-    port = Jellyfin server port
     username = username
     password = password
     libraries = Library1, Library2 (Optional: will default to "Music" if left undefined)
