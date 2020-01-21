@@ -32,7 +32,11 @@ class JellyfinHandler(object):
         jellyfin = config.get('jellyfin')
         if jellyfin:
             self.hostname = jellyfin.get('hostname')
-            self.port = jellyfin.get('port')
+            if jellyfin.get('port', False):
+                logger.warn('Specifying port in the config file is '
+                            'depreciated. This will be removed in a future '
+                            'release. This should be combined with the '
+                            'hostname field')
             self.username = jellyfin.get('username')
             self.password = jellyfin.get('password')
             self.libraries = jellyfin.get('libraries')
@@ -224,7 +228,7 @@ class JellyfinHandler(object):
     def api_url(self, endpoint):
         """Returns a joined url.
 
-        Takes host, port and endpoint and generates a valid jellyfin API url.
+        Takes host, and endpoint and generates a valid jellyfin API url.
         """
         # check if http or https is defined as host and create hostname
         hostname_list = [self.hostname]
@@ -235,13 +239,7 @@ class JellyfinHandler(object):
             hostname_list.insert(0, 'http://')
             hostname = ''.join(hostname_list)
 
-        joined = urljoin(
-            '{hostname}:{port}'.format(
-                hostname=hostname,
-                port=self.port
-            ),
-            endpoint
-        )
+        joined = urljoin(hostname, endpoint)
 
         scheme, netloc, path, query_string, fragment = urlsplit(joined)
         query_params = parse_qs(query_string)

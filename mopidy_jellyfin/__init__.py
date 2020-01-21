@@ -29,7 +29,7 @@ class Extension(ext.Extension):
         schema['hostname'] = config.String()
         schema['libraries'] = config.String(optional=True)
         schema['albumartistsort'] = config.String(optional=True)
-        schema['port'] = config.Port()
+        schema['port'] = config.Port(optional=True)
         schema['client_cert'] = config.String(optional=True)
         schema['client_key'] = config.String(optional=True)
 
