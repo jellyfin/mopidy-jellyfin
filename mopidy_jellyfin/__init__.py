@@ -38,4 +38,6 @@ class Extension(ext.Extension):
 
     def setup(self, registry):
         from .backend import JellyfinBackend
+        from .frontend import EventMonitorFrontend
         registry.add('backend', JellyfinBackend)
+        registry.add('frontend', EventMonitorFrontend)
