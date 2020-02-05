@@ -28,12 +28,15 @@ class EventMonitorFrontend(
 
 
     def on_start(self):
+        # Start the websocket client
         self.wsc.start()
 
     def on_stop(self):
+        # Stop the websocket client.  Prevent hanging on closing program
         self.wsc.stop_client()
 
     def on_event(self, event, **kwargs):
+        # Receives internal Mopidy events
         super(EventMonitorFrontend, self).on_event(event, **kwargs)
 
         if event == 'playback_state_changed':
@@ -44,6 +47,7 @@ class EventMonitorFrontend(
             self._volume_changed(kwargs)
 
     def _get_session_id(self):
+        # Get the current playback session ID from the Jellyfin server
         device_id = socket.gethostname()
         sessions = requests.get(f'{self.wsc.hostname}/Sessions?{device_id}',
                                 headers=self.wsc.headers)
@@ -52,9 +56,10 @@ class EventMonitorFrontend(
 
         return session_id
 
-        #session_id = [ session.get('
 
     def _playback_state_changed(self, data):
+        # When mopidy changes tracks, send an update to Jellyfin
+
         session_id = self._get_session_id()
 
         new_state = data.get('new_state')
@@ -70,10 +75,6 @@ class EventMonitorFrontend(
                 pause_state = True
             else:
                 pause_state = False
-            # TODO:
-                # Playlist position
-                # Playback modes (shuffle/repeat)
-                # Tracklist changed (update playlist in web UI?)
 
             data = {
                 "VolumeLevel": volume,
@@ -95,26 +96,31 @@ class EventMonitorFrontend(
 
 
     def _stop_playback(self):
+        # Report to Jellyfin that playback has stopped
         r = requests.post(f'{self.hostname}/Sessions/Playing/Stopped',
                           headers=self.wsc.headers)
 
     def _start_playback(self, data):
+        # Report to Jellyfin that playback has started
         report = requests.post(f'{self.hostname}/Sessions/Playing',
                                headers=self.wsc.headers,
                                json=data)
 
     def _seeked(self, kwargs):
+        # Report to Jellyfin the new playback position
         playback_time = kwargs.get('time_position') * 10000
         self._update_playback(PositionTicks=playback_time,
                               EventName='TimeUpdate')
 
     def _volume_changed(self, kwargs):
+        # Report to Jellyfin the new volume level
         volume = kwargs.get('volume')
 
         self._update_playback(Volume=volume, EventName='VolumeChange')
 
 
     def _update_playback(self, **kwargs):
+        # Send an update to Jellyfin about the current playback status
         session_id = self._get_session_id()
         track = self.core.playback.get_current_track().get()
         if track:
@@ -140,6 +146,7 @@ class EventMonitorFrontend(
                               headers=self.wsc.headers, json=data)
 
     def playstate(self, data):
+        # Processes Playstate commands received from the Jellyfin server
         command = data.get('Command')
         if command == 'NextTrack':
             self.core.playback.next()
@@ -155,6 +162,7 @@ class EventMonitorFrontend(
             self.core.playback.stop()
 
     def general_command(self, data):
+        # Processes General commands received from the Jellyfin server
         command = data.get('Name')
         if command == 'SetVolume':
             volume = data['Arguments'].get('Volume')
@@ -166,6 +174,7 @@ class EventMonitorFrontend(
                 self.core.mixer.set_mute(True)
 
     def play_tracks(self, data):
+        # Receives the "Play To" commands from the Jellyfin server
         items = data.get('ItemIds')
         uris = [f'jellyfin:track:{item_id}' for item_id in items]
         tracks = self.core.tracklist.add(uris=uris).get()

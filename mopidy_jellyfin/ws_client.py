@@ -28,6 +28,7 @@ class WSClient(threading.Thread):
     stop = False
 
     def __init__(self, client):
+        # Start in a second thread to not interfere with the main program
 
         logger.debug("WSClient initializing...")
 
@@ -35,18 +36,17 @@ class WSClient(threading.Thread):
         threading.Thread.__init__(self)
 
     def send(self, message, data=""):
+        # Send message to the Jellyfin server
 
         if self.wsc is None:
             raise ValueError("The websocket client is not started.")
 
         self.wsc.send(json.dumps({'MessageType': message, "Data": data}))
 
-    def _http_post(self, data):
-        r = requests.post(f'{self.hostname}/Playing/Progress', headers=self.headers, json=data)
-
-        return r
-
     def _login(self):
+        # Authenticates to the server
+        # TODO: Needs to be consolidated with the backend
+
         self.hostname = self.client.config.get('hostname')
         username = self.client.config.get('username')
         password = self.client.config.get('password')
@@ -87,6 +87,7 @@ class WSClient(threading.Thread):
         return r.json()
 
     def run(self):
+        # Starts the websocket event listener
 
         credentials = self._login()
 
@@ -95,8 +96,6 @@ class WSClient(threading.Thread):
         server = self.client.config.get('hostname')
         server = server.replace('https', "wss") if server.startswith('https') else server.replace('http', "ws")
         wsc_url = "%s/socket?api_key=%s&device_id=%s" % (server, token, device_id)
-
-        logger.info("Websocket url: %s", wsc_url)
 
         self.wsc = websocket.WebSocketApp(
             wsc_url,
@@ -112,7 +111,6 @@ class WSClient(threading.Thread):
             if not self.stop:
                 break
 
-        logger.info("---<[ websocket ]")
         self.callback('WebSocketDisconnect', None)
 
 
@@ -121,25 +119,19 @@ class WSClient(threading.Thread):
         self.callback('WebSocketError', error)
 
     def on_open(self, ws):
-        logger.info("--->[ websocket ]")
         self.post_capabilities()
         self.callback('WebSocketConnect', None)
 
     def on_message(self, ws, message):
+        # Receive messages from Jellyfin, sends to callback for processing
 
         message = json.loads(message)
         data = message.get('Data', {})
 
-        if message['MessageType'] in ('RefreshProgress',):
-            logger.debug("Ignoring %s", message)
-
-            return
-
-        #data['ServerId'] = self.client.remote.auth_details.get('ServerId')
-
         self.callback(message['MessageType'], data)
 
     def stop_client(self):
+        # Stop the client websocket thread
 
         self.stop = True
 
@@ -147,11 +139,13 @@ class WSClient(threading.Thread):
             self.wsc.close()
 
     def post_capabilities(self):
+        # Tell the server what media and controls we can handle
+
         data = {
             'PlayableMediaTypes': "Audio",
             'SupportsMediaControl': True,
             'SupportedCommands': (
-                    "VolumeUp,VolumeDown,ToggleMute,SendString,DisplayMessage,"
+                    "VolumeUp,VolumeDown,ToggleMute"
                     "SetAudioStreamIndex,"
                     "SetRepeatMode,"
                     "Mute,Unmute,SetVolume,"
@@ -164,10 +158,7 @@ class WSClient(threading.Thread):
         r = requests.post(url, headers=self.headers, json=data)
 
     def callback(self, message, data):
-        #logger.info(f'Callback message: {message}')
-        #logger.info(f'Callback data: {data}')
-        # TODO:
-            # Playback modes (shuffle/repeat)
+        # Processes events from Jellyfin and sends them to EventListener
 
         if message == 'Pause':
            self.client.playback.pause_track()
