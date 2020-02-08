@@ -2,7 +2,6 @@ from mopidy import audio, core
 import pykka
 import logging
 import threading
-import requests
 import socket
 
 from .ws_client import WSClient
@@ -22,8 +21,8 @@ class EventMonitorFrontend(
         super(EventMonitorFrontend, self).__init__()
         self.core = core
         self.token = self._read_token(config)
-        self.config = config['jellyfin']
-        self.hostname = self.config.get('hostname')
+        self.config = config
+        self.hostname = self.config['jellyfin'].get('hostname')
 
         self.wsc = WSClient(self)
 
@@ -51,10 +50,16 @@ class EventMonitorFrontend(
     def _get_session_id(self):
         # Get the current playback session ID from the Jellyfin server
         device_id = socket.gethostname()
-        sessions = requests.get(f'{self.wsc.hostname}/Sessions?{device_id}',
-                                headers=self.wsc.headers)
+        sessions = self.wsc.http.get('{}/Sessions?{}'.format(self.hostname,
+                                                             device_id))
 
-        session_id = sessions.json()[0].get('Id')
+        matching = [ session for session in sessions
+                    if session.get('DeviceId') == device_id ]
+        if matching:
+            session_id = matching[0].get('Id')
+        else:
+            session_id = None
+            logger.warn('No matching Jellyfin playback session found')
 
         return session_id
 
@@ -66,11 +71,11 @@ class EventMonitorFrontend(
 
         new_state = data.get('new_state')
         if new_state in ['paused', 'playing']:
-            playback_time = self.core.playback.get_time_position().get() * 10000
+            play_time = self.core.playback.get_time_position().get() * 10000
             track = self.core.playback.get_current_track().get()
             item_id = track.uri.split(':')[-1]
-            playback_milliseconds = self.core.playback.get_time_position().get()
-            playback_ticks = playback_milliseconds * 10000
+            playback_ms = self.core.playback.get_time_position().get()
+            playback_ticks = playback_ms * 10000
             volume = self.core.mixer.get_volume().get()
 
             if new_state == 'paused':
@@ -83,7 +88,7 @@ class EventMonitorFrontend(
                 "IsMuted": False,
                 "IsPaused": pause_state,
                 "RepeatMode": "RepeatNone",
-                "PositionTicks": playback_time,
+                "PositionTicks": play_time,
                 "PlayMethod": "DirectPlay",
                 "PlaySessionId": session_id,
                 "MediaSourceId": item_id,
@@ -96,17 +101,15 @@ class EventMonitorFrontend(
         elif new_state == 'stopped':
             self._stop_playback()
 
-
     def _stop_playback(self):
         # Report to Jellyfin that playback has stopped
-        r = requests.post(f'{self.hostname}/Sessions/Playing/Stopped',
-                          headers=self.wsc.headers)
+        r = self.wsc.http.post(
+            '{}/Sessions/Playing/Stopped'.format(self.hostname))
 
     def _start_playback(self, data):
         # Report to Jellyfin that playback has started
-        report = requests.post(f'{self.hostname}/Sessions/Playing',
-                               headers=self.wsc.headers,
-                               json=data)
+        report = self.wsc.http.post(
+            '{}/Sessions/Playing'.format(self.hostname), data)
 
     def _seeked(self, kwargs):
         # Report to Jellyfin the new playback position
@@ -119,7 +122,6 @@ class EventMonitorFrontend(
         volume = kwargs.get('volume')
 
         self._update_playback(Volume=volume, EventName='VolumeChange')
-
 
     def _update_playback(self, **kwargs):
         # Send an update to Jellyfin about the current playback status
@@ -144,8 +146,8 @@ class EventMonitorFrontend(
 
             # This should work, but isn't.  Using http post for now
             #self.wsc.send('ReportPlaybackProgress', data=data)
-            r = requests.post(f'{self.hostname}/Sessions/Playing/Progress',
-                              headers=self.wsc.headers, json=data)
+            r = self.wsc.http.post(
+                '{}/Sessions/Playing/Progress'.format(self.hostname), data)
 
     def playstate(self, data):
         # Processes Playstate commands received from the Jellyfin server
@@ -178,7 +180,7 @@ class EventMonitorFrontend(
     def play_tracks(self, data):
         # Receives the "Play To" commands from the Jellyfin server
         items = data.get('ItemIds')
-        uris = [f'jellyfin:track:{item_id}' for item_id in items]
+        uris = ['jellyfin:track:{}'.format(item_id) for item_id in items]
         tracks = self.core.tracklist.add(uris=uris).get()
         self.core.playback.play(tlid=tracks[0].tlid)
 

@@ -9,6 +9,7 @@ import requests
 import socket
 import threading
 import mopidy_jellyfin
+from .http import JellyfinHttpClient
 
 import websocket
 
@@ -47,10 +48,19 @@ class WSClient(threading.Thread):
         # Starts the websocket event listener
 
         device_id = name=socket.gethostname()
-        self.hostname = self.client.config.get('hostname')
+        # Load things from config file
+        server = self.client.config['jellyfin'].get('hostname')
+        cert = None
+        client_cert = self.client.config['jellyfin'].get('client_cert', None)
+        client_key = self.client.config['jellyfin'].get('client_key', None)
+        if client_cert is not None and client_key is not None:
+            cert = (client_cert, client_key)
+        self.hostname = self.client.config['jellyfin'].get('hostname')
+        proxy = self.client.config.get('proxy', None)
+
         token = self.client.token
-        self.headers = {'x-mediabrowser-token': token}
-        server = self.client.config.get('hostname')
+        headers = {'x-mediabrowser-token': token}
+        self.http = JellyfinHttpClient(headers, cert, proxy)
         server = server.replace('https', "wss") if server.startswith('https') else server.replace('http', "ws")
         wsc_url = "%s/socket?api_key=%s&device_id=%s" % (server, token, device_id)
 
@@ -110,9 +120,9 @@ class WSClient(threading.Thread):
             )
         }
 
-        url = f'{self.hostname}/Sessions/Capabilities/Full'
+        url = '{}/Sessions/Capabilities/Full'.format(self.hostname)
 
-        r = requests.post(url, headers=self.headers, json=data)
+        r = self.http.post(url, data)
 
     def callback(self, message, data):
         # Processes events from Jellyfin and sends them to EventListener
