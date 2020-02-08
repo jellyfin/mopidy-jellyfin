@@ -33,7 +33,8 @@ class EventMonitorFrontend(
         self.wsc.start()
 
     def on_stop(self):
-        # Stop the websocket client.  Prevent hanging on closing program
+        # Stop the websocket client and tell the server playback has stopped
+        self._stop_playback()
         self.wsc.stop_client()
 
     def on_event(self, event, **kwargs):
