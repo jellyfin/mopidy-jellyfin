@@ -535,6 +535,7 @@ class JellyfinHandler(object):
             ),
             name=track.get('Name'),
             track_no=track.get('IndexNumber'),
+            disc_no=track.get('ParentIndexNumber'),
             genre=track.get('Genre'),
             artists=self.create_artists(track),
             album=self.create_album(track),
@@ -768,6 +769,7 @@ class JellyfinHandler(object):
                     tracks = [ models.Track(
                         uri='jellyfin:track:{}'.format(track.get('Id')),
                         track_no=track.get('IndexNumber'),
+                        disc_no=track.get('ParentIndexNumber'),
                         name=track.get('Name'),
                         artists=artist_ref,
                         album=models.Album(
@@ -782,6 +784,7 @@ class JellyfinHandler(object):
                     tracks = [ models.Track(
                         uri='jellyfin:track:{}'.format(track.get('Id')),
                         track_no=track.get('IndexNumber'),
+                        disc_no=track.get('ParentIndexNumber'),
                         name=track.get('Name'),
                         artists=artist_ref,
                         album=models.Album(
@@ -842,6 +845,7 @@ class JellyfinHandler(object):
                 models.Track(
                     uri='jellyfin:track:{}'.format(item.get('Id')),
                     track_no=item.get('IndexNumber'),
+                    disc_no=track.get('ParentIndexNumber'),
                     name=item.get('Name'),
                     artists=artist_ref,
                     album=models.Album(
