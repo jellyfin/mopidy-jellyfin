@@ -32,6 +32,7 @@ class Extension(ext.Extension):
         schema['port'] = config.Port(optional=True)
         schema['client_cert'] = config.String(optional=True)
         schema['client_key'] = config.String(optional=True)
+        schema['album_format'] = config.String(optional=True)
 
         return schema
 

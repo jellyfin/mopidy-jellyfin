@@ -60,6 +60,9 @@ class JellyfinHandler(object):
             client_key = jellyfin.get('client_key', None)
             if client_cert is not None and client_key is not None:
                 self.cert = (client_cert, client_key)
+            self.album_format = jellyfin.get('album_format', False)
+            if not self.album_format:
+                self.album_format = '{Name}'
         else:
             logger.info('No Jellyfin config found')
 
@@ -382,7 +385,7 @@ class JellyfinHandler(object):
             elif item.get('Type') == 'MusicAlbum':
                 ret_value.append(models.Ref.album(
                     uri='jellyfin:album:{}'.format(item.get('Id')),
-                    name=item.get('Name')
+                    name=self.album_format.format(**item)
                 ))
             elif item.get('Type') == 'Folder':
                 ret_value.append(models.Ref.album(
@@ -532,6 +535,7 @@ class JellyfinHandler(object):
             ),
             name=track.get('Name'),
             track_no=track.get('IndexNumber'),
+            disc_no=track.get('ParentIndexNumber'),
             genre=track.get('Genre'),
             artists=self.create_artists(track),
             album=self.create_album(track),
@@ -765,6 +769,7 @@ class JellyfinHandler(object):
                     tracks = [ models.Track(
                         uri='jellyfin:track:{}'.format(track.get('Id')),
                         track_no=track.get('IndexNumber'),
+                        disc_no=track.get('ParentIndexNumber'),
                         name=track.get('Name'),
                         artists=artist_ref,
                         album=models.Album(
@@ -779,6 +784,7 @@ class JellyfinHandler(object):
                     tracks = [ models.Track(
                         uri='jellyfin:track:{}'.format(track.get('Id')),
                         track_no=track.get('IndexNumber'),
+                        disc_no=track.get('ParentIndexNumber'),
                         name=track.get('Name'),
                         artists=artist_ref,
                         album=models.Album(
@@ -839,6 +845,7 @@ class JellyfinHandler(object):
                 models.Track(
                     uri='jellyfin:track:{}'.format(item.get('Id')),
                     track_no=item.get('IndexNumber'),
+                    disc_no=track.get('ParentIndexNumber'),
                     name=item.get('Name'),
                     artists=artist_ref,
                     album=models.Album(
