@@ -6,7 +6,6 @@ from __future__ import division, absolute_import, print_function, unicode_litera
 import json
 import logging
 import requests
-import socket
 import threading
 import mopidy_jellyfin
 from .http import JellyfinHttpClient
@@ -47,7 +46,7 @@ class WSClient(threading.Thread):
     def run(self):
         # Starts the websocket event listener
 
-        device_id = name=socket.gethostname()
+        device_id = mopidy_jellyfin.Extension.device_id
         # Load things from config file
         server = self.client.config['jellyfin'].get('hostname')
         cert = None

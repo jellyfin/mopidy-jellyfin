@@ -2,7 +2,6 @@ from mopidy import audio, core
 import pykka
 import logging
 import threading
-import socket
 
 from .ws_client import WSClient
 from mopidy_jellyfin import listener, Extension
@@ -49,17 +48,11 @@ class EventMonitorFrontend(
 
     def _get_session_id(self):
         # Get the current playback session ID from the Jellyfin server
-        device_id = socket.gethostname()
-        sessions = self.wsc.http.get('{}/Sessions?{}'.format(self.hostname,
-                                                             device_id))
+        device_id = Extension.device_id
+        sessions = self.wsc.http.get(
+            '{}/Sessions?DeviceId={}'.format(self.hostname, device_id))
 
-        matching = [ session for session in sessions
-                    if session.get('DeviceId') == device_id ]
-        if matching:
-            session_id = matching[0].get('Id')
-        else:
-            session_id = None
-            logger.warn('No matching Jellyfin playback session found')
+        session_id = sessions[0].get('Id')
 
         return session_id
 

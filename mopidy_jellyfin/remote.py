@@ -7,7 +7,6 @@ from .http import JellyfinHttpClient
 from unidecode import unidecode
 
 import logging
-import socket
 from collections import OrderedDict, defaultdict
 import sys
 if sys.version.startswith('3'):
@@ -115,11 +114,12 @@ class JellyfinHandler(object):
         authorization = (
             'MediaBrowser , '
             'Client="Mopidy", '
-            'Device="{name}", '
-            'DeviceId="{name}", '
+            'Device="{device}", '
+            'DeviceId="{device_id}", '
             'Version="{version}"'
         ).format(
-            name=socket.gethostname(),
+            device=mopidy_jellyfin.Extension.device_name,
+            device_id=mopidy_jellyfin.Extension.device_id,
             version=mopidy_jellyfin.__version__
         )
 
