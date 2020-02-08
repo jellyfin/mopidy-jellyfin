@@ -43,56 +43,13 @@ class WSClient(threading.Thread):
 
         self.wsc.send(json.dumps({'MessageType': message, "Data": data}))
 
-    def _login(self):
-        # Authenticates to the server
-        # TODO: Needs to be consolidated with the backend
-
-        self.hostname = self.client.config.get('hostname')
-        username = self.client.config.get('username')
-        password = self.client.config.get('password')
-        cert = self.client.config.get('client_cert', None)
-
-        auth_payload = {
-            'username': username,
-            'Pw': password
-        }
-
-        url = f'{self.hostname}/Users/AuthenticateByName'
-
-        headers = {}
-
-        authorization = (
-            'MediaBrowser , '
-            'Client="Mopidy", '
-            'Device="{name}", '
-            'DeviceId="{name}", '
-            'Version="{version}"'
-        ).format(
-            name=socket.gethostname(),
-            version=mopidy_jellyfin.__version__
-        )
-
-        headers['x-emby-authorization'] = authorization
-
-        r = requests.post(
-                url, headers=headers, data=auth_payload, cert=cert)
-
-        r.raise_for_status()
-
-        if r.json().get('AccessToken'):
-            headers['x-mediabrowser-token'] = r.json().get('AccessToken')
-
-        self.headers = headers
-
-        return r.json()
-
     def run(self):
         # Starts the websocket event listener
 
-        credentials = self._login()
-
         device_id = name=socket.gethostname()
-        token = credentials.get('AccessToken')
+        self.hostname = self.client.config.get('hostname')
+        token = self.client.token
+        self.headers = {'x-mediabrowser-token': token}
         server = self.client.config.get('hostname')
         server = server.replace('https', "wss") if server.startswith('https') else server.replace('http', "ws")
         wsc_url = "%s/socket?api_key=%s&device_id=%s" % (server, token, device_id)

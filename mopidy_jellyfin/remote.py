@@ -73,6 +73,15 @@ class JellyfinHandler(object):
         self.token = auth_details.get('AccessToken')
         self.user_id = auth_details.get('User').get('Id')
         self.headers = self._create_headers(token=self.token)
+        self._save_token(config)
+
+    def _save_token(self, config):
+        # Save the authentication token where the frontend can also access it
+        cache_dir = mopidy_jellyfin.Extension.get_cache_dir(config)
+        token_file = cache_dir / 'token'
+
+        with open(token_file, 'w') as f:
+            f.write(self.token)
 
     def _get_user(self):
         """Return user dict from server or None if there is no user.
