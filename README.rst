@@ -12,8 +12,8 @@ Mopidy extension for playing audio files from Jellyfin
 Notes:
 
 - Supports both "Music" and "Book" media types
-- Tested using `ncmpcpp <https://rybczak.net/ncmpcpp/>`_, `M.A.L.P. <https://play.google.com/store/apps/details?id=org.gateshipone.malp>`_, and various mopidy `web frontends <https://docs.mopidy.com/en/latest/ext/web/#ext-web>`_.
-    - When using ncmpcpp, it's recommended to set `mpd_connection_timeout = 30`, particularly if browsing folders that have a large number of items inside them
+- Tested using `ncmpcpp <https://rybczak.net/ncmpcpp/>`_, `M.A.L.P. <https://play.google.com/store/apps/details?id=org.gateshipone.malp>`_, and various mopidy `web frontends <https://mopidy.com/ext/>`_.
+    - When using ncmpcpp, it's recommended to set ``mpd_connection_timeout = 30``, particularly if browsing folders that have a large number of items inside them
     - There is some inconsistency in M.A.L.P. where you may have to go to the menu and select 'Show All Tracks' for the library to populate properly
 - MPDroid on Android does not work properly
 
@@ -23,9 +23,9 @@ Installation
 
 Install by running::
 
-    pip2 install Mopidy-Jellyfin
+    pip install Mopidy-Jellyfin
 
-Note that mopidy is officially still limited to python 2.  There is a prerelease of python 3 support that can be installed for testing purposes.  More information can be found `here <https://github.com/mopidy/mopidy/issues/779#issuecomment-552116742>`_
+Mopidy-Jellyfin has officially moved to Python 3 with the release of `Mopidy 3.0 <https://mopidy.com/blog/2019/12/22/mopidy-3.0/>`_.  All future updates will target this newer version.
 
 
 Configuration
@@ -42,20 +42,11 @@ Mopidy-Jellyfin to your Mopidy configuration file::
     albumartistsort = False (Optional: will default to True if left undefined)
     album_format = {ProductionYear} - {Name} (Optional: will default to "{Name}" if left undefined)
 
-The ``libraries`` option determines what is populated into Mopidy's internal library (view by Artists/Album/etc).  Using the file browser will show all libraries in the Jellyfin server that have a 'music' type.
+  * ``libraries`` determines what is populated into Mopidy's internal library (view by Artists/Album/etc).  Using the file browser will show all libraries in the Jellyfin server that have a 'music' type.
 
-It's also possible to add a hidden user by adding ``user_id = $id_number`` in addition to the username.  The user_id can be found through the web UI by navigating to your profile in the Web client and looking at the URL: ``https://jellyfin.example.com/web/index.html#!/myprofile.html?userId=3920b99003194448a2a9d4f0bedd3d82``
+  * ``albumartistsort`` changes whether the media library populates based on "Artist" or "Album Artist" metadata
 
-In this example, the config file will look like this::
-
-    [jellyfin]
-    hostname = Jellyfin server hostname
-    port = Jellyfin server port
-    username = username
-    password = password
-    user_id = 3920b99003194448a2a9d4f0bedd3d82
-    libraries = Library1, Library2 (Optional: will default to "Music" if left undefined)
-    albumartistsort = False (Optional: will default to True if left undefined)
+  * ``album_format`` can be used to change the display format of music albums when using the file browser view.  Currently the only really usable fields are ProductionYear and Name
 
 
 Development
@@ -67,15 +58,17 @@ Development
 
    ``$ git clone git@github.com:jellyfin/mopidy-jellyfin.git && cd mopidy-jellyfin``
 
-2. Set up a virtualenv.  We need to include system packages since some things don't behave well inside of a virtualenv (such as ``PyGObject`` or interacting with pulseaudio).
+2. Set up a virtualenv.  We need to include system packages since some things don't behave well inside of a virtualenv (such as ``PyGObject`` or interacting with pulseaudio).  Note that with the release of Mopidy 3.0 only Python 3.7 or newer is supported.
 
-   ``$ virtualenv --python python2.7 --system-site-packages env``
+   ``$ python -m venv env --system-site-packages``
 
 3. Install mopidy-jellyfin to the virtualenv.
 
-   ``$ env/bin/python setup.py develop```
+   ``$ env/bin/python setup.py develop``
 
 4. Do your thing.
+
+   Mopidy can be launched from the virtualenv with ``env/bin/mopidy``
 
 
 Project resources
