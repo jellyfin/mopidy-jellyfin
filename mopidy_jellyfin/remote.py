@@ -59,10 +59,10 @@ class JellyfinHandler(object):
             client_cert = jellyfin.get('client_cert', None)
             client_key = jellyfin.get('client_key', None)
             if client_cert is not None and client_key is not None:
+                cert = (client_cert, client_key)
             self.album_format = jellyfin.get('album_format', False)
             if not self.album_format:
                 self.album_format = '{Name}'
-                cert = (client_cert, client_key)
         else:
             logger.info('No Jellyfin config found')
 
