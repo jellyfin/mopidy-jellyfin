@@ -14,7 +14,7 @@ def get_version(filename):
 setup(
     name='Mopidy-Jellyfin',
     version=get_version('mopidy_jellyfin/__init__.py'),
-    url='https://github.com/mcarlton00/mopidy-jellyfin',
+    url='https://github.com/jellyfin/mopidy-jellyfin',
     license='Apache License, Version 2.0',
     author='Matt Carlton',
     author_email='mcarlton00@gmail.com',
@@ -41,7 +41,7 @@ setup(
         'Intended Audience :: End Users/Desktop',
         'License :: OSI Approved :: Apache Software License',
         'Operating System :: OS Independent',
-        'Programming Language :: Python :: 2',
+        'Programming Language :: Python :: 2 :: 3',
         'Topic :: Multimedia :: Sound/Audio :: Players',
     ],
 )

@@ -1,6 +1,18 @@
 Changelog
 =========
 
+v0.7.0
+---------------------------------------
+
+- Add config option for artist sort method
+- Remove need to manually define user_id for hidden users
+- Support for servers with a baseurl set
+- Remove separate port config option
+- Add custom name formats for albums in browse mode
+- Add remote control from the Jellyfin Web UI or mobile apps
+- Add playback reporting from Mopidy to Jellyfin server
+
+
 v0.6.0
 ---------------------------------------
 
