@@ -287,7 +287,7 @@ class JellyfinHandler(object):
             elif item.get('Type') == 'MusicAlbum':
                 ret_value.append(models.Ref.album(
                     uri='jellyfin:album:{}'.format(item.get('Id')),
-                    name=self.album_format.format(**item)
+                    name=self.format_album(item)
                 ))
             elif item.get('Type') == 'Folder':
                 ret_value.append(models.Ref.album(
@@ -776,6 +776,15 @@ class JellyfinHandler(object):
             ]
 
         return tracks
+
+    def format_album(self, item):
+        # If an error occurs when parsing the custom album format for a given
+        # item, fallback to just using the name
+        try:
+            return self.album_format.format(**item)
+        except:
+            return item.get('Name')
+
 
     def lookup_artist(self, artist_id):
         """Lookup all artist tracks and sort them.
