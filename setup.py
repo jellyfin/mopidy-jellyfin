@@ -28,7 +28,8 @@ setup(
         'Mopidy >= 2.0',
         'Pykka >= 1.1',
         'requests >= 2.20',
-        'unidecode >= 1.1'
+        'unidecode >= 1.1',
+        'websocket-client >= 0.57'
     ],
     entry_points={
         'mopidy.ext': [

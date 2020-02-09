@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 import logging
 import os
+import socket
 
 from mopidy import config, ext
 
@@ -16,6 +17,8 @@ class Extension(ext.Extension):
     dist_name = 'Mopidy-Jellyfin'
     ext_name = 'jellyfin'
     version = __version__
+    device_name = socket.gethostname()
+    device_id = dist_name + '-' + socket.gethostname()
 
     def get_default_config(self):
         conf_file = os.path.join(os.path.dirname(__file__), 'ext.conf')
@@ -38,4 +41,6 @@ class Extension(ext.Extension):
 
     def setup(self, registry):
         from .backend import JellyfinBackend
+        from .frontend import EventMonitorFrontend
         registry.add('backend', JellyfinBackend)
+        registry.add('frontend', EventMonitorFrontend)

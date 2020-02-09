@@ -3,11 +3,10 @@ from __future__ import unicode_literals
 from mopidy import httpclient, models
 from mopidy_jellyfin.utils import cache
 import mopidy_jellyfin
-import requests
+from .http import JellyfinHttpClient
 from unidecode import unidecode
 
 import logging
-import socket
 from collections import OrderedDict, defaultdict
 import sys
 if sys.version.startswith('3'):
@@ -29,6 +28,8 @@ logger = logging.getLogger(__name__)
 
 class JellyfinHandler(object):
     def __init__(self, config):
+        self.config = config
+        proxy = config.get('proxy')
         jellyfin = config.get('jellyfin')
         if jellyfin:
             self.hostname = jellyfin.get('hostname')
@@ -50,16 +51,15 @@ class JellyfinHandler(object):
                 self.albumartistsort = True
             else:
                 self.albumartistsort = False
-            self.proxy = config['proxy']
             if jellyfin.get('user_id', False):
                 logger.warn('Specifying user_id in the config file is '
                             'depreciated. This will be removed in a future '
                             'release')
-            self.cert = None
+            cert = None
             client_cert = jellyfin.get('client_cert', None)
             client_key = jellyfin.get('client_key', None)
             if client_cert is not None and client_key is not None:
-                self.cert = (client_cert, client_key)
+                cert = (client_cert, client_key)
             self.album_format = jellyfin.get('album_format', False)
             if not self.album_format:
                 self.album_format = '{Name}'
@@ -68,32 +68,35 @@ class JellyfinHandler(object):
 
         # create authentication headers
         self.auth_data = self._password_data()
-        self.headers = self._create_headers()
-        auth_details = self._login()
-        self.token = auth_details.get('AccessToken')
-        self.user_id = auth_details.get('User').get('Id')
-        self.headers = self._create_headers(token=self.token)
+        headers = self._create_headers()
+        self.http = JellyfinHttpClient(headers, cert, proxy)
+        self._login()
 
-    def _get_user(self):
-        """Return user dict from server or None if there is no user.
-        """
-        url = self.api_url('/Users/Public')
-        r = requests.get(url, cert=self.cert)
-        user = [i for i in r.json() if i.get('Name') == self.username]
+    def _save_token(self, token):
+        # Save the authentication token where the frontend can also access it
+        cache_dir = mopidy_jellyfin.Extension.get_cache_dir(self.config)
+        token_file = cache_dir / 'token'
 
-        if user:
-            return user
-        else:
-            raise Exception('No Jellyfin user {} found'.format(self.username))
+        with open(token_file, 'w') as f:
+            f.write(token)
 
     def _login(self):
         """Return token for a user.
         """
         url = self.api_url('/Users/AuthenticateByName')
-        r = requests.post(
-                url, headers=self.headers, data=self.auth_data, cert=self.cert)
+        auth_details = self.http.post(
+                url, self.auth_data)
 
-        return r.json()
+        token = auth_details.get('AccessToken')
+
+        if token:
+            self.user_id = auth_details.get('User').get('Id')
+            headers = {'x-mediabrowser-token': token}
+            self.http.session.headers.update(headers)
+            self._save_token(token)
+        else:
+            logger.error('Unable to login to Jellyfin')
+
 
     def _password_data(self):
         """Returns a dict with username and its encoded password.
@@ -111,11 +114,12 @@ class JellyfinHandler(object):
         authorization = (
             'MediaBrowser , '
             'Client="Mopidy", '
-            'Device="{name}", '
-            'DeviceId="{name}", '
+            'Device="{device}", '
+            'DeviceId="{device_id}", '
             'Version="{version}"'
         ).format(
-            name=socket.gethostname(),
+            device=mopidy_jellyfin.Extension.device_name,
+            device_id=mopidy_jellyfin.Extension.device_id,
             version=mopidy_jellyfin.__version__
         )
 
@@ -125,108 +129,6 @@ class JellyfinHandler(object):
             headers['x-mediabrowser-token'] = self.token
 
         return headers
-
-    def _get_session(self):
-        proxy = httpclient.format_proxy(self.proxy)
-        full_user_agent = httpclient.format_user_agent(
-            '/'.join(
-                (
-                    mopidy_jellyfin.Extension.dist_name,
-                    mopidy_jellyfin.__version__
-                )
-            )
-        )
-
-        session = requests.Session()
-        session.cert = self.cert
-        session.proxies.update({'http': proxy, 'https': proxy})
-        session.headers.update({'user-agent': full_user_agent})
-
-        return session
-
-    def r_get(self, url):
-        counter = 0
-        session = self._get_session()
-        session.headers.update(self.headers)
-        while counter <= 5:
-
-            try:
-                r = session.get(url)
-                try:
-                    rv = r.json()
-                except Exception as e:
-                    logger.info(
-                        'Error parsing Jellyfin data: {}'.format(e)
-                    )
-                    rv = {}
-
-                logger.debug(str(rv))
-
-                return rv
-
-            except Exception as e:
-                logger.info(
-                    'Jellyfin connection on try {} with problem: {}'.format(
-                        counter, e
-                    )
-                )
-                counter += 1
-
-        raise Exception('Cant connect to Jellyfin API')
-
-    def r_post(self, url, *args, **kwargs):
-        if args:
-            payload = args[0]
-        else:
-            payload = {}
-        counter = 0
-        session = self._get_session()
-        session.headers.update(self.headers)
-        while counter <= 5:
-
-            try:
-                r = session.post(url, payload)
-                if r.text:
-                    rv = r.json()
-                else:
-                    rv = r.text
-
-                logger.debug(rv)
-
-                return rv
-
-            except Exception as e:
-                logger.info(
-                    'Jellyfin connection on try {} with problem: {}'.format(
-                        counter, e
-                    )
-                )
-                counter += 1
-
-        raise Exception('Cant connect to Jellyfin API')
-
-    def r_delete(self, url):
-        counter = 0
-        session = self._get_session()
-        session.headers.update(self.headers)
-        while counter <= 5:
-
-            try:
-                r = session.delete(url)
-
-                logger.debug(str(r))
-
-                return r
-
-            except Exception as e:
-                logger.info(
-                    'Jellyfin connection on try {} with problem: {}'.format(
-                        counter, e
-                    )
-                )
-                counter += 1
-
-        raise Exception('Cant connect to Jellyfin API')
 
     def api_url(self, endpoint):
         """Returns a joined url.
@@ -257,7 +159,7 @@ class JellyfinHandler(object):
             '/Users/{}/Views'.format(self.user_id)
         )
 
-        data = self.r_get(url)
+        data = self.http.get(url)
 
         media_folders = [
             {'Name': library.get('Name'),
@@ -296,7 +198,7 @@ class JellyfinHandler(object):
             '/Users/{}/Views'.format(self.user_id)
         )
 
-        data = self.r_get(url)
+        data = self.http.get(url)
 
         library_id = [
             library.get('Id') for library in data.get('Items')
@@ -317,7 +219,7 @@ class JellyfinHandler(object):
             '/Playlists/{}/Items?UserId={}'.format(playlist_id, self.user_id)
         )
 
-        data = self.r_get(url).get('Items')
+        data = self.http.get(url).get('Items')
 
         return data
 
@@ -330,7 +232,7 @@ class JellyfinHandler(object):
             'MediaType': 'Audio'
         }
 
-        return self.r_post(url, payload)
+        return self.http.post(url, payload)
 
     def delete_playlist(self, playlist_id):
         url = self.api_url(
@@ -339,7 +241,7 @@ class JellyfinHandler(object):
             )
         )
 
-        return self.r_delete(url)
+        return self.http.delete(url)
 
     def update_playlist(self, playlist_id, new_ids):
         curr_tracks = self.get_playlist_contents(playlist_id)
@@ -352,7 +254,7 @@ class JellyfinHandler(object):
             )
         )
 
-        self.r_delete(del_url)
+        self.http.delete(del_url)
 
         new_url = self.api_url(
             '/Playlists/{}/Items?UserId={}&Ids={}'.format(
@@ -360,7 +262,7 @@ class JellyfinHandler(object):
             )
         )
 
-        self.r_post(new_url)
+        self.http.post(new_url)
 
     @cache()
     def browse_item(self, item_id):
@@ -416,7 +318,7 @@ class JellyfinHandler(object):
                         )
                     )
 
-                artists += self.r_get(url).get('Items')
+                artists += self.http.get(url).get('Items')
 
         return [
             models.Ref.artist(
@@ -450,7 +352,7 @@ class JellyfinHandler(object):
         )
 
         # Pull out artist_id
-        artist_data = self.r_get(url)
+        artist_data = self.http.get(url)
         artist_id = artist_data.get('Id')
 
         # Get album list
@@ -469,7 +371,7 @@ class JellyfinHandler(object):
                 )
             )
 
-        result = self.r_get(url)
+        result = self.http.get(url)
         if result:
             raw_albums = result.get('Items')
 
@@ -493,7 +395,7 @@ class JellyfinHandler(object):
         :returns Directory
         :rtype: dict
         """
-        return self.r_get(
+        return self.http.get(
             self.api_url(
                 '/Users/{}/Items?ParentId={}&SortOrder=Ascending'.format(
                     self.user_id, id
@@ -510,7 +412,7 @@ class JellyfinHandler(object):
         :returns: Item
         :rtype: dict
         """
-        data = self.r_get(
+        data = self.http.get(
             self.api_url(
                 '/Users/{}/Items/{}'.format(self.user_id, id)
             )
@@ -604,7 +506,7 @@ class JellyfinHandler(object):
         else:
             raise Exception('Jellyfin search: no itemtype {}'.format(itemtype))
 
-        data = self.r_get(
+        data = self.http.get(
             self.api_url(
                 ('/Search/Hints?SearchTerm={}&'
                  'IncludeItemTypes={}').format(
@@ -724,7 +626,7 @@ class JellyfinHandler(object):
                 )
             )
 
-            artist_data = self.r_get(url)
+            artist_data = self.http.get(url)
             artist_id = artist_data.get('Id')
 
             # Get album list
@@ -743,7 +645,7 @@ class JellyfinHandler(object):
                     )
                 )
 
-            album_data = self.r_get(album_url)
+            album_data = self.http.get(album_url)
             if album_data:
                 raw_albums = album_data.get('Items')
 
@@ -762,7 +664,7 @@ class JellyfinHandler(object):
                     )
                 )
 
-            track_data = self.r_get(track_url)
+            track_data = self.http.get(track_url)
             if track_data:
                 # If the query has an album, only match those tracks
                 if query.get('album'):
@@ -811,7 +713,7 @@ class JellyfinHandler(object):
                         album, self.user_id
                     )
                 )
-                album_data = self.r_get(url).get('Items')
+                album_data = self.http.get(url).get('Items')
 
                 album_id = album_data[0].get('AlbumId')
 
@@ -834,7 +736,7 @@ class JellyfinHandler(object):
             )
         )
 
-        result = self.r_get(url)
+        result = self.http.get(url)
         if result:
             raw_tracks = result.get('Items')
 
@@ -898,7 +800,7 @@ class JellyfinHandler(object):
                 ).format(self.user_id, artist_id)
             )
 
-        items = self.r_get(url)
+        items = self.http.get(url)
 
         # sort tracks into album keys
         album_dict = defaultdict(list)
