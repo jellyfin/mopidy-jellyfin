@@ -157,6 +157,10 @@ class EventMonitorFrontend(
                 self.core.playback.resume()
         elif command == 'Stop':
             self.core.playback.stop()
+        elif command == 'Seek':
+            position_ticks = data.get('SeekPositionTicks')
+            position_ms = int(position_ticks / 10000)
+            self.core.playback.seek(position_ms)
 
     def general_command(self, data):
         # Processes General commands received from the Jellyfin server
