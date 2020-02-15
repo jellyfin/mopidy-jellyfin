@@ -5,7 +5,7 @@ from mopidy_jellyfin.utils import cache
 import mopidy_jellyfin
 from .http import JellyfinHttpClient
 from unidecode import unidecode
-
+import os
 import logging
 from collections import OrderedDict, defaultdict
 import sys
@@ -75,7 +75,7 @@ class JellyfinHandler(object):
     def _save_token(self, token):
         # Save the authentication token where the frontend can also access it
         cache_dir = mopidy_jellyfin.Extension.get_cache_dir(self.config)
-        token_file = cache_dir / 'token'
+        token_file = os.path.join(cache_dir, 'token')
 
         with open(token_file, 'w') as f:
             f.write(token)
