@@ -75,7 +75,7 @@ class JellyfinHandler(object):
     def _save_token(self, token):
         # Save the authentication token where the frontend can also access it
         cache_dir = mopidy_jellyfin.Extension.get_cache_dir(self.config)
-        token_file = cache_dir / 'token'
+        token_file = '/'.join([cache_dir, 'token'])
 
         with open(token_file, 'w') as f:
             f.write(token)
