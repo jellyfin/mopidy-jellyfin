@@ -51,15 +51,18 @@ class JellyfinPlaylistsProvider(backend.PlaylistsProvider):
                 contents = self.backend.remote.get_playlist_contents(
                     playlist_id
                 )
+                # Create local Mopidy tracks for audio and book files
                 tracks = [
                     self.backend.remote.create_track(track)
-                    for track in contents
+                    for track in contents if track['Type'] in ['Audio', 'Book']
                 ]
-                playlists[playlist_uri] = Playlist(
-                    uri='jellyfin:playlist:%s' % playlist.get('Id'),
-                    name=playlist.get('Name'),
-                    tracks=tracks
-                )
+                # Only create a playlist if it has valid tracks
+                if tracks:
+                    playlists[playlist_uri] = Playlist(
+                        uri='jellyfin:playlist:%s' % playlist.get('Id'),
+                        name=playlist.get('Name'),
+                        tracks=tracks
+                    )
 
         self._playlists = playlists
         backend.BackendListener.send('playlists_loaded')
