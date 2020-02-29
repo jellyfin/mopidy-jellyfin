@@ -186,7 +186,8 @@ class EventMonitorFrontend(
         tracks = self.core.tracklist.add(uris=uris).get()
         # Allows adding to play queue without changing currently playing track
         if playcommand == 'PlayNow':
-            self.core.playback.play(tlid=tracks[0].tlid)
+            start_index = data.get('StartIndex', 0)
+            self.core.playback.play(tlid=tracks[start_index].tlid)
         # If playing a track that already has playback progress, start at that
         # progress point, not the beginning
         if start_position:
