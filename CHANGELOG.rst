@@ -1,6 +1,15 @@
 Changelog
 =========
 
+v0.7.1
+---------------------------------------
+
+- Fix path to cache dir
+- Add ability to queue tracks during remote control
+- Add ability to resume playback during remote control
+- Fix crash when video files are in playlists
+- Start at the correct song index during remote control
+
 v0.7.0
 ---------------------------------------
 
