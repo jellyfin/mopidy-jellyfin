@@ -24,3 +24,8 @@ class JellyfinPlaybackProvider(backend.PlaybackProvider):
 
         else:
             return None
+
+    def is_live(self, uri):
+        # jellyfin streams are best handled as live
+        logger.debug('Jellyfin enabled live_stream for uri {}'.format(uri))
+        return True
