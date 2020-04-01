@@ -31,6 +31,7 @@ class Extension(ext.Extension):
         schema['password'] = config.Secret()
         schema['hostname'] = config.String()
         schema['libraries'] = config.String(optional=True)
+        schema['transcode'] = config.Boolean(optional=True)
         schema['albumartistsort'] = config.String(optional=True)
         schema['port'] = config.Port(optional=True)
         schema['client_cert'] = config.String(optional=True)

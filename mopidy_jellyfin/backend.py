@@ -22,6 +22,6 @@ class JellyfinBackend(pykka.ThreadingActor, backend.Backend):
         super(JellyfinBackend, self).__init__()
 
         self.library = JellyfinLibraryProvider(backend=self)
-        self.playback = JellyfinPlaybackProvider(audio=audio, backend=self)
+        self.playback = JellyfinPlaybackProvider(config, audio=audio, backend=self)
         self.remote = JellyfinHandler(config)
         self.playlists = JellyfinPlaylistsProvider(backend=self)
