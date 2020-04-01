@@ -15,7 +15,7 @@ class JellyfinPlaybackProvider(backend.PlaybackProvider):
             id = uri.split(':')[-1]
 
             track_url = self.backend.remote.api_url(
-                '/Audio/{}/stream?static=true'.format(id)
+                '/Audio/{}/stream?Container=ogg'.format(id)
             )
 
             logger.debug('Jellyfin track streaming url: {}'.format(track_url))
