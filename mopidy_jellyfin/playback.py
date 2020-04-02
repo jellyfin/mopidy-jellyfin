@@ -13,8 +13,6 @@ class JellyfinPlaybackProvider(backend.PlaybackProvider):
         self.audio = audio
         self.backend = backend
         self.transcode = config.get('jellyfin').get('transcode')
-        if self.transcode is None:
-            self.transcode = False
         super().__init__(audio, backend)
 
     def translate_uri(self, uri):
