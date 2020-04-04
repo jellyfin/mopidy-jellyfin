@@ -130,7 +130,7 @@ class JellyfinHandler(object):
 
         return headers
 
-    def api_url(self, endpoint):
+    def api_url(self, endpoint, url_params={}):
         """Returns a joined url.
 
         Takes host, and endpoint and generates a valid jellyfin API url.
@@ -144,12 +144,12 @@ class JellyfinHandler(object):
             hostname_list.insert(0, 'http://')
             hostname = ''.join(hostname_list)
 
-        joined = urljoin(hostname, endpoint)
-
-        scheme, netloc, path, query_string, fragment = urlsplit(joined)
+        scheme, netloc, path, query_string, fragment = urlsplit(hostname)
         query_params = parse_qs(query_string)
+        path = path + endpoint
 
-        query_params['format'] = ['json']
+        query_params['format'] = 'json'
+        query_params.update(url_params)
         new_query_string = urlencode(query_params, doseq=True)
 
         return urlunsplit((scheme, netloc, path, new_query_string, fragment))
@@ -215,9 +215,8 @@ class JellyfinHandler(object):
         return raw_playlists.get('Items')
 
     def get_playlist_contents(self, playlist_id):
-        url = self.api_url(
-            '/Playlists/{}/Items?UserId={}'.format(playlist_id, self.user_id)
-        )
+        url_params = {'UserId': self.user_id}
+        url = self.api_url('/Playlists/{}/Items'.format(playlist_id), url_params)
 
         data = self.http.get(url).get('Items')
 
@@ -235,11 +234,8 @@ class JellyfinHandler(object):
         return self.http.post(url, payload)
 
     def delete_playlist(self, playlist_id):
-        url = self.api_url(
-            '/Items/{}?UserId={}'.format(
-                playlist_id, self.user_id
-            )
-        )
+        url_params = {'UserId': self.user_id}
+        url = self.api_url('/Items/{}'.format(playlist_id), url_params)
 
         return self.http.delete(url)
 
@@ -248,19 +244,19 @@ class JellyfinHandler(object):
 
         curr_ids = [i.get('PlaylistItemId') for i in curr_tracks]
 
-        del_url = self.api_url(
-            'Playlists/{}/Items?UserId={}&EntryIds={}'.format(
-                playlist_id, self.user_id, ','.join(str(i) for i in curr_ids)
-            )
-        )
+        url_params = {
+            'UserId': self.user_id,
+            'EntryIds': ','.join(str(i) for i in curr_ids)
+        }
+        del_url = self.api_url('Playlists/{}/Items'.format(playlist_id), url_params)
 
         self.http.delete(del_url)
 
-        new_url = self.api_url(
-            '/Playlists/{}/Items?UserId={}&Ids={}'.format(
-                playlist_id, self.user_id, ','.join(new_ids)
-            )
-        )
+        url_params = {
+            'UserId': self.user_id,
+            'Ids': ','.join(new_ids)
+        }
+        new_url = self.api_url('/Playlists/{}/Items'.format(playlist_id), url_params)
 
         self.http.post(new_url)
 
@@ -305,18 +301,18 @@ class JellyfinHandler(object):
         for library in libraries:
 
             if library.get('Name') in self.libraries:
+                url_params = {
+                    'ParentId': library.get('Id'),
+                    'UserId': self.user_id
+                }
                 if self.albumartistsort:
-                    url = self.api_url(
-                        '/Artists/AlbumArtists?ParentId={}&UserId={}'.format(
-                            library.get('Id'), self.user_id
-                        )
-                    )
+                    url_params = {
+                        'ParentId': library.get('Id'),
+                        'UserId': self.user_id
+                    }
+                    url = self.api_url('/Artists/AlbumArtists', url_params)
                 else:
-                    url = self.api_url(
-                        '/Artists?ParentId={}&UserId={}'.format(
-                            library.get('Id'), self.user_id
-                        )
-                    )
+                    url = self.api_url('/Artists', url_params)
 
                 artists += self.http.get(url).get('Items')
 
@@ -346,10 +342,10 @@ class JellyfinHandler(object):
         # URL encode artist string
         artist = quote(raw_artist[0].encode('utf8')).replace('/', '-')
         artist_ref = [models.Artist(name=raw_artist[0])]
-        url = self.api_url(
-            '/Artists/{}?UserId={}'.format(
-                artist, self.user_id)
-        )
+        url_params= {
+            'UserId': self.user_id
+        }
+        url = self.api_url('/Artists/{}'.format(artist), url_params)
 
         # Pull out artist_id
         artist_data = self.http.get(url)
@@ -357,20 +353,21 @@ class JellyfinHandler(object):
 
         # Get album list
         if self.albumartistsort:
-            url = self.api_url(
-                '/Items?AlbumArtistIds={}&UserId={}&'
-                'IncludeItemTypes=MusicAlbum&Recursive=true'.format(
-                    artist_id, self.user_id
-                )
-            )
+            url_params = {
+                'AlbumArtistIds': artist_id,
+                'UserId': self.user_id,
+                'IncludeItemTypes': 'MusicAlbum',
+                'Recursive': 'true'
+            }
         else:
-            url = self.api_url(
-                '/Items?ArtistIds={}&UserId={}&'
-                'IncludeItemTypes=MusicAlbum&Recursive=true'.format(
-                    artist_id, self.user_id
-                )
-            )
+            url_params = {
+                'ArtistIds': artist_id,
+                'UserId': self.user_id,
+                'IncludeItemTypes': 'MusicAlbum',
+                'Recursive': 'true'
+            }
 
+        url = self.api_url('/Items', url_params)
         result = self.http.get(url)
         if result:
             raw_albums = result.get('Items')
@@ -395,13 +392,12 @@ class JellyfinHandler(object):
         :returns Directory
         :rtype: dict
         """
-        return self.http.get(
-            self.api_url(
-                '/Users/{}/Items?ParentId={}&SortOrder=Ascending'.format(
-                    self.user_id, id
-                )
-            )
-        )
+        url_params= {
+            'ParentId': id,
+            'SortOrder': 'Ascending'
+        }
+        url = self.api_url('/Users/{}/Items'.format(self.user_id), url_params)
+        return self.http.get(url)
 
     @cache()
     def get_item(self, id):
@@ -496,25 +492,23 @@ class JellyfinHandler(object):
         :rtype: list
         """
         if itemtype == 'any':
-            query = 'Audio,MusicAlbum,MusicArtist'
+            search_query = 'Audio,MusicAlbum,MusicArtist'
         elif itemtype == 'artist' or itemtype == 'albumartist':
-            query = 'MusicArtist'
+            search_query = 'MusicArtist'
         elif itemtype == 'album':
-            query = 'MusicAlbum'
+            search_query = 'MusicAlbum'
         elif itemtype == 'track_name':
-            query = 'Audio'
+            search_query = 'Audio'
         else:
             raise Exception('Jellyfin search: no itemtype {}'.format(itemtype))
 
-        data = self.http.get(
-            self.api_url(
-                ('/Search/Hints?SearchTerm={}&'
-                 'IncludeItemTypes={}').format(
-                     quote(term.encode('utf8')),
-                     query
-                )
-            )
-        )
+        url_params = {
+            'SearchTerm': quote(term.encode('utf-8')),
+            'IncludeItemTypes': search_query
+        }
+
+        url = self.api_url('/Search/Hints', url_params)
+        data = self.http.get(url)
 
         return [i for i in data.get('SearchHints', [])]
 
@@ -620,50 +614,49 @@ class JellyfinHandler(object):
             # URL encode artist string
             artist = quote(raw_artist[0].encode('utf8')).replace('/', '-')
             artist_ref = [models.Artist(name=raw_artist[0])]
-            url = self.api_url(
-                '/Artists/{}?UserId={}'.format(
-                    artist, self.user_id
-                )
-            )
+            url_params = { 'UserId': self.user_id }
+            url = self.api_url('/Artists/{}'.format(artist), url_params)
 
             artist_data = self.http.get(url)
             artist_id = artist_data.get('Id')
 
             # Get album list
             if self.albumartistsort:
-                album_url = self.api_url(
-                    '/Items?IncludeItemTypes=MusicAlbum&Recursive=true&'
-                    'AlbumArtistIds={}&UserId={}&'.format(
-                        artist_id, self.user_id
-                    )
-                )
+                url_params = {
+                    'IncludeItemTypes': 'MusicAlbum',
+                    'Recursive': 'true',
+                    'AlbumArtistIds': artist_id,
+                    'UserId': self.user_id
+                }
             else:
-                album_url = self.api_url(
-                    '/Items?IncludeItemTypes=MusicAlbum&Recursive=true&'
-                    'ArtistIds={}&UserId={}&'.format(
-                        artist_id, self.user_id
-                    )
-                )
+                url_params = {
+                    'IncludeItemTypes': 'MusicAlbum',
+                    'Recursive': 'true',
+                    'ArtistIds': artist_id,
+                    'UserId': self.user_id
+                }
 
+            album_url = self.api_url('/Items', url_params)
             album_data = self.http.get(album_url)
             if album_data:
                 raw_albums = album_data.get('Items')
 
             if self.albumartistsort:
-                track_url = self.api_url(
-                    '/Items?IncludeItemTypes=Audio&Recursive=true&'
-                    'AlbumArtistIds={}&UserId={}&'.format(
-                        artist_id, self.user_id
-                    )
-                )
+                url_params = {
+                    'IncludeItemTypes': 'Audio',
+                    'Recursive': 'true',
+                    'AlbumArtistIds': artist_id,
+                    'UserId': self.user_id
+                }
             else:
-                track_url = self.api_url(
-                    '/Items?IncludeItemTypes=Audio&Recursive=true&'
-                    'ArtistIds={}&UserId={}&'.format(
-                        artist_id, self.user_id
-                    )
-                )
+                url_params = {
+                    'IncludeItemTypes': 'Audio',
+                    'Recursive': 'true',
+                    'ArtistIds': artist_id,
+                    'UserId': self.user_id
+                }
 
+            track_url = self.api_url('/Items', url_params)
             track_data = self.http.get(track_url)
             if track_data:
                 # If the query has an album, only match those tracks
@@ -707,12 +700,13 @@ class JellyfinHandler(object):
                     if i.get('Name') == unidecode(album_name)
                 ][0]
             else:
-                url = self.api_url(
-                    '/Items?IncludeItemTypes=Audio&Recursive=true&'
-                    'Albums={}&UserId={}&'.format(
-                        album, self.user_id
-                    )
-                )
+                url_params = {
+                    'IncludeItemTypes': 'Audio',
+                    'Recursive': 'true',
+                    'Albums': album,
+                    'UserId': self.user_id
+                }
+                url = self.api_url('/Items', url_params)
                 album_data = self.http.get(url).get('Items')
 
                 album_id = album_data[0].get('AlbumId')
@@ -729,12 +723,13 @@ class JellyfinHandler(object):
     def get_search_tracks(self, artist_ref, album_id):
         tracks = []
 
-        url = self.api_url(
-            '/Items?IncludeItemTypes=Audio&Recursive=true&'
-            'AlbumIds={}&UserId={}&'.format(
-                album_id, self.user_id
-            )
-        )
+        url_params = {
+            'IncludeItemTypes': 'Audio',
+            'Recursive': 'true',
+            'AlbumIds': album_id,
+            'UserId': self.user_id
+        }
+        url = self.api_url('/Items', url_params)
 
         result = self.http.get(url)
         if result:
@@ -795,20 +790,21 @@ class JellyfinHandler(object):
         :rtype: list
         """
         if self.albumartistsort:
-            url = self.api_url(
-                (
-                    '/Users/{}/Items?SortOrder=Ascending&AlbumArtistIds={}'
-                    '&Recursive=true&IncludeItemTypes=Audio'
-                ).format(self.user_id, artist_id)
-            )
+            url_params = {
+                'SortOrder': 'Ascending',
+                'AlbumArtistIds': artist_id,
+                'Recursive': 'true',
+                'IncludeItemTypes': 'Audio'
+            }
         else:
-            url = self.api_url(
-                (
-                    '/Users/{}/Items?SortOrder=Ascending&ArtistIds={}'
-                    '&Recursive=true&IncludeItemTypes=Audio'
-                ).format(self.user_id, artist_id)
-            )
+            url_params = {
+                'SortOrder': 'Ascending',
+                'ArtistIds': artist_id,
+                'Recursive': 'true',
+                'IncludeItemTypes': 'Audio'
+            }
 
+        url = self.api_url('/Users/{}/Items'.format(self.user_id), url_params)
         items = self.http.get(url)
 
         # sort tracks into album keys
