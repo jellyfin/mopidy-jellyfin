@@ -215,7 +215,7 @@ class JellyfinHandler(object):
         return raw_playlists.get('Items')
 
     def get_playlist_contents(self, playlist_id):
-        url_params = {'UserId': self.user_id}
+        url_params = { 'UserId': self.user_id }
         url = self.api_url('/Playlists/{}/Items'.format(playlist_id), url_params)
 
         data = self.http.get(url).get('Items')
@@ -234,7 +234,7 @@ class JellyfinHandler(object):
         return self.http.post(url, payload)
 
     def delete_playlist(self, playlist_id):
-        url_params = {'UserId': self.user_id}
+        url_params = { 'UserId': self.user_id }
         url = self.api_url('/Items/{}'.format(playlist_id), url_params)
 
         return self.http.delete(url)
