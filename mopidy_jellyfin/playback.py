@@ -14,8 +14,9 @@ class JellyfinPlaybackProvider(backend.PlaybackProvider):
         if uri.startswith('jellyfin:track:') and len(uri.split(':')) == 3:
             id = uri.split(':')[-1]
 
+            url_params = { 'static': 'true' }
             track_url = self.backend.remote.api_url(
-                '/Audio/{}/stream?static=true'.format(id)
+                '/Audio/{}/stream'.format(id), url_params
             )
 
             logger.debug('Jellyfin track streaming url: {}'.format(track_url))
