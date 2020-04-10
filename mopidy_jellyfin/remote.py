@@ -39,7 +39,7 @@ class JellyfinHandler(object):
                             'release. This should be combined with the '
                             'hostname field')
             self.username = jellyfin.get('username')
-            self.password = jellyfin.get('password')
+            self.password = jellyfin.get('password', '')
             self.libraries = jellyfin.get('libraries')
             # If no libraries are provided, default to 'Music'
             if not self.libraries:
@@ -67,7 +67,7 @@ class JellyfinHandler(object):
             logger.info('No Jellyfin config found')
 
         # create authentication headers
-        self.auth_data = self._password_data()
+        self.auth_data = self._auth_payload()
         headers = self._create_headers()
         self.http = JellyfinHttpClient(headers, cert, proxy)
         self._login()
@@ -98,8 +98,8 @@ class JellyfinHandler(object):
             logger.error('Unable to login to Jellyfin')
 
 
-    def _password_data(self):
-        """Returns a dict with username and its encoded password.
+    def _auth_payload(self):
+        """Returns a dict with username and password.
         """
         return {
             'username': self.username,
