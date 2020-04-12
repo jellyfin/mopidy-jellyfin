@@ -139,6 +139,19 @@ class EventMonitorFrontend(
         if track:
             item_id = track.uri.split(':')[-1]
             volume = self.core.mixer.get_volume().get()
+
+            # Report current playlist and position to server
+            track_index = self.core.tracklist.index().get()
+            tracklist = self.core.tracklist.get_tracks().get()
+            now_playing_queue = []
+            for index, track in enumerate(tracklist):
+                item_id = track.uri.split(':')[-1]
+                now_playing_queue.append({
+                    'Id': item_id,
+                    'PlaylistItemId': f'playlistItem{index}'
+                })
+            playlist_item_id = f'playlistItem{index}'
+
             data = {
                 "VolumeLevel": volume,
                 "IsMuted": False,
@@ -150,6 +163,8 @@ class EventMonitorFrontend(
                 "MediaSourceId": item_id,
                 "CanSeek": True,
                 "ItemId": item_id,
+                "NowPlayingQueue": now_playing_queue,
+                "PlaylistItemId": playlist_item_id,
             }
             data.update(kwargs)
 
