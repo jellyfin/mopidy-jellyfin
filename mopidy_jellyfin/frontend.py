@@ -62,50 +62,12 @@ class EventMonitorFrontend(
     def _playback_state_changed(self, data):
         # When mopidy changes tracks, send an update to Jellyfin
 
-        session_id = self._get_session_id()
-
         new_state = data.get('new_state')
+
         if new_state in ['paused', 'playing']:
-            play_time = self.core.playback.get_time_position().get() * 10000
-            track = self.core.playback.get_current_track().get()
-            item_id = track.uri.split(':')[-1]
-            playback_ms = self.core.playback.get_time_position().get()
-            playback_ticks = playback_ms * 10000
-            volume = self.core.mixer.get_volume().get()
-
-            if new_state == 'paused':
-                pause_state = True
-            else:
-                pause_state = False
-
-            # Report current playlist and position to server
-            track_index = self.core.tracklist.index().get()
-            tracklist = self.core.tracklist.get_tracks().get()
-            now_playing_queue = []
-            for index, track in enumerate(tracklist):
-                item_id = track.uri.split(':')[-1]
-                now_playing_queue.append({
-                    'Id': item_id,
-                    'PlaylistItemId': f'playlistItem{index}'
-                })
-            playlist_item_id = f'playlistItem{index}'
-
-            data = {
-                "VolumeLevel": volume,
-                "IsMuted": False,
-                "IsPaused": pause_state,
-                "RepeatMode": "RepeatNone",
-                "PositionTicks": play_time,
-                "PlayMethod": "DirectPlay",
-                "PlaySessionId": session_id,
-                "MediaSourceId": item_id,
-                "CanSeek": True,
-                "ItemId": item_id,
-                "NowPlayingQueue": now_playing_queue,
-                "PlaylistItemId": playlist_item_id,
-            }
-
-            self._start_playback(data)
+            data = self._create_progress_payload()
+            if data:
+                self._start_playback(data)
 
         elif new_state == 'stopped':
             self._stop_playback()
@@ -134,12 +96,33 @@ class EventMonitorFrontend(
 
     def _update_playback(self, **kwargs):
         # Send an update to Jellyfin about the current playback status
+
+        data = self._create_progress_payload()
+        if data:
+            data.update(kwargs)
+
+            # This should work, but isn't.  Using http post for now
+            #self.wsc.send('ReportPlaybackProgress', data=data)
+            r = self.wsc.http.post(
+                '{}/Sessions/Playing/Progress'.format(self.hostname), data)
+
+    def _create_progress_payload(self):
+        # Build the json payload sent to the server for playback reporting
+
         session_id = self._get_session_id()
         track = self.core.playback.get_current_track().get()
+
         if track:
             item_id = track.uri.split(':')[-1]
+            mute_state = self.core.mixer.get_mute().get()
             volume = self.core.mixer.get_volume().get()
+            play_time = self.core.playback.get_time_position().get() * 10000
 
+            state = self.core.playback.get_state().get()
+            if state == 'paused':
+                pause_state = True
+            else:
+                pause_state = False
             # Report current playlist and position to server
             track_index = self.core.tracklist.index().get()
             tracklist = self.core.tracklist.get_tracks().get()
@@ -152,12 +135,13 @@ class EventMonitorFrontend(
                 })
             playlist_item_id = f'playlistItem{index}'
 
+            # json payload to server
             data = {
                 "VolumeLevel": volume,
-                "IsMuted": False,
-                "IsPaused": False,
+                "IsMuted": mute_state,
+                "IsPaused": pause_state,
                 "RepeatMode": "RepeatNone",
-                "PositionTicks": 0,
+                "PositionTicks": play_time,
                 "PlayMethod": "DirectPlay",
                 "PlaySessionId": session_id,
                 "MediaSourceId": item_id,
@@ -166,12 +150,11 @@ class EventMonitorFrontend(
                 "NowPlayingQueue": now_playing_queue,
                 "PlaylistItemId": playlist_item_id,
             }
-            data.update(kwargs)
+        else:
+            data = {}
 
-            # This should work, but isn't.  Using http post for now
-            #self.wsc.send('ReportPlaybackProgress', data=data)
-            r = self.wsc.http.post(
-                '{}/Sessions/Playing/Progress'.format(self.hostname), data)
+        return data
+
 
     def playstate(self, data):
         # Processes Playstate commands received from the Jellyfin server
