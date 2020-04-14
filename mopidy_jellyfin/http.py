@@ -62,7 +62,7 @@ class JellyfinHttpClient(object):
         while counter <= 5:
 
             try:
-                r = self.session.post(url, payload)
+                r = self.session.post(url, json=payload)
                 if r.text:
                     rv = r.json()
                 else:
