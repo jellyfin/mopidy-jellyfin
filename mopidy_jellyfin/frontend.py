@@ -27,10 +27,13 @@ class EventMonitorFrontend(
 
         self.wsc = WSClient(self)
 
+        self.reporting_thread = threading.Thread(target=self._check_status)
+
 
     def on_start(self):
-        # Start the websocket client
+        # Start the websocket client and reporting thread
         self.wsc.start()
+        self.reporting_thread.start()
 
     def on_stop(self):
         # Stop the websocket client and tell the server playback has stopped
@@ -218,3 +221,11 @@ class EventMonitorFrontend(
             token = f.read()
 
         return token
+
+    def _check_status(self):
+        # Reports status to Jellyfin server every 60 seconds
+        while True:
+            state = self.core.playback.get_state().get()
+            if state in ['playing', 'paused']:
+                self._update_playback()
+            time.sleep(60)
