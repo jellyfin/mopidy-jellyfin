@@ -26,9 +26,7 @@ class EventMonitorFrontend(
         self.hostname = self.config['jellyfin'].get('hostname')
 
         self.wsc = WSClient(self)
-
         self.reporting_thread = threading.Thread(target=self._check_status)
-
 
     def on_start(self):
         # Start the websocket client and reporting thread
