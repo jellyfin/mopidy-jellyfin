@@ -27,6 +27,8 @@ class EventMonitorFrontend(
 
         self.wsc = WSClient(self)
         self.reporting_thread = threading.Thread(target=self._check_status)
+        # Kill thread immediately on program exit
+        self.reporting_thread.daemon = True
 
     def on_start(self):
         # Start the websocket client and reporting thread
