@@ -1,6 +1,14 @@
 Changelog
 =========
 
+v0.8.0
+---------------------------------------
+
+- Add support for baseurl
+- Allow for passwordless login
+- Report the current tracklist to the server
+- Add scheduled playback reporting
+
 v0.7.1
 ---------------------------------------
 
