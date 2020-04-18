@@ -131,12 +131,12 @@ class EventMonitorFrontend(
             tracklist = self.core.tracklist.get_tracks().get()
             now_playing_queue = []
             for index, track in enumerate(tracklist):
-                item_id = track.uri.split(':')[-1]
+                track_id = track.uri.split(':')[-1]
                 now_playing_queue.append({
-                    'Id': item_id,
+                    'Id': track_id,
                     'PlaylistItemId': f'playlistItem{index}'
                 })
-            playlist_item_id = f'playlistItem{index}'
+            playlist_item_id = f'playlistItem{track_index}'
 
             # json payload to server
             data = {
