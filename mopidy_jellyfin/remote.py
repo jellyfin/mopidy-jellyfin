@@ -428,13 +428,11 @@ class JellyfinHandler(object):
         """
         # TODO: add more metadata
         return models.Track(
-            uri='jellyfin:track:{}'.format(
-                track.get('Id')
-            ),
+            uri='jellyfin:track:{}'.format(track.get('Id')),
             name=track.get('Name'),
             track_no=track.get('IndexNumber'),
             disc_no=track.get('ParentIndexNumber'),
-            genre=track.get('Genre'),
+            genre=','.join(track.get('Genres')),
             artists=self.create_artists(track),
             album=self.create_album(track),
             length=self.ticks_to_milliseconds(track.get('RunTimeTicks'))
