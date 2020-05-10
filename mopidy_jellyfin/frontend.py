@@ -13,8 +13,7 @@ logger = logging.getLogger(__name__)
 class EventMonitorFrontend(
         pykka.ThreadingActor,
         core.CoreListener,
-        audio.AudioListener,
-        listener.JellyfinListener,
+        audio.AudioListener
 ):
     # Sends events and playback updates back to Jellyfin server
 
