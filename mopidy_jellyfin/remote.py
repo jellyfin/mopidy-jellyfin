@@ -729,34 +729,34 @@ class JellyfinHandler(object):
             # ensure all tracks belong to that artist
             tracks = [
                 models.Track(
-                    uri='jellyfin:track:{}'.format(item.get('Id')),
-                    track_no=item.get('IndexNumber'),
+                    uri='jellyfin:track:{}'.format(track.get('Id')),
+                    track_no=track.get('IndexNumber'),
                     disc_no=track.get('ParentIndexNumber'),
-                    name=item.get('Name'),
+                    name=track.get('Name'),
                     artists=artist_ref,
                     album=models.Album(
-                        name=item.get('Album'),
+                        name=track.get('Album'),
                         artists=artist_ref
                     )
                 )
-                for item in raw_tracks
+                for track in raw_tracks
                 if unidecode(artist_ref[0].name.lower()) in (
-                    artist.lower() for artist in item.get('Artists'))
+                    artist.lower() for artist in track.get('Artists'))
             ]
         else:
             # If the query doesn't contain an artist, return all tracks
             tracks = [
                 models.Track(
-                    uri='jellyfin:track:{}'.format(item.get('Id')),
-                    track_no=item.get('IndexNumber'),
-                    name=item.get('Name'),
+                    uri='jellyfin:track:{}'.format(track.get('Id')),
+                    track_no=track.get('IndexNumber'),
+                    name=track.get('Name'),
                     artists=artist_ref,
                     album=models.Album(
-                        name=item.get('Album'),
+                        name=track.get('Album'),
                         artists=artist_ref
                     )
                 )
-                for item in raw_tracks
+                for track in raw_tracks
             ]
 
         return tracks
