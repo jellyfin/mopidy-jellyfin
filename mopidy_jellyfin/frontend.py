@@ -25,6 +25,9 @@ class EventMonitorFrontend(
         self.hostname = self.config['jellyfin'].get('hostname')
 
         self.wsc = WSClient(self)
+        response_url = self.wsc.http.check_redirect(self.hostname)
+        if self.hostname != response_url:
+            self.hostname = response_url
         self.reporting_thread = threading.Thread(target=self._check_status)
         # Kill thread immediately on program exit
         self.reporting_thread.daemon = True
