@@ -70,6 +70,9 @@ class JellyfinHandler(object):
         self.auth_data = self._auth_payload()
         headers = self._create_headers()
         self.http = JellyfinHttpClient(headers, cert, proxy)
+        response_url = self.http.check_redirect(self.hostname)
+        if self.hostname != response_url:
+            self.hostname = response_url
         self._login()
 
     def _save_token(self, token):
@@ -135,16 +138,8 @@ class JellyfinHandler(object):
 
         Takes host, and endpoint and generates a valid jellyfin API url.
         """
-        # check if http or https is defined as host and create hostname
-        hostname_list = [self.hostname]
-        if self.hostname.startswith('http://') or \
-                self.hostname.startswith('https://'):
-            hostname = ''.join(hostname_list)
-        else:
-            hostname_list.insert(0, 'http://')
-            hostname = ''.join(hostname_list)
 
-        scheme, netloc, path, query_string, fragment = urlsplit(hostname)
+        scheme, netloc, path, query_string, fragment = urlsplit(self.hostname)
         query_params = parse_qs(query_string)
         path = path + endpoint
 
@@ -306,10 +301,6 @@ class JellyfinHandler(object):
                     'UserId': self.user_id
                 }
                 if self.albumartistsort:
-                    url_params = {
-                        'ParentId': library.get('Id'),
-                        'UserId': self.user_id
-                    }
                     url = self.api_url('/Artists/AlbumArtists', url_params)
                 else:
                     url = self.api_url('/Artists', url_params)

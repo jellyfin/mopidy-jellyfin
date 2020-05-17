@@ -33,6 +33,19 @@ class WSClient(threading.Thread):
         logger.debug("WSClient initializing...")
 
         self.client = client
+        self.device_id = mopidy_jellyfin.Extension.device_id
+        # Load things from config file
+        cert = None
+        client_cert = self.client.config['jellyfin'].get('client_cert', None)
+        client_key = self.client.config['jellyfin'].get('client_key', None)
+        if client_cert is not None and client_key is not None:
+            cert = (client_cert, client_key)
+        self.hostname = self.client.config['jellyfin'].get('hostname')
+        proxy = self.client.config.get('proxy', None)
+
+        self.token = self.client.token
+        headers = {'x-mediabrowser-token': self.token}
+        self.http = JellyfinHttpClient(headers, cert, proxy)
         threading.Thread.__init__(self)
 
     def send(self, message, data=""):
@@ -46,22 +59,14 @@ class WSClient(threading.Thread):
     def run(self):
         # Starts the websocket event listener
 
-        device_id = mopidy_jellyfin.Extension.device_id
-        # Load things from config file
-        server = self.client.config['jellyfin'].get('hostname')
-        cert = None
-        client_cert = self.client.config['jellyfin'].get('client_cert', None)
-        client_key = self.client.config['jellyfin'].get('client_key', None)
-        if client_cert is not None and client_key is not None:
-            cert = (client_cert, client_key)
-        self.hostname = self.client.config['jellyfin'].get('hostname')
-        proxy = self.client.config.get('proxy', None)
-
-        token = self.client.token
-        headers = {'x-mediabrowser-token': token}
-        self.http = JellyfinHttpClient(headers, cert, proxy)
-        server = server.replace('https', "wss") if server.startswith('https') else server.replace('http', "ws")
-        wsc_url = "%s/socket?api_key=%s&device_id=%s" % (server, token, device_id)
+        response_url = self.http.check_redirect(self.hostname)
+        if self.hostname != response_url:
+            self.hostname = response_url
+        if self.hostname.startswith('https'):
+            server = self.hostname.replace('https', "wss")
+        else:
+            server = self.hostname.replace('http', "ws")
+        wsc_url = "%s/socket?api_key=%s&device_id=%s" % (server, self.token, self.device_id)
 
         self.wsc = websocket.WebSocketApp(
             wsc_url,
