@@ -6,7 +6,7 @@ import os
 import time
 
 from .ws_client import WSClient
-from mopidy_jellyfin import listener, Extension
+from mopidy_jellyfin import Extension
 
 logger = logging.getLogger(__name__)
 
