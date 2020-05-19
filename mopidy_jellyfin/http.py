@@ -104,3 +104,27 @@ class JellyfinHttpClient(object):
                 counter += 1
 
         raise Exception('Cant connect to Jellyfin API')
+
+    def check_redirect(self, server):
+        # Perform HTTP Get to public endpoint to check for redirects
+        counter = 0
+        self.session.headers.update(self.headers)
+        path = '/system/info/public'
+
+        if 'http' not in server:
+            server = 'http://' + server
+
+        while counter <= 5:
+
+            try:
+                r = self.session.get(f'{server}{path}')
+                r.raise_for_status()
+                return r.url.replace(path, '')
+            except Exception as e:
+                logger.info(
+                    'Jellyfin connection on try {} with problem: {}'.format(
+                        counter, e
+                    )
+                )
+                counter += 1
+
