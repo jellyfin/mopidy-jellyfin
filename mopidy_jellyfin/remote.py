@@ -237,22 +237,62 @@ class JellyfinHandler(object):
     def update_playlist(self, playlist_id, new_ids):
         curr_tracks = self.get_playlist_contents(playlist_id)
 
-        curr_ids = [i.get('PlaylistItemId') for i in curr_tracks]
+        curr_length = len(curr_tracks)
+        new_length = len(new_ids)
+
+        if curr_length == new_length:
+            # If the playlist is the same length, assume a track has moved
+            self.move_playlist_items(playlist_id, curr_tracks, new_ids)
+        elif curr_length > new_length:
+            # If the new playlist is shorter than the old, delete tracks
+            self.delete_from_playlist(playlist_id, curr_tracks, new_ids)
+        elif curr_length < new_length:
+            # If the new playlist is longer than the old, add new tracks
+            self.add_to_playlist(playlist_id, curr_tracks, new_ids)
+
+    def move_playlist_items(self, playlist_id, curr_tracks, new_ids):
+        # Loop through the current and new list, finding the moved track
+        for index,item in enumerate(curr_tracks, 0):
+            if item['Id'] != new_ids[index]:
+                new_index = new_ids.index(item['Id'])
+                # If an item has only moved down 1 slot, it was likely caused
+                # by another track being moved above it
+                if new_index - index != 1:
+                    break
+
+        # Playlists have their own unique item IDs
+        item_id = item['PlaylistItemId']
+
+        url = self.api_url(f'/Playlists/{playlist_id}/Items/{item_id}/Move/{new_index}')
+        self.http.post(url)
+
+    def delete_from_playlist(self, playlist_id, curr_tracks, new_ids):
+        curr_ids = [ track['Id'] for track in curr_tracks ]
+
+        # Find items that are in the old playlist but missing from the new one
+        del_items = list(set(curr_ids) - set(new_ids))
+
+        # Get the PlaylistItemId of each track to be deleted
+        del_ids = [ track['PlaylistItemId'] for track in curr_tracks if track['Id'] in del_items ]
 
         url_params = {
             'UserId': self.user_id,
-            'EntryIds': ','.join(str(i) for i in curr_ids)
+            'EntryIds': ','.join(del_ids)
         }
-        del_url = self.api_url('Playlists/{}/Items'.format(playlist_id), url_params)
-
+        del_url = self.api_url(f'Playlists/{playlist_id}/Items', url_params)
         self.http.delete(del_url)
 
+    def add_to_playlist(self, playlist_id, curr_tracks, new_ids):
+        curr_ids = [ track['Id'] for track in curr_tracks ]
+
+        # Find items in the new playlist that are missing from the old one
+        add_ids = list(set(new_ids) - set(curr_ids))
+
         url_params = {
             'UserId': self.user_id,
-            'Ids': ','.join(new_ids)
+            'Ids': ','.join(add_ids)
         }
-        new_url = self.api_url('/Playlists/{}/Items'.format(playlist_id), url_params)
-
+        new_url = self.api_url(f'/Playlists/{playlist_id}/Items', url_params)
         self.http.post(new_url)
 
     @cache()
