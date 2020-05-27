@@ -90,8 +90,10 @@ class JellyfinPlaylistsProvider(backend.PlaylistsProvider):
         return False
 
     def save(self, playlist):
+        # Update modifications to the playlist in the Jellyfin server
         playlist_id = playlist.uri.split(':')[-1]
 
+        # Get the list of Jellyfin Ids for each track of the playlist
         new_track_ids = [
             i.uri.split(':')[-1] for i in playlist.tracks
         ]
@@ -100,9 +102,6 @@ class JellyfinPlaylistsProvider(backend.PlaylistsProvider):
             playlist_id, new_track_ids
         )
 
+        # Update the playlist views
         self.refresh()
-        return Playlist(
-            uri=playlist.uri,
-            name=playlist.name,
-            tracks=playlist.tracks
-        )
+        return playlist
