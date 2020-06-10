@@ -1,6 +1,14 @@
 Changelog
 =========
 
+v0.8.1
+---------------------------------------
+
+- Fix track genres
+- Code quality cleanup
+- Follow 301 redirects
+- Improve playlist handling
+
 v0.8.0
 ---------------------------------------
 
