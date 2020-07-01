@@ -21,7 +21,7 @@ class JellyfinPlaybackProvider(backend.PlaybackProvider):
             item_id = uri.split(':')[-1]
             # Build unique session ID
             letters = string.ascii_letters
-            session_id = ''.join(random.choice(letters) for i in range(20))
+            session_id = ''.join(random.choice(letters) for _ in range(20))
             # List of supported containers
             container = 'opus,mp3,aac,m4a,flac,webma,webm,wav,ogg,mpa,wma'
 
