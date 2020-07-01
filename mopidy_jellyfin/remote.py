@@ -97,6 +97,7 @@ class JellyfinHandler(object):
             headers = {'x-mediabrowser-token': token}
             self.http.session.headers.update(headers)
             self._save_token(token)
+            self.token = token
         else:
             logger.error('Unable to login to Jellyfin')
 
