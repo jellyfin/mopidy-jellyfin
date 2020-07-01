@@ -197,13 +197,19 @@ class EventMonitorFrontend(
         # Receives the "Play To" commands from the Jellyfin server
         items = data.get('ItemIds')
         playcommand = data.get('PlayCommand', '')
-        start_position = int(data.get('StartPositionTicks', 0)) / 10000
+        start_ticks = data.get('StartPositionTicks')
+        if start_ticks:
+            start_position = int(start_ticks / 10000)
+        else:
+            start_position = 0
 
         uris = ['jellyfin:track:{}'.format(item_id) for item_id in items]
         tracks = self.core.tracklist.add(uris=uris).get()
         # Allows adding to play queue without changing currently playing track
         if playcommand == 'PlayNow':
-            start_index = data.get('StartIndex', 0)
+            start_index = data.get('StartIndex')
+            if not start_index:
+                start_index = 0
             self.core.playback.play(tlid=tracks[start_index].tlid)
         # If playing a track that already has playback progress, start at that
         # progress point, not the beginning
