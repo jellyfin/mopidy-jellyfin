@@ -59,7 +59,11 @@ class EventMonitorFrontend(
         sessions = self.wsc.http.get(
             '{}/Sessions?DeviceId={}'.format(self.hostname, device_id))
 
-        session_id = sessions[0].get('Id')
+        if sessions:
+            session_id = sessions[0].get('Id')
+        else:
+            logger.debug('Unable to find playback session on server')
+            session_id = None
 
         return session_id
 
@@ -115,9 +119,10 @@ class EventMonitorFrontend(
         # Build the json payload sent to the server for playback reporting
 
         session_id = self._get_session_id()
+
         track = self.core.playback.get_current_track().get()
 
-        if track:
+        if session_id and track:
             item_id = track.uri.split(':')[-1]
             mute_state = self.core.mixer.get_mute().get()
             volume = self.core.mixer.get_volume().get()
