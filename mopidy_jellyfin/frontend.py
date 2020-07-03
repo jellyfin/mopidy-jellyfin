@@ -119,7 +119,6 @@ class EventMonitorFrontend(
         # Build the json payload sent to the server for playback reporting
 
         session_id = self._get_session_id()
-
         track = self.core.playback.get_current_track().get()
 
         if session_id and track:
