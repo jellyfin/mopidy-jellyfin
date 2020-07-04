@@ -59,7 +59,7 @@ class JellyfinHandler(object):
             if max_bitrate:
                 self.max_bitrate = str(max_bitrate * 1024)
             else:
-                self.max_bitrate = None
+                self.max_bitrate = '140000000'
             cert = None
             client_cert = jellyfin.get('client_cert', None)
             client_key = jellyfin.get('client_key', None)

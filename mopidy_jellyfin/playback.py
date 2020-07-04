@@ -25,8 +25,6 @@ class JellyfinPlaybackProvider(backend.PlaybackProvider):
             # List of supported containers
             container = 'opus,mp3,aac,m4a,flac,webma,webm,wav,ogg,mpa,wma'
             bitrate = self.backend.remote.max_bitrate
-            if not bitrate:
-                bitrate = '140000000'
 
             url_params = {
                 'MaxStreamingBitrate': bitrate,
