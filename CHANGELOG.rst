@@ -1,6 +1,14 @@
 Changelog
 =========
 
+v0.9.0
+---------------------------------------
+
+- Switch away from legacy playback endpoint
+- Update websocket receiver for 10.6 changes
+- Don't crash if a reporting session isn't found
+- Add max bitrate option to enable transcoding
+
 v0.8.1
 ---------------------------------------
 
