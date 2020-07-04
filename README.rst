@@ -49,7 +49,7 @@ Mopidy-Jellyfin to your Mopidy configuration file::
 
 * ``album_format`` can be used to change the display format of music albums when using the file browser view.  Currently the only really usable fields are ProductionYear and Name
 
-  ``max_bitrate `` is used to trigger transcoding if a file is over a given bitrate (in kbps)
+  ``max_bitrate`` is used to trigger transcoding if a file is over a given bitrate (in kbps)
 
 
 Development
