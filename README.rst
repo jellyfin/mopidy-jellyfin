@@ -41,12 +41,16 @@ Mopidy-Jellyfin to your Mopidy configuration file::
     libraries = Library1, Library2 (Optional: will default to "Music" if left undefined)
     albumartistsort = False (Optional: will default to True if left undefined)
     album_format = {ProductionYear} - {Name} (Optional: will default to "{Name}" if left undefined)
+    max_bitrate = number
 
 * ``libraries`` determines what is populated into Mopidy's internal library (view by Artists/Album/etc).  Using the file browser will show all libraries in the Jellyfin server that have a 'music' type.
 
 * ``albumartistsort`` changes whether the media library populates based on "Artist" or "Album Artist" metadata
 
 * ``album_format`` can be used to change the display format of music albums when using the file browser view.  Currently the only really usable fields are ProductionYear and Name
+
+
+  ``max_bitrate `` is used to trigger transcoding if a file is over a given bitrate (in kbps)
 
 
 Development

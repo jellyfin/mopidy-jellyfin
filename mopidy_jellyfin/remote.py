@@ -55,6 +55,11 @@ class JellyfinHandler(object):
                 logger.warn('Specifying user_id in the config file is '
                             'depreciated. This will be removed in a future '
                             'release')
+            max_bitrate = jellyfin.get('max_bitrate')
+            if max_bitrate:
+                self.max_bitrate = str(max_bitrate * 1024)
+            else:
+                self.max_bitrate = '140000000'
             cert = None
             client_cert = jellyfin.get('client_cert', None)
             client_key = jellyfin.get('client_key', None)
