@@ -24,9 +24,12 @@ class JellyfinPlaybackProvider(backend.PlaybackProvider):
             session_id = ''.join(random.choice(letters) for _ in range(20))
             # List of supported containers
             container = 'opus,mp3,aac,m4a,flac,webma,webm,wav,ogg,mpa,wma'
+            bitrate = self.backend.remote.max_bitrate
+            if not bitrate:
+                bitrate = '140000000'
 
             url_params = {
-                'MaxStreamingBitrate': '140000000',
+                'MaxStreamingBitrate': bitrate,
                 'api_key': self.backend.remote.token,
                 'UserId': self.backend.remote.user_id,
                 'DeviceId': mopidy_jellyfin.Extension.device_id,
