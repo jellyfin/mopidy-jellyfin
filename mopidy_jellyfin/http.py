@@ -119,12 +119,15 @@ class JellyfinHttpClient(object):
             try:
                 r = self.session.get(f'{server}{path}')
                 r.raise_for_status()
+
                 return r.url.replace(path, '')
+
             except Exception as e:
-                logger.info(
-                    'Jellyfin connection on try {} with problem: {}'.format(
+                logger.error(
+                    'Failed to reach Jellyfin public API on try {} with problem: {}'.format(
                         counter, e
                     )
                 )
                 counter += 1
 
+        raise Exception('Unable to find Jellyfin server, check hostname config')

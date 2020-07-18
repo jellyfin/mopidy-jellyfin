@@ -229,6 +229,9 @@ class EventMonitorFrontend(
         cache_dir = Extension.get_cache_dir(config)
         token_file = os.path.join(cache_dir, 'token')
 
+        if not os.path.isfile(token_file):
+            raise Exception('No authentication token found')
+
         with open(token_file, 'r') as f:
             token = f.read()
 
