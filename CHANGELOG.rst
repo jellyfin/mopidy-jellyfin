@@ -1,6 +1,12 @@
 Changelog
 =========
 
+v0.9.1
+---------------------------------------
+
+- Add more detailed log messages on connection failure
+- Fixes to allow usage with Mopidy-Iris
+
 v0.9.0
 ---------------------------------------
 
