@@ -37,28 +37,37 @@ class JellyfinLibraryProvider(backend.LibraryProvider):
 
             if uri.startswith('jellyfin:track:') and len(parts) == 3:
                 track_id = parts[-1]
-                tracks = [self.backend.remote.get_track(track_id)]
+                contents = [self.backend.remote.get_track(track_id)]
 
             elif uri.startswith('jellyfin:album:') and len(parts) == 3:
                 album_id = parts[-1]
                 album_data = self.backend.remote.get_directory(album_id)
-                tracks = [
+                contents = [
                     self.backend.remote.create_track(track)
                     for track in album_data.get('Items', [])
                 ]
 
-                tracks = sorted(tracks, key=lambda k: k.track_no)
+                contents = sorted(contents, key=lambda k: (k.track_no, k.name))
 
             elif uri.startswith('jellyfin:artist:') and len(parts) == 3:
                 artist_id = parts[-1]
 
-                tracks = self.backend.remote.lookup_artist(artist_id)
+                contents = self.backend.remote.lookup_artist(artist_id)
+
+            elif uri.startswith('jellyfin:directory:') and len(parts) ==  3:
+                item_id = parts[-1]
+
+                contents = self.backend.remote.lookup_artist(item_id)
+
+            elif uri == 'jellyfin:':
+                # Prevents weirdness when using Iris, this gets redirected to browse()
+                return None
 
             else:
                 logger.info('Unknown Jellyfin lookup URI: {}'.format(uri))
-                tracks = []
+                contents = []
 
-            return tracks
+            return contents
 
         else:
             return {uri: self.lookup(uri=uri) for uri in uris}
