@@ -378,7 +378,7 @@ class JellyfinHandler(object):
 
         # URL encode artist string
         artist = quote(raw_artist[0].encode('utf8')).replace('/', '-')
-        artist_ref = [models.Artist(name=raw_artist[0])]
+        artist_ref = self.create_artists(name=raw_artist[0])
         url_params= {
             'UserId': self.user_id
         }
@@ -410,11 +410,7 @@ class JellyfinHandler(object):
             raw_albums = result.get('Items')
 
         albums = [
-            models.Album(
-                uri='jellyfin:album:{}'.format(item.get('Id')),
-                name=item.get('Name'),
-                artists=artist_ref
-            )
+            self.create_album(item)
             for item in raw_albums
         ]
 
@@ -491,7 +487,7 @@ class JellyfinHandler(object):
             track_no=track.get('IndexNumber', 0),
             disc_no=track.get('ParentIndexNumber'),
             genre=','.join(track.get('Genres', [])),
-            artists=self.create_artists(track),
+            artists=self.create_artists(track=track),
             album=self.create_album(track),
             length=self.ticks_to_milliseconds(track.get('RunTimeTicks'))
         )
@@ -506,23 +502,28 @@ class JellyfinHandler(object):
         """
         return models.Album(
             name=track.get('Album'),
-            artists=self.create_artists(track)
+            artists=self.create_artists(track=track)
         )
 
-    def create_artists(self, track):
+    def create_artists(self, track={}, name=None):
         """Create artist object from track.
 
         :param track: Track
         :type track: dict
+        :param name: Name
+        :type name: str
         :returns: List of artists
         :rtype: list of mopidy.models.Artist
         """
-        return [
-            models.Artist(
-                name=artist.get('Name')
-            )
-            for artist in track.get('ArtistItems')
-        ]
+        if track:
+            return [
+                models.Artist(
+                    name=name if name else artist.get('Name')
+                )
+                for artist in track.get('ArtistItems')
+            ]
+        else:
+            return [ models.Artist(name=name) ]
 
     @cache()
     def get_track(self, track_id):
@@ -600,28 +601,10 @@ class JellyfinHandler(object):
                 tracks.append(create_track(item))
 
             elif item.get('Type') == 'MusicAlbum':
-                album_artists = [
-                    models.Artist(
-                        name=artist
-                    )
-                    for artist in item.get('Artists')
-                ]
-
-                albums.append(
-                    models.Album(
-                        uri='jellyfin:album:{}'.format(item.get('ItemId')),
-                        name=item.get('Name'),
-                        artists=album_artists
-                    )
-                )
+                albums.append(self.create_album(item))
 
             elif item.get('Type') == 'MusicArtist':
-                artists.append(
-                    models.Artist(
-                        uri='jellyfin:artist:{}'.format(item.get('ItemId')),
-                        name=item.get('Name')
-                    )
-                )
+                artists.append(self.create_artists(track=item))
 
         return models.SearchResult(
             uri='jellyfin:search',
@@ -650,7 +633,7 @@ class JellyfinHandler(object):
         if raw_artist:
             # URL encode artist string
             artist = quote(raw_artist[0].encode('utf8')).replace('/', '-')
-            artist_ref = [models.Artist(name=raw_artist[0])]
+            artist_ref = self.create_artists(name=raw_artist[0])
             url_params = { 'UserId': self.user_id }
             url = self.api_url('/Artists/{}'.format(artist), url_params)
 
