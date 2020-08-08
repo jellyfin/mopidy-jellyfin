@@ -54,12 +54,7 @@ class JellyfinLibraryProvider(backend.LibraryProvider):
 
                 contents = self.backend.remote.lookup_artist(artist_id)
 
-            elif uri.startswith('jellyfin:directory:') and len(parts) ==  3:
-                item_id = parts[-1]
-
-                contents = self.backend.remote.lookup_artist(item_id)
-
-            elif uri == 'jellyfin:':
+            elif uri.startswith('jellyfin:directory:') or uri == 'jellyfin:':
                 # Prevents weirdness when using Iris, this gets redirected to browse()
                 return None
 
