@@ -597,26 +597,7 @@ class JellyfinHandler(object):
         for item in data:
 
             if item.get('Type') == 'Audio':
-
-                track_artists = [
-                    models.Artist(
-                        name=artist
-                    )
-                    for artist in item.get('Artists')
-                ]
-
-                tracks.append(
-                    models.Track(
-                        uri='jellyfin:track:{}'.format(item.get('ItemId')),
-                        track_no=item.get('IndexNumber', 0),
-                        name=item.get('Name'),
-                        artists=track_artists,
-                        album=models.Album(
-                            name=item.get('Album'),
-                            artists=track_artists
-                        )
-                    )
-                )
+                tracks.append(create_track(item))
 
             elif item.get('Type') == 'MusicAlbum':
                 album_artists = [
@@ -717,32 +698,16 @@ class JellyfinHandler(object):
             if track_data:
                 # If the query has an album, only match those tracks
                 if query.get('album'):
-                    tracks = [ models.Track(
-                        uri='jellyfin:track:{}'.format(track.get('Id')),
-                        track_no=track.get('IndexNumber', 0),
-                        disc_no=track.get('ParentIndexNumber'),
-                        name=track.get('Name'),
-                        artists=artist_ref,
-                        album=models.Album(
-                            name=track.get('Album'),
-                            artists=artist_ref
-                        )
-                    ) for track in track_data.get('Items')
+                    tracks = [
+                        self.create_track(track)
+                        for track in track_data.get('Items')
                         if track.get('Album') == query.get('album')[0]
                     ]
                 # Otherwise return all tracks
                 else:
-                    tracks = [ models.Track(
-                        uri='jellyfin:track:{}'.format(track.get('Id')),
-                        track_no=track.get('IndexNumber', 0),
-                        disc_no=track.get('ParentIndexNumber'),
-                        name=track.get('Name'),
-                        artists=artist_ref,
-                        album=models.Album(
-                            name=track.get('Album'),
-                            artists=artist_ref
-                        )
-                    ) for track in track_data.get('Items')
+                    tracks = [
+                        self.create_track(track)
+                        for track in track_data.get('Items')
                     ]
 
         # Use if query only has an album name
@@ -795,17 +760,7 @@ class JellyfinHandler(object):
             # If the artist was in the query,
             # ensure all tracks belong to that artist
             tracks = [
-                models.Track(
-                    uri='jellyfin:track:{}'.format(track.get('Id')),
-                    track_no=track.get('IndexNumber', 0),
-                    disc_no=track.get('ParentIndexNumber'),
-                    name=track.get('Name'),
-                    artists=artist_ref,
-                    album=models.Album(
-                        name=track.get('Album'),
-                        artists=artist_ref
-                    )
-                )
+                self.create_track(track)
                 for track in raw_tracks
                 if unidecode(artist_ref[0].name.lower()) in (
                     artist.lower() for artist in track.get('Artists'))
@@ -813,16 +768,7 @@ class JellyfinHandler(object):
         else:
             # If the query doesn't contain an artist, return all tracks
             tracks = [
-                models.Track(
-                    uri='jellyfin:track:{}'.format(track.get('Id')),
-                    track_no=track.get('IndexNumber', 0),
-                    name=track.get('Name'),
-                    artists=artist_ref,
-                    album=models.Album(
-                        name=track.get('Album'),
-                        artists=artist_ref
-                    )
-                )
+                self.create_track(track)
                 for track in raw_tracks
             ]
 
