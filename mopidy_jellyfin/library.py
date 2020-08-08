@@ -53,6 +53,7 @@ class JellyfinLibraryProvider(backend.LibraryProvider):
                 contents = [
                     self.backend.remote.create_track(track)
                     for track in album_data.get('Items', [])
+                    if track.get('Type') == 'Audio'
                 ]
 
                 contents = sorted(contents, key=lambda k: (k.track_no, k.name))
