@@ -22,6 +22,14 @@ class JellyfinLibraryProvider(backend.LibraryProvider):
         # split uri
         parts = uri.split(':')
 
+        # Used for browsing artists in Iris
+        if uri.startswith('jellyfin:artists'):
+            return self.backend.remote.get_artists()
+
+        # Used for browsing albums in Iris
+        if uri.startswith('jellyfin:albums'):
+            return self.backend.remote.get_all_albums()
+
         # move one level lower in directory tree
         if uri.startswith('jellyfin:') and len(parts) == 3:
             item_id = parts[-1]
@@ -56,7 +64,7 @@ class JellyfinLibraryProvider(backend.LibraryProvider):
 
             elif uri.startswith('jellyfin:directory:') or uri == 'jellyfin:':
                 # Prevents weirdness when using Iris, this gets redirected to browse()
-                return None
+                contents = []
 
             else:
                 logger.info('Unknown Jellyfin lookup URI: {}'.format(uri))

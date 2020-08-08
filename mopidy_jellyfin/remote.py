@@ -421,6 +421,27 @@ class JellyfinHandler(object):
         return albums
 
     @cache()
+    def get_all_albums(self):
+        url_params = {
+            'UserId': self.user_id,
+            'IncludeItemTypes': 'MusicAlbum',
+            'Recursive': 'true'
+        }
+
+        url = self.api_url('/Items', url_params)
+        albums = self.http.get(url)
+
+        return [
+            models.Ref.album(
+                uri='jellyfin:album:{}'.format(
+                    album.get('Id')
+                ),
+                name=album.get('Name')
+            )
+            for album in albums.get('Items', [])
+        ]
+
+    @cache()
     def get_directory(self, id):
         """Get directory from Jellyfin API.
 
