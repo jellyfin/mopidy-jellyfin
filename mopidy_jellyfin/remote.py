@@ -378,7 +378,6 @@ class JellyfinHandler(object):
 
         # URL encode artist string
         artist = quote(raw_artist[0].encode('utf8')).replace('/', '-')
-        artist_ref = self.create_artists(name=raw_artist[0])
         url_params= {
             'UserId': self.user_id
         }
@@ -598,7 +597,7 @@ class JellyfinHandler(object):
         for item in data:
 
             if item.get('Type') == 'Audio':
-                tracks.append(create_track(item))
+                tracks.append(self.create_track(item))
 
             elif item.get('Type') == 'MusicAlbum':
                 albums.append(self.create_album(item))
