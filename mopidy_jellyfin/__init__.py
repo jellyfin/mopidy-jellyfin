@@ -37,6 +37,7 @@ class Extension(ext.Extension):
         schema['client_key'] = config.String(optional=True)
         schema['album_format'] = config.String(optional=True)
         schema['max_bitrate'] = config.Integer(optional=True)
+        schema['watched_status'] = config.Boolean(optional=True)
 
         return schema
 
