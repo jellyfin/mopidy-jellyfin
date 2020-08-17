@@ -1,6 +1,13 @@
 Changelog
 =========
 
+v0.9.2
+---------------------------------------
+
+- More iris fixes
+- Remove duplicated code
+- Optional flag to show 'watched' status when browsing books
+
 v0.9.1
 ---------------------------------------
 
