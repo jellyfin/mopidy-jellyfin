@@ -60,6 +60,7 @@ class JellyfinHandler(object):
                 self.max_bitrate = str(max_bitrate * 1024)
             else:
                 self.max_bitrate = '140000000'
+            self.watched_status = jellyfin.get('watched_status')
             cert = None
             client_cert = jellyfin.get('client_cert', None)
             client_key = jellyfin.get('client_key', None)
@@ -480,9 +481,16 @@ class JellyfinHandler(object):
         :rtype: mopidy.models.Track
         """
         # TODO: add more metadata
+        name = track.get('Name')
+        if self.watched_status and track.get('Type') == 'AudioBook':
+            if track['UserData'].get('PlayCount'):
+                name = f'[X] - {name}'
+            else:
+                name = f'[] - {name}'
+
         return models.Track(
             uri='jellyfin:track:{}'.format(track.get('Id')),
-            name=track.get('Name'),
+            name=name,
             track_no=track.get('IndexNumber', 0),
             disc_no=track.get('ParentIndexNumber'),
             genre=','.join(track.get('Genres', [])),
