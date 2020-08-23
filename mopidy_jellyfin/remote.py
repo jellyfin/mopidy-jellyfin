@@ -307,7 +307,7 @@ class JellyfinHandler(object):
         item = self.get_item(item_id)
         if item.get('CollectionType', '') == 'music':
             artists = self.get_library_artists(item_id)
-            ret_value = self.get_artists_as_ref(artists)
+            ret_value = [self.get_artist_as_ref(artist) for artist in artists]
         elif item.get('Type', '') == 'MusicArtist':
             ret_value = self.get_artist_contents(item_id)
         else:
@@ -330,22 +330,9 @@ class JellyfinHandler(object):
                         name=item.get('Name')
                     ))
                 elif item.get('Type') == 'MusicArtist':
-                    ret_value.append(models.Ref.artist(
-                        uri='jellyfin:artist:{}'.format(
-                            item.get('Id')
-                        ),
-                        name=item.get('Name')
-                    ))
-                elif item.get('Type') == 'MusicAlbum':
-                    ret_value.append(models.Ref.album(
-                        uri='jellyfin:album:{}'.format(item.get('Id')),
-                        name=self.format_album(item)
-                    ))
-                elif item.get('Type') == 'Folder':
-                    ret_value.append(models.Ref.album(
-                        uri='jellyfin:album:{}'.format(item.get('Id')),
-                        name=item.get('Name')
-                    ))
+                    ret_value.append(self.get_artist_as_ref(item))
+                elif item.get('Type') in ('MusicAlbum', 'Folder'):
+                    ret_value.append(self.get_album_as_ref(item))
 
         return ret_value
 
@@ -391,7 +378,6 @@ class JellyfinHandler(object):
 
         return ret_val
 
-
     @cache()
     def get_library_artists(self, library_id):
         url_params = {
@@ -408,16 +394,15 @@ class JellyfinHandler(object):
         return artists
 
     @cache()
-    def get_artists_as_ref(self, artists):
-        return [
-            models.Ref.artist(
-                uri='jellyfin:artist:{}'.format(
-                    artist.get('Id')
-                ),
-                name=artist.get('Name')
-            )
-            for artist in artists
-        ]
+    def get_artist_as_ref(self, artist):
+        artist_ref = models.Ref.artist(
+            uri='jellyfin:artist:{}'.format(
+                artist.get('Id')
+            ),
+            name=artist.get('Name')
+        )
+
+        return artist_ref
 
     @cache()
     def get_album_as_ref(self, album):
@@ -496,12 +481,7 @@ class JellyfinHandler(object):
         albums = self.http.get(url)
 
         return [
-            models.Ref.album(
-                uri='jellyfin:album:{}'.format(
-                    album.get('Id')
-                ),
-                name=album.get('Name')
-            )
+            self.get_album_as_ref(album)
             for album in albums.get('Items', [])
         ]
 
@@ -715,42 +695,25 @@ class JellyfinHandler(object):
             artist_data = self.http.get(url)
             artist_id = artist_data.get('Id')
 
+            url_params = {
+                'IncludeItemTypes': 'MusicAlbum',
+                'Recursive': 'true',
+                'UserId': self.user_id
+            }
+
             # Get album list
             if self.albumartistsort:
-                url_params = {
-                    'IncludeItemTypes': 'MusicAlbum',
-                    'Recursive': 'true',
-                    'AlbumArtistIds': artist_id,
-                    'UserId': self.user_id
-                }
+                url_params['AlbumArtistIds'] = artist_id
             else:
-                url_params = {
-                    'IncludeItemTypes': 'MusicAlbum',
-                    'Recursive': 'true',
-                    'ArtistIds': artist_id,
-                    'UserId': self.user_id
-                }
+                url_params['ArtistIds'] = artist_id
 
             album_url = self.api_url('/Items', url_params)
             album_data = self.http.get(album_url)
             if album_data:
                 raw_albums = album_data.get('Items')
 
-            if self.albumartistsort:
-                url_params = {
-                    'IncludeItemTypes': 'Audio',
-                    'Recursive': 'true',
-                    'AlbumArtistIds': artist_id,
-                    'UserId': self.user_id
-                }
-            else:
-                url_params = {
-                    'IncludeItemTypes': 'Audio',
-                    'Recursive': 'true',
-                    'ArtistIds': artist_id,
-                    'UserId': self.user_id
-                }
-
+            # Get artist tracks
+            url_params['IncludeItemTypes'] = 'Audio'
             track_url = self.api_url('/Items', url_params)
             track_data = self.http.get(track_url)
             if track_data:
@@ -849,20 +812,15 @@ class JellyfinHandler(object):
         :returns: List of tracks
         :rtype: list
         """
+        url_params = {
+            'SortOrder': 'Ascending',
+            'Recursive': 'true',
+            'IncludeItemTypes': 'Audio'
+        }
         if self.albumartistsort:
-            url_params = {
-                'SortOrder': 'Ascending',
-                'AlbumArtistIds': artist_id,
-                'Recursive': 'true',
-                'IncludeItemTypes': 'Audio'
-            }
+            url_params['AlbumArtistIds'] = artist_id
         else:
-            url_params = {
-                'SortOrder': 'Ascending',
-                'ArtistIds': artist_id,
-                'Recursive': 'true',
-                'IncludeItemTypes': 'Audio'
-            }
+            url_params['ArtistIds'] = artist_id
 
         url = self.api_url('/Users/{}/Items'.format(self.user_id), url_params)
         items = self.http.get(url)
