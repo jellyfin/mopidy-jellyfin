@@ -304,56 +304,111 @@ class JellyfinHandler(object):
 
     @cache()
     def browse_item(self, item_id):
-        contents = self.get_directory(item_id).get('Items')
-        ret_value = []
+        item = self.get_item(item_id)
+        if item.get('CollectionType', '') == 'music':
+            artists = self.get_library_artists(item_id)
+            ret_value = self.get_artists_as_ref(artists)
+        elif item.get('Type', '') == 'MusicArtist':
+            ret_value = self.get_artist_contents(item_id)
+        else:
+            contents = self.get_directory(item_id).get('Items')
+            ret_value = []
 
-        for item in contents:
-            if item.get('Type') == 'Audio':
-                ret_value.append(models.Ref.track(
-                    uri='jellyfin:track:{}'.format(
-                        item.get('Id')
-                    ),
-                    name=item.get('Name')
-                ))
-            elif item.get('Type') == 'AudioBook':
-                ret_value.append(models.Ref.track(
-                    uri='jellyfin:track:{}'.format(
-                        item.get('Id')
-                    ),
-                    name=item.get('Name')
-                ))
-            elif item.get('Type') == 'MusicAlbum':
-                ret_value.append(models.Ref.album(
-                    uri='jellyfin:album:{}'.format(item.get('Id')),
-                    name=self.format_album(item)
-                ))
-            elif item.get('Type') == 'Folder':
-                ret_value.append(models.Ref.album(
-                    uri='jellyfin:album:{}'.format(item.get('Id')),
-                    name=item.get('Name')
-                ))
+            for item in contents:
+                if item.get('Type') == 'Audio':
+                    ret_value.append(models.Ref.track(
+                        uri='jellyfin:track:{}'.format(
+                            item.get('Id')
+                        ),
+                        name=item.get('Name')
+                    ))
+                elif item.get('Type') == 'AudioBook':
+                    ret_value.append(models.Ref.track(
+                        uri='jellyfin:track:{}'.format(
+                            item.get('Id')
+                        ),
+                        name=item.get('Name')
+                    ))
+                elif item.get('Type') == 'MusicArtist':
+                    ret_value.append(models.Ref.artist(
+                        uri='jellyfin:artist:{}'.format(
+                            item.get('Id')
+                        ),
+                        name=item.get('Name')
+                    ))
+                elif item.get('Type') == 'MusicAlbum':
+                    ret_value.append(models.Ref.album(
+                        uri='jellyfin:album:{}'.format(item.get('Id')),
+                        name=self.format_album(item)
+                    ))
+                elif item.get('Type') == 'Folder':
+                    ret_value.append(models.Ref.album(
+                        uri='jellyfin:album:{}'.format(item.get('Id')),
+                        name=item.get('Name')
+                    ))
 
         return ret_value
 
     @cache()
-    def get_artists(self):
+    def get_all_artists(self):
         artists = []
         libraries = self.get_music_root()
 
         for library in libraries:
 
             if library.get('Name') in self.libraries:
-                url_params = {
-                    'ParentId': library.get('Id'),
-                    'UserId': self.user_id
-                }
-                if self.albumartistsort:
-                    url = self.api_url('/Artists/AlbumArtists', url_params)
-                else:
-                    url = self.api_url('/Artists', url_params)
+                library_id = library.get('Id')
+                artists += self.get_library_artists(library_id)
 
-                artists += self.http.get(url).get('Items')
+        return artists
 
+    @cache()
+    def get_artist_contents(self, artist_id):
+        contents = []
+        ret_val = []
+
+        # Get album list
+        url_params = {
+            'UserId': self.user_id,
+            'IncludeItemTypes': 'MusicAlbum',
+            'Recursive': 'true'
+        }
+        if self.albumartistsort:
+            url_params['AlbumArtistIds'] = artist_id
+        else:
+            url_params['ArtistIds'] = artist_id
+
+        url = self.api_url('/Items', url_params)
+        result = self.http.get(url)
+        if result:
+            contents = result.get('Items')
+
+        for item in contents:
+            if item.get('Type') == 'MusicAlbum':
+                ret_val.append(self.get_album_as_ref(item))
+            elif item.get('Type') == 'Audio':
+                ret_val.append(self.get_track_as_ref(item))
+
+        return ret_val
+
+
+    @cache()
+    def get_library_artists(self, library_id):
+        url_params = {
+            'ParentId': library_id,
+            'UserId': self.user_id
+        }
+        if self.albumartistsort:
+            url = self.api_url('/Artists/AlbumArtists', url_params)
+        else:
+            url = self.api_url('/Artists', url_params)
+
+        artists = self.http.get(url).get('Items')
+
+        return artists
+
+    @cache()
+    def get_artists_as_ref(self, artists):
         return [
             models.Ref.artist(
                 uri='jellyfin:artist:{}'.format(
@@ -363,6 +418,23 @@ class JellyfinHandler(object):
             )
             for artist in artists
         ]
+
+    @cache()
+    def get_album_as_ref(self, album):
+        return models.Ref.album(
+            uri='jellyfin:album:{}'.format(
+                album.get('Id')
+            ),
+            name=album.get('Name')
+        )
+
+    def get_track_as_ref(self, track):
+        return models.Ref.track(
+            uri='jellyfin:track:{}'.format(
+                track.get('Id')
+            ),
+            name=track.get('Name')
+        )
 
     @cache()
     def get_albums(self, query):
@@ -388,21 +460,17 @@ class JellyfinHandler(object):
         artist_data = self.http.get(url)
         artist_id = artist_data.get('Id')
 
+        url_params = {
+            'UserId': self.user_id,
+            'IncludeItemTypes': 'MusicAlbum',
+            'Recursive': 'true'
+        }
+
         # Get album list
         if self.albumartistsort:
-            url_params = {
-                'AlbumArtistIds': artist_id,
-                'UserId': self.user_id,
-                'IncludeItemTypes': 'MusicAlbum',
-                'Recursive': 'true'
-            }
+            url_params['AlbumArtistIds'] = artist_id
         else:
-            url_params = {
-                'ArtistIds': artist_id,
-                'UserId': self.user_id,
-                'IncludeItemTypes': 'MusicAlbum',
-                'Recursive': 'true'
-            }
+            url_params['ArtistIds'] = artist_id
 
         url = self.api_url('/Items', url_params)
         result = self.http.get(url)

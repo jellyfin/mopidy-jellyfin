@@ -24,7 +24,8 @@ class JellyfinLibraryProvider(backend.LibraryProvider):
 
         # Used for browsing artists in Iris
         if uri.startswith('jellyfin:artists'):
-            return self.backend.remote.get_artists()
+            artists = self.backend.remote.get_all_artists()
+            return self.backend.remote.get_artists_as_ref(artists)
 
         # Used for browsing albums in Iris
         if uri.startswith('jellyfin:albums'):
@@ -86,8 +87,10 @@ class JellyfinLibraryProvider(backend.LibraryProvider):
         # Populates Media Library sections (Artists, Albums, etc)
         # Mopidy internally calls search() with exact=True
         if field == 'artist' or field == 'albumartist':
+            artists = self.backend.remote.get_all_artists()
+            artist_refs = self.backend.remote.get_artists_as_ref(artists)
             return [
-                artist.name for artist in self.backend.remote.get_artists()
+                artist.name for artist in artist_refs
             ]
         elif field == 'album':
             return [
