@@ -88,12 +88,8 @@ class JellyfinLibraryProvider(backend.LibraryProvider):
         # Mopidy internally calls search() with exact=True
         if field == 'artist' or field == 'albumartist':
             artists = self.backend.remote.get_all_artists()
-            artist_refs = self.backend.remote.get_artists_as_ref(artists)
-            return [
-                artist.name for artist in artist_refs
-            ]
+            return [ artist.get('Name') for artist in artists ]
         elif field == 'album':
-            return [
-                album.name for album in self.backend.remote.get_albums(query)
-            ]
+            albums = self.backend.remote.get_albums(query)
+            return [album.get('Name') for album in albums]
         return []
