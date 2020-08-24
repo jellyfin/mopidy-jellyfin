@@ -457,12 +457,7 @@ class JellyfinHandler(object):
         url = self.api_url('/Items', url_params)
         result = self.http.get(url)
         if result:
-            raw_albums = result.get('Items')
-
-        albums = [
-            self.create_album(item)
-            for item in raw_albums
-        ]
+            albums = result.get('Items')
 
         return albums
 
@@ -742,7 +737,6 @@ class JellyfinHandler(object):
                     'IncludeItemTypes': 'MusicAlbum',
                     'IncludeMedia': 'true',
                     'Recursive': 'true',
-                    'UserId': self.user_id,
                     'searchTerm': album_name
                 }
                 url = self.api_url('/Users/{}/Items'.format(self.user_id), url_params)
