@@ -749,9 +749,9 @@ class JellyfinHandler(object):
             for album in album_data:
                 if album.get('Name') == album_name:
                     album_obj = models.Album(
-                        name=item.get('Name'),
-                        artists=self.create_artists(item),
-                        uri='jellyfin:album:{}'.format(item.get('Id'))
+                        name=album.get('Name'),
+                        artists=self.create_artists(album),
+                        uri='jellyfin:album:{}'.format(album.get('Id'))
                     )
                     if album_obj not in albums:
                         albums.append(album_obj)
