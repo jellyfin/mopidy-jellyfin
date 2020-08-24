@@ -735,7 +735,6 @@ class JellyfinHandler(object):
         # Use if query only has an album name
         elif 'album' in query:
             album_name = query.get('album')[0]
-            album = quote(album_name.encode('utf8'))
             url_params = {
                 'IncludeItemTypes': 'MusicAlbum',
                 'IncludeMedia': 'true',
