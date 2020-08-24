@@ -421,7 +421,6 @@ class JellyfinHandler(object):
     @cache()
     def get_albums(self, query):
         raw_artist = [""]
-        raw_albums = []
 
         # Check query for artist name
         if 'artist' in query:
@@ -704,7 +703,6 @@ class JellyfinHandler(object):
                 contents = album_data.get('Items')
                 for item in contents:
                     if item.get('Type') == 'MusicAlbum':
-                        #album_obj = self.create_album(item)
                         album_obj = models.Album(
                             name=item.get('Name'),
                             artists=self.create_artists(item),
