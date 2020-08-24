@@ -648,7 +648,7 @@ class JellyfinHandler(object):
             elif item.get('Type') == 'MusicAlbum':
                 albums.append(models.Album(
                     name=item.get('Name'),
-                    artists=self.create_artists(track=track)
+                    artists=self.create_artists(name=item.get('AlbumArtist'))
                 ))
 
             elif item.get('Type') == 'MusicArtist':
@@ -667,7 +667,7 @@ class JellyfinHandler(object):
         tracks = []
         raw_artist = ''
         artist_ref = []
-        raw_albums = []
+        albums = []
 
         # Check query for artist name
         if 'artist' in query:
@@ -687,7 +687,7 @@ class JellyfinHandler(object):
             artist_id = artist_data.get('Id')
 
             url_params = {
-                'IncludeItemTypes': 'MusicAlbum,Audio',
+                'IncludeItemTypes': 'MusicAlbum',
                 'Recursive': 'true',
                 'UserId': self.user_id
             }
@@ -701,7 +701,17 @@ class JellyfinHandler(object):
             album_url = self.api_url('/Items', url_params)
             album_data = self.http.get(album_url)
             if album_data:
-                raw_albums = album_data.get('Items')
+                contents = album_data.get('Items')
+                for item in contents:
+                    if item.get('Type') == 'MusicAlbum':
+                        #album_obj = self.create_album(item)
+                        album_obj = models.Album(
+                            name=item.get('Name'),
+                            artists=self.create_artists(item),
+                            uri='jellyfin:album:{}'.format(item.get('Id'))
+                        )
+                        if album_obj not in albums:
+                            albums.append(album_obj)
 
             # Get artist tracks
             url_params['IncludeItemTypes'] = 'Audio'
@@ -726,34 +736,34 @@ class JellyfinHandler(object):
         elif 'album' in query:
             album_name = query.get('album')[0]
             album = quote(album_name.encode('utf8'))
-            if raw_albums:
-                album_id = [
-                    i.get('Id')
-                    for i in raw_albums
-                    if i.get('Name') == unidecode(album_name)
-                ][0]
-            else:
-                url_params = {
-                    'IncludeItemTypes': 'MusicAlbum',
-                    'IncludeMedia': 'true',
-                    'Recursive': 'true',
-                    'searchTerm': album_name
-                }
-                url = self.api_url('/Users/{}/Items'.format(self.user_id), url_params)
-                album_data = self.http.get(url).get('Items')
-                tracks = []
-                # This can lead to false matches, but all we have at this point
-                # is an album name to match against.  Options are limited
-                for album in album_data:
-                    if album.get('Name') == album_name:
-                        raw_tracks = self.get_directory(album.get('Id'))
-                        tracks += [self.create_track(track)
-                                   for track in raw_tracks.get('Items', [])]
-
+            url_params = {
+                'IncludeItemTypes': 'MusicAlbum',
+                'IncludeMedia': 'true',
+                'Recursive': 'true',
+                'searchTerm': album_name
+            }
+            url = self.api_url('/Users/{}/Items'.format(self.user_id), url_params)
+            album_data = self.http.get(url).get('Items')
+            tracks = []
+            # This can lead to false matches, but all we have at this point
+            # is an album name to match against.  Options are limited
+            for album in album_data:
+                if album.get('Name') == album_name:
+                    album_obj = models.Album(
+                        name=item.get('Name'),
+                        artists=self.create_artists(item),
+                        uri='jellyfin:album:{}'.format(item.get('Id'))
+                    )
+                    if album_obj not in albums:
+                        albums.append(album_obj)
+                    raw_tracks = self.get_directory(album.get('Id'))
+                    tracks += [self.create_track(track)
+                               for track in raw_tracks.get('Items', [])]
 
         return models.SearchResult(
             uri='jellyfin:search',
             tracks=tracks,
+            albums=albums,
             artists=artist_ref,
         )
 
