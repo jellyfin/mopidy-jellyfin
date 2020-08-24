@@ -317,8 +317,9 @@ class JellyfinHandler(object):
             contents = self.get_directory(item_id).get('Items')
             ret_value = []
 
+            # Create an entry for each item depending on it's type
             for item in contents:
-                if item.get('Type') in ('Audio', 'Audiobok'):
+                if item.get('Type') in ('Audio', 'AudioBook'):
                     # Create tracks
                     ret_value.append(self.get_track_as_ref(item))
                 elif item.get('Type') == 'MusicArtist':
@@ -475,12 +476,9 @@ class JellyfinHandler(object):
         }
 
         url = self.api_url('/Items', url_params)
-        albums = self.http.get(url)
+        albums = self.http.get(url).get('Items')
 
-        return [
-            self.get_album_as_ref(album)
-            for album in albums.get('Items', [])
-        ]
+        return albums
 
     @cache()
     def get_directory(self, id):
