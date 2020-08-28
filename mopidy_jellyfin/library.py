@@ -24,16 +24,19 @@ class JellyfinLibraryProvider(backend.LibraryProvider):
 
         # Used for browsing artists in Iris
         if uri.startswith('jellyfin:artists'):
-            return self.backend.remote.get_artists()
+            artists = self.backend.remote.get_all_artists()
+            return [self.backend.remote.get_artist_as_ref(artist)
+                    for artist in artists]
 
         # Used for browsing albums in Iris
         if uri.startswith('jellyfin:albums'):
-            return self.backend.remote.get_all_albums()
+            albums = self.backend.remote.get_all_albums()
+            return [self.backend.remote.get_album_as_ref(album)
+                    for album in albums]
 
         # move one level lower in directory tree
         if uri.startswith('jellyfin:') and len(parts) == 3:
             item_id = parts[-1]
-            item_type = self.backend.remote.get_item(item_id).get('Type')
             return self.backend.remote.browse_item(item_id)
 
         return []
@@ -86,11 +89,9 @@ class JellyfinLibraryProvider(backend.LibraryProvider):
         # Populates Media Library sections (Artists, Albums, etc)
         # Mopidy internally calls search() with exact=True
         if field == 'artist' or field == 'albumartist':
-            return [
-                artist.name for artist in self.backend.remote.get_artists()
-            ]
+            artists = self.backend.remote.get_all_artists()
+            return [ artist.get('Name') for artist in artists ]
         elif field == 'album':
-            return [
-                album.name for album in self.backend.remote.get_albums(query)
-            ]
+            albums = self.backend.remote.get_albums(query)
+            return [album.get('Name') for album in albums]
         return []
