@@ -533,7 +533,7 @@ class JellyfinHandler(object):
             genre=','.join(track.get('Genres', [])),
             artists=self.create_artists(track=track),
             album=self.create_album(track),
-            length=self.ticks_to_milliseconds(track.get('RunTimeTicks'))
+            length=self.ticks_to_milliseconds(track.get('RunTimeTicks', 0))
         )
 
     def create_album(self, track):
