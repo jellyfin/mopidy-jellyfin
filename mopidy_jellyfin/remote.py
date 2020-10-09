@@ -31,46 +31,34 @@ class JellyfinHandler(object):
         self.config = config
         proxy = config.get('proxy')
         jellyfin = config.get('jellyfin')
-        if jellyfin:
-            self.hostname = jellyfin.get('hostname')
-            if jellyfin.get('port', False):
-                logger.warn('Specifying port in the config file is '
-                            'deprecated. This will be removed in a future '
-                            'release. This should be combined with the '
-                            'hostname field')
-            self.username = jellyfin.get('username')
-            self.password = jellyfin.get('password', '')
-            self.libraries = jellyfin.get('libraries')
-            # If no libraries are provided, default to 'Music'
-            if not self.libraries:
-                self.libraries = 'Music'
-            self.albumartistsort = jellyfin.get('albumartistsort')
-            # If not overridden, default to using Album Artist sort method
-            # This _really_ shouldn't be necessary, but it is for reasons
-            if self.albumartistsort not in ['False', 'false']:
-                self.albumartistsort = True
-            else:
-                self.albumartistsort = False
-            if jellyfin.get('user_id', False):
-                logger.warn('Specifying user_id in the config file is '
-                            'depreciated. This will be removed in a future '
-                            'release')
-            max_bitrate = jellyfin.get('max_bitrate')
-            if max_bitrate:
-                self.max_bitrate = str(max_bitrate * 1024)
-            else:
-                self.max_bitrate = '140000000'
-            self.watched_status = jellyfin.get('watched_status')
-            cert = None
-            client_cert = jellyfin.get('client_cert', None)
-            client_key = jellyfin.get('client_key', None)
-            if client_cert is not None and client_key is not None:
-                cert = (client_cert, client_key)
-            self.album_format = jellyfin.get('album_format', False)
-            if not self.album_format:
-                self.album_format = '{Name}'
+        self.hostname = jellyfin.get('hostname')
+        self.username = jellyfin.get('username')
+        self.password = jellyfin.get('password', '')
+        self.libraries = jellyfin.get('libraries')
+        # If no libraries are provided, default to 'Music'
+        if not self.libraries:
+            self.libraries = 'Music'
+        self.albumartistsort = jellyfin.get('albumartistsort')
+        # If not overridden, default to using Album Artist sort method
+        # This _really_ shouldn't be necessary, but it is for reasons
+        if self.albumartistsort not in ['False', 'false']:
+            self.albumartistsort = True
         else:
-            logger.info('No Jellyfin config found')
+            self.albumartistsort = False
+        max_bitrate = jellyfin.get('max_bitrate')
+        if max_bitrate:
+            self.max_bitrate = str(max_bitrate * 1024)
+        else:
+            self.max_bitrate = '140000000'
+        self.watched_status = jellyfin.get('watched_status')
+        cert = None
+        client_cert = jellyfin.get('client_cert', None)
+        client_key = jellyfin.get('client_key', None)
+        if client_cert is not None and client_key is not None:
+            cert = (client_cert, client_key)
+        self.album_format = jellyfin.get('album_format', False)
+        if not self.album_format:
+            self.album_format = '{Name}'
 
         # create authentication headers
         self.auth_data = self._auth_payload()
@@ -420,8 +408,6 @@ class JellyfinHandler(object):
 
     @cache()
     def get_albums(self, query):
-        raw_artist = [""]
-
         # Check query for artist name
         if 'artist' in query:
             raw_artist = query.get('artist')
