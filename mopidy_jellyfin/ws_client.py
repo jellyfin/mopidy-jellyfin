@@ -126,7 +126,7 @@ class WSClient(threading.Thread):
 
         url = '{}/Sessions/Capabilities/Full'.format(self.hostname)
 
-        r = self.http.post(url, data)
+        self.http.post(url, data)
 
     def callback(self, message, data):
         # Processes events from Jellyfin and sends them to EventListener
@@ -139,4 +139,3 @@ class WSClient(threading.Thread):
             self.client.playstate(data)
         elif message == 'GeneralCommand':
             self.client.general_command(data)
-        pass

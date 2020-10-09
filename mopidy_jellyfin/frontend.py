@@ -83,12 +83,12 @@ class EventMonitorFrontend(
 
     def _stop_playback(self):
         # Report to Jellyfin that playback has stopped
-        r = self.wsc.http.post(
+        self.wsc.http.post(
             '{}/Sessions/Playing/Stopped'.format(self.hostname))
 
     def _start_playback(self, data):
         # Report to Jellyfin that playback has started
-        report = self.wsc.http.post(
+        self.wsc.http.post(
             '{}/Sessions/Playing'.format(self.hostname), data)
 
     def _seeked(self, kwargs):
@@ -112,7 +112,7 @@ class EventMonitorFrontend(
 
             # This should work, but isn't.  Using http post for now
             #self.wsc.send('ReportPlaybackProgress', data=data)
-            r = self.wsc.http.post(
+            self.wsc.http.post(
                 '{}/Sessions/Playing/Progress'.format(self.hostname), data)
 
     def _create_progress_payload(self):
