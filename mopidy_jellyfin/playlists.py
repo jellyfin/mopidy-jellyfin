@@ -17,6 +17,9 @@ class JellyfinPlaylistsProvider(backend.PlaylistsProvider):
         self.refresh()
 
     def as_list(self):
+        '''
+        Returns a list of playlist names sorted in alpha order
+        '''
         refs = [
             Ref.playlist(uri=i.uri, name=i.name)
             for i in self._playlists.values()]
@@ -24,6 +27,9 @@ class JellyfinPlaylistsProvider(backend.PlaylistsProvider):
         return sorted(refs, key=operator.attrgetter('name'))
 
     def get_items(self, uri):
+        '''
+        Query local playlist cache for a given playlist, returns tracks
+        '''
         playlist = self._playlists.get(uri)
         if not playlist:
             logger.info('Jellyfin: No playlists found')
@@ -32,6 +38,9 @@ class JellyfinPlaylistsProvider(backend.PlaylistsProvider):
         return [Ref.track(uri=i.uri, name=i.name) for i in playlist.tracks]
 
     def lookup(self, uri):
+        '''
+        Query playlist cache for a given playlist, return full object
+        '''
         playlist = self._playlists.get(uri)
 
         return Playlist(
@@ -41,6 +50,10 @@ class JellyfinPlaylistsProvider(backend.PlaylistsProvider):
         )
 
     def refresh(self):
+        '''
+        Generates a list of the playlists stored on the server and their
+        contents and caches it locally
+        '''
         playlists = {}
 
         raw_playlists = self.backend.remote.get_playlists()
@@ -70,27 +83,36 @@ class JellyfinPlaylistsProvider(backend.PlaylistsProvider):
         return []
 
     def create(self, name):
+        '''
+        Creates a new playlist, adds to the local cache
+        '''
         playlist = self.backend.remote.create_playlist(name)
         self.refresh()
 
         return Playlist(
-            uri='jellyfin:playlists:{}'.format(playlist.get('Id')),
+            uri='jellyfin:playlist:{}'.format(playlist.get('Id')),
             name=name,
             tracks=[]
         )
 
     def delete(self, uri):
+        '''
+        Deletes a playlist from the server and local cache
+        '''
         playlist_id = uri.split(':')[-1]
         result = self.backend.remote.delete_playlist(playlist_id)
 
-        if not result:
+        # True if the delete succeeded, False if there was an error
+        if result:
             del self._playlists[uri]
             self.refresh()
             return True
         return False
 
     def save(self, playlist):
-        # Update modifications to the playlist in the Jellyfin server
+        '''
+        Update the remote playlist when it's modified locally
+        '''
         playlist_id = playlist.uri.split(':')[-1]
 
         # Get the list of Jellyfin Ids for each track of the playlist

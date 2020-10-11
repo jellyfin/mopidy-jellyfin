@@ -208,7 +208,7 @@ class JellyfinHandler(object):
         url_params = { 'UserId': self.user_id }
         url = self.api_url('/Playlists/{}/Items'.format(playlist_id), url_params)
 
-        data = self.http.get(url).get('Items')
+        data = self.http.get(url).get('Items', [])
 
         return data
 
@@ -227,7 +227,8 @@ class JellyfinHandler(object):
         url_params = { 'UserId': self.user_id }
         url = self.api_url('/Items/{}'.format(playlist_id), url_params)
 
-        return self.http.delete(url)
+        result = self.http.delete(url)
+        return result.ok
 
     def update_playlist(self, playlist_id, new_ids):
         curr_tracks = self.get_playlist_contents(playlist_id)
