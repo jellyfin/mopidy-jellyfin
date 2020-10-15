@@ -291,6 +291,17 @@ class JellyfinHandler(object):
         new_url = self.api_url(f'/Playlists/{playlist_id}/Items', url_params)
         self.http.post(new_url)
 
+    def get_favorites(self):
+        url_params = {
+            'Recursive': 'true',
+            'Filters': 'IsFavorite',
+            'IncludeItemTypes': 'Audio'
+        }
+
+        url = self.api_url(f'/Users/{self.user_id}/Items', url_params)
+        results = self.http.get(url).get('Items', [])
+        return results
+
     @cache()
     def browse_item(self, item_id):
         item = self.get_item(item_id)
