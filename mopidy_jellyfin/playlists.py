@@ -77,6 +77,9 @@ class JellyfinPlaylistsProvider(backend.PlaylistsProvider):
                         tracks=tracks
                     )
 
+        favorites = self.favorite_tracks()
+        playlists.update(favorites)
+
         self._playlists = playlists
         backend.BackendListener.send('playlists_loaded')
 
@@ -127,3 +130,18 @@ class JellyfinPlaylistsProvider(backend.PlaylistsProvider):
         # Update the playlist views
         self.refresh()
         return playlist
+
+    def favorite_tracks(self):
+        uri = 'jellyfin:playlist:favorite-tracks'
+        raw_playlist_tracks = self.backend.remote.get_favorites()
+        playlist_tracks = [
+            self.backend.remote.create_track(track)
+            for track in raw_playlist_tracks
+        ]
+
+        playlist = {
+            uri: Playlist(uri=uri, name='Favorite Tracks', tracks=playlist_tracks)
+        }
+
+        return playlist
+
