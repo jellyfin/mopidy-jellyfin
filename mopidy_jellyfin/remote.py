@@ -292,15 +292,56 @@ class JellyfinHandler(object):
         self.http.post(new_url)
 
     def get_favorites(self):
+        '''
+        Pulls a list of favorite audio related content from the server and
+        build playlists from it
+        '''
+
+        # Types of playlists to build
+        playlists = {
+            'All': [],
+            'Tracks': [],
+            'Albums': [],
+            'Artists': []
+        }
+
         url_params = {
             'Recursive': 'true',
             'Filters': 'IsFavorite',
-            'IncludeItemTypes': 'Audio'
         }
 
-        url = self.api_url(f'/Users/{self.user_id}/Items', url_params)
-        results = self.http.get(url).get('Items', [])
-        return results
+        fav_items_url = self.api_url(f'/Users/{self.user_id}/Items', url_params)
+        fav_items = self.http.get(fav_items_url).get('Items', [])
+
+        for item in fav_items:
+            item_type = item.get('Type')
+            if item_type == 'Audio':
+                playlists['Tracks'].append(self.create_track(item))
+            elif item_type == 'MusicAlbum':
+                # Get tracks from the favorited album
+                tracks = self.get_directory(item.get('Id')).get('Items', [])
+                playlists['Albums'].extend([
+                    self.create_track(track) for track in tracks])
+
+        # User ID needed for the artists query
+        url_params['UserId'] = self.user_id
+
+        # Artists aren't available in the previous call and have to be separate
+        fav_artists_url = self.api_url(f'/Artists', url_params)
+        fav_artists = self.http.get(fav_artists_url).get('Items', [])
+
+        for artist in fav_artists:
+            # Get tracks from the favorited artist
+            artist_id = artist.get('Id')
+            playlists['Artists'].extend(self.lookup_artist(artist_id))
+
+        # 'All' should include the other 3 lists combined
+        playlists['All'].extend(playlists['Tracks'])
+        playlists['All'].extend(playlists['Albums'])
+        playlists['All'].extend(playlists['Artists'])
+
+        return playlists
+
 
     @cache()
     def browse_item(self, item_id):
