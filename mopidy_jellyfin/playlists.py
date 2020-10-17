@@ -103,13 +103,16 @@ class JellyfinPlaylistsProvider(backend.PlaylistsProvider):
         Deletes a playlist from the server and local cache
         '''
         playlist_id = uri.split(':')[-1]
-        result = self.backend.remote.delete_playlist(playlist_id)
+        if 'favorite-' in playlist_id:
+            logger.warning('Favorite playlists are dynamically generated and cannot be deleted')
+        else:
+            result = self.backend.remote.delete_playlist(playlist_id)
 
-        # True if the delete succeeded, False if there was an error
-        if result:
-            del self._playlists[uri]
-            self.refresh()
-            return True
+            # True if the delete succeeded, False if there was an error
+            if result:
+                del self._playlists[uri]
+                self.refresh()
+                return True
         return False
 
     def save(self, playlist):
@@ -117,6 +120,9 @@ class JellyfinPlaylistsProvider(backend.PlaylistsProvider):
         Update the remote playlist when it's modified locally
         '''
         playlist_id = playlist.uri.split(':')[-1]
+        if 'favorite-' in playlist_id:
+            logger.warning('Favorite playlists cannot be modified')
+            return None
 
         # Get the list of Jellyfin Ids for each track of the playlist
         new_track_ids = [
