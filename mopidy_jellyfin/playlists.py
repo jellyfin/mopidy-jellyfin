@@ -144,8 +144,9 @@ class JellyfinPlaylistsProvider(backend.PlaylistsProvider):
         favorite_playlists = self.backend.remote.get_favorites()
 
         for name, contents in favorite_playlists.items():
-            uri = f'jellyfin:playlist:favorite-{name}'
-            playlists[uri] = Playlist(
-                uri=uri, name=f'Favorites - {name}', tracks=contents)
+            if contents:
+                uri = f'jellyfin:playlist:favorite-{name}'
+                playlists[uri] = Playlist(
+                    uri=uri, name=f'Favorites - {name}', tracks=contents)
 
         return playlists
