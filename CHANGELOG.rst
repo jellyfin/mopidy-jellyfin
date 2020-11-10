@@ -1,6 +1,17 @@
 Changelog
 =========
 
+v1.0.0
+---------------------------------------
+
+- Fallback to 0 if runtimeticks value isn't found
+- Sonarcloud cleanup
+- Fix bugs in playlist create/delete
+- Use favorited tracks as a playlist
+- Include more favorites as playlists
+- Don't error when trying to modify favorites
+- Only show favorite playlists if they have contents
+
 v0.9.3
 ---------------------------------------
 
