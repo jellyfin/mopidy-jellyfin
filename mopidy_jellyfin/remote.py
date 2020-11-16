@@ -570,42 +570,58 @@ class JellyfinHandler(object):
             track_no=track.get('IndexNumber', 0),
             disc_no=track.get('ParentIndexNumber'),
             genre=','.join(track.get('Genres', [])),
-            artists=self.create_artists(track=track),
+            artists=self.create_artists(track),
             album=self.create_album(track),
             length=self.ticks_to_milliseconds(track.get('RunTimeTicks', 0))
         )
 
-    def create_album(self, track):
-        """Create album object from track.
+    def create_album(self, item):
+        """Create album object from Jellyfin item.
 
-        :param track: Track
+        :param track: item
         :type track: dict
         :returns: Album
         :rtype: mopidy.models.Album
         """
-        return models.Album(
-            name=track.get('Album'),
-            artists=self.create_artists(track=track)
-        )
+        item_type = item.get('Type')
+        if item_type == 'Audio':
+            return models.Album(
+                name=item.get('Album'),
+                artists=self.create_artists(item),
+                uri=f'jellyfin:album:{item.get("AlbumId")}'
+            )
+        elif item_type == 'MusicAlbum':
+            return models.Album(
+                name=item.get('Name'),
+                artists=self.create_artists(item),
+                uri=f'jellyfin:album:{item.get("Id")}'
+            )
 
-    def create_artists(self, track={}, name=None):
-        """Create artist object from track.
+    def create_artists(self, item={}, name=None):
+        """Create artist object from jellyfin item.
 
-        :param track: Track
+        :param track: item
         :type track: dict
         :param name: Name
         :type name: str
         :returns: List of artists
         :rtype: list of mopidy.models.Artist
         """
-        if track:
+        item_type = item.get('Type', '')
+        if item_type == 'MusicArtist':
+            # Artists have a slightly different structure
             return [
-                models.Artist(
-                    name=name if name else artist.get('Name')
-                )
-                for artist in track.get('ArtistItems')
+                models.Artist(name=item.get('Name'),
+                              uri=f'jellyfin:artist:{item.get("Id")}')
+            ]
+        elif item_type:
+            # For tracks and albums
+            return [
+                models.Artist(name=artist, uri=f'jellyfin:artist:{item.get("Id")}')
+                for artist in item.get('Artists', [])
             ]
         else:
+            # In case we only get a name
             return [ models.Artist(name=name) ]
 
     @cache()
@@ -684,13 +700,10 @@ class JellyfinHandler(object):
                 tracks.append(self.create_track(item))
 
             elif item.get('Type') == 'MusicAlbum':
-                albums.append(models.Album(
-                    name=item.get('Name'),
-                    artists=self.create_artists(name=item.get('AlbumArtist'))
-                ))
+                albums.append(self.create_album(item))
 
             elif item.get('Type') == 'MusicArtist':
-                artists.append(self.create_artists(track=item))
+                artists.extend(self.create_artists(item))
 
         return models.SearchResult(
             uri='jellyfin:search',
@@ -698,6 +711,7 @@ class JellyfinHandler(object):
             artists=artists,
             albums=albums
         )
+
 
     @cache()
     def exact_search(self, query):
