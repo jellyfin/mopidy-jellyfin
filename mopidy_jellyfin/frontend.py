@@ -72,12 +72,17 @@ class EventMonitorFrontend(
         # When mopidy changes tracks, send an update to Jellyfin
 
         new_state = data.get('new_state')
+        old_state = data.get('old_state')
+
+        if new_state == 'playing' and old_state == 'playing':
+            # Report playback stopped between songs for scrobbling purposes
+            # https://github.com/jesseward/jellyfin-plugin-lastfm/issues/27#issuecomment-744031810
+            self._stop_playback()
 
         if new_state in ['paused', 'playing']:
             data = self._create_progress_payload()
             if data:
                 self._start_playback(data)
-
         elif new_state == 'stopped':
             self._stop_playback()
 
