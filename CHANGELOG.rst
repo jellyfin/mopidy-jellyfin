@@ -1,8 +1,14 @@
 Changelog
 =========
 
+v1.0.2
+---------------------------------------
+
+- Report playback stopped between songs
+
 v1.0.1
 ---------------------------------------
+
 - Fix search function
 
 v1.0.0
