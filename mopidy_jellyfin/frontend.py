@@ -127,16 +127,12 @@ class EventMonitorFrontend(
         # Build the json payload sent to the server for playback reporting
 
         session_id = self._get_session_id()
+        new_item_id = ''
 
         if session_id:
             track = self.core.playback.get_current_track().get()
-            # We always need the item ID available when reporting playback status
             if track:
-                item_id = track.uri.split(':')[-1]
-            else:
-                item_id = self.current_track_id
-            if not item_id:
-                return {}
+                new_item_id = track.uri.split(':')[-1]
             mute_state = self.core.mixer.get_mute().get()
             volume = self.core.mixer.get_volume().get()
             play_time = self.core.playback.get_time_position().get() * 10000
@@ -167,13 +163,14 @@ class EventMonitorFrontend(
                 "PositionTicks": play_time,
                 "PlayMethod": "DirectPlay",
                 "PlaySessionId": session_id,
-                "MediaSourceId": item_id,
+                "MediaSourceId": self.current_track_id or new_item_id,
                 "CanSeek": True,
-                "ItemId": item_id,
+                "ItemId": self.current_track_id or new_item_id,
                 "NowPlayingQueue": now_playing_queue,
                 "PlaylistItemId": playlist_item_id,
             }
-            self.current_track_id = item_id
+            if new_item_id:
+                self.current_track_id = new_item_id
         else:
             data = {}
 
