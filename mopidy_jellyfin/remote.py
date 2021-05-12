@@ -205,7 +205,10 @@ class JellyfinHandler(object):
         return raw_playlists.get('Items')
 
     def get_playlist_contents(self, playlist_id):
-        url_params = { 'UserId': self.user_id }
+        url_params = {
+            'UserId': self.user_id,
+            'fields': 'MediaSources'
+        }
         url = self.api_url('/Playlists/{}/Items'.format(playlist_id), url_params)
 
         data = self.http.get(url).get('Items', [])
@@ -308,6 +311,7 @@ class JellyfinHandler(object):
         url_params = {
             'Recursive': 'true',
             'Filters': 'IsFavorite',
+            'fields': 'MediaSources'
         }
 
         fav_items_url = self.api_url(f'/Users/{self.user_id}/Items', url_params)
@@ -396,7 +400,8 @@ class JellyfinHandler(object):
         url_params = {
             'UserId': self.user_id,
             'IncludeItemTypes': 'MusicAlbum',
-            'Recursive': 'true'
+            'Recursive': 'true',
+            'fields': 'MediaSources'
         }
         if self.albumartistsort:
             url_params['AlbumArtistIds'] = artist_id
@@ -524,7 +529,8 @@ class JellyfinHandler(object):
         """
         url_params= {
             'ParentId': id,
-            'SortOrder': 'Ascending'
+            'SortOrder': 'Ascending',
+            'fields': 'MediaSources'
         }
         url = self.api_url('/Users/{}/Items'.format(self.user_id), url_params)
         return self.http.get(url)
@@ -558,15 +564,24 @@ class JellyfinHandler(object):
         """
         # TODO: add more metadata
         name = track.get('Name')
+        bitrate = 0
         if self.watched_status and track.get('Type') == 'AudioBook':
             if track['UserData'].get('PlayCount'):
                 name = f'[X] - {name}'
             else:
                 name = f'[] - {name}'
 
+        for source in track.get('MediaSources', []):
+            for stream in source.get('MediaStreams', []):
+                if stream.get('Type') == 'Audio':
+                    # Server returns bitrate in bits/sec, we need kbits
+                    bitrate = int(stream.get('BitRate', 0) / 1000)
+                    break
+
         return models.Track(
             uri='jellyfin:track:{}'.format(track.get('Id')),
             name=name,
+            bitrate=bitrate,
             track_no=track.get('IndexNumber', 0),
             disc_no=track.get('ParentIndexNumber'),
             genre=','.join(track.get('Genres', [])),
@@ -741,7 +756,8 @@ class JellyfinHandler(object):
             url_params = {
                 'IncludeItemTypes': 'MusicAlbum',
                 'Recursive': 'true',
-                'UserId': self.user_id
+                'UserId': self.user_id,
+                'fields': 'MediaSources'
             }
 
             # Get album list
@@ -790,7 +806,8 @@ class JellyfinHandler(object):
                 'IncludeItemTypes': 'MusicAlbum',
                 'IncludeMedia': 'true',
                 'Recursive': 'true',
-                'searchTerm': album_name
+                'searchTerm': album_name,
+                'fields': 'MediaSources'
             }
             url = self.api_url('/Users/{}/Items'.format(self.user_id), url_params)
             album_data = self.http.get(url).get('Items')
@@ -825,7 +842,8 @@ class JellyfinHandler(object):
             'IncludeItemTypes': 'Audio',
             'Recursive': 'true',
             'AlbumIds': album_id,
-            'UserId': self.user_id
+            'UserId': self.user_id,
+            'fields': 'MediaSources'
         }
         url = self.api_url('/Items', url_params)
 
@@ -871,7 +889,8 @@ class JellyfinHandler(object):
         url_params = {
             'SortOrder': 'Ascending',
             'Recursive': 'true',
-            'IncludeItemTypes': 'Audio'
+            'IncludeItemTypes': 'Audio',
+            'fields': 'MediaSources'
         }
         if self.albumartistsort:
             url_params['AlbumArtistIds'] = artist_id
