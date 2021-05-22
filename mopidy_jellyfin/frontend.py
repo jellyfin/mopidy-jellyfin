@@ -198,7 +198,7 @@ class EventMonitorFrontend(
             self.core.mixer.set_volume(int(volume))
         elif command == 'VolumeUp' or command == 'VolumeDown':
             vol = self.core.mixer.get_volume().get()
-            increment = -1 if command == 'VolumeDown' else 1
+            increment = -5 if command == 'VolumeDown' else 5
             self.core.mixer.set_volume(vol + increment)
         elif command == 'ToggleMute':
             if self.core.mixer.get_mute().get():
