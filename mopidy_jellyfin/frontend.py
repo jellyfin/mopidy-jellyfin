@@ -196,6 +196,10 @@ class EventMonitorFrontend(
         if command == 'SetVolume':
             volume = data['Arguments'].get('Volume')
             self.core.mixer.set_volume(int(volume))
+        elif command == 'VolumeUp' or command == 'VolumeDown':
+            vol = self.core.mixer.get_volume().get()
+            increment = -5 if command == 'VolumeDown' else 5
+            self.core.mixer.set_volume(vol + increment)
         elif command == 'ToggleMute':
             if self.core.mixer.get_mute().get():
                 self.core.mixer.set_mute(False)
