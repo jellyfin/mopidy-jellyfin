@@ -941,3 +941,14 @@ class JellyfinHandler(object):
         :rtype: int
         """
         return milliseconds * 10000
+
+    def get_image(self, item_id):
+        url = f'{self.hostname}/Items/{item_id}/Images/Primary'
+        # Verify if image exists instead of returning bad URLs
+        image = self.http.head(item_id, url)
+        if image:
+            return models.Image(
+                uri=url,
+            )
+        else:
+            return []
