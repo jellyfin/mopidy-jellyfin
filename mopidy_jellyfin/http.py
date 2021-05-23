@@ -138,6 +138,6 @@ class JellyfinHttpClient(object):
             r = self.session.head(url)
             r.raise_for_status()
             return True
-        except Exception as e:
+        except:
             logger.debug(f'No primary image found for item {item_id}')
             return False
