@@ -79,7 +79,7 @@ class WSClient(threading.Thread):
         while not self.stop:
 
             time.sleep(retry_count * 5)
-            self.wsc.run_forever(ping_interval=10, ping_timeout=5)
+            self.wsc.run_forever(ping_interval=10)
 
             # If connection fails, attempt to reconnect every 60 seconds at max
             max_tries = 12
