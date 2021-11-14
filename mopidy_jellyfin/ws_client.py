@@ -86,9 +86,6 @@ class WSClient(threading.Thread):
             if retry_count < max_tries:
                 retry_count += 1
 
-            if self.stop:
-                break
-
     def on_error(self, ws, error):
         logger.error(error)
 
