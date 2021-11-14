@@ -95,3 +95,22 @@ class JellyfinLibraryProvider(backend.LibraryProvider):
             albums = self.backend.remote.get_albums(query)
             return [album.get('Name') for album in albums]
         return []
+
+    def get_images(self, uris):
+        # Provides links to images for provided URI
+        # Seems semi unreliable and is very frontend dependent
+        results = {}
+
+        for uri in uris:
+            parts = uri.split(':')
+            if len(parts) == 3:
+                item_id = parts[-1]
+                image = self.backend.remote.get_image(item_id)
+                if image:
+                    results[uri] = [image]
+                else:
+                    results[uri] = []
+            else:
+                results[uri] = []
+
+        return results

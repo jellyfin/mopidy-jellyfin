@@ -131,3 +131,13 @@ class JellyfinHttpClient(object):
                 counter += 1
 
         raise Exception('Unable to find Jellyfin server, check hostname config')
+
+    def head(self, item_id, url):
+        # Used to verify if an image exists
+        try:
+            r = self.session.head(url)
+            r.raise_for_status()
+            return True
+        except:
+            logger.debug(f'No primary image found for item {item_id}')
+            return False
