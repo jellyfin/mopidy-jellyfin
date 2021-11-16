@@ -31,6 +31,7 @@ class EventMonitorFrontend(
         self.reporting_thread = threading.Thread(target=self._check_status)
         # Kill thread immediately on program exit
         self.reporting_thread.daemon = True
+        self.current_track_id = ''
 
     def on_start(self):
         # Start the websocket client and reporting thread
@@ -85,11 +86,13 @@ class EventMonitorFrontend(
                 self._start_playback(data)
         elif new_state == 'stopped':
             self._stop_playback()
+            self.current_track_id = ''
 
     def _stop_playback(self):
         # Report to Jellyfin that playback has stopped
+        data = self._create_progress_payload()
         self.wsc.http.post(
-            '{}/Sessions/Playing/Stopped'.format(self.hostname))
+            '{}/Sessions/Playing/Stopped'.format(self.hostname), data)
 
     def _start_playback(self, data):
         # Report to Jellyfin that playback has started
@@ -124,10 +127,12 @@ class EventMonitorFrontend(
         # Build the json payload sent to the server for playback reporting
 
         session_id = self._get_session_id()
-        track = self.core.playback.get_current_track().get()
+        new_item_id = ''
 
-        if session_id and track:
-            item_id = track.uri.split(':')[-1]
+        if session_id:
+            track = self.core.playback.get_current_track().get()
+            if track:
+                new_item_id = track.uri.split(':')[-1]
             mute_state = self.core.mixer.get_mute().get()
             volume = self.core.mixer.get_volume().get()
             play_time = self.core.playback.get_time_position().get() * 10000
@@ -158,12 +163,14 @@ class EventMonitorFrontend(
                 "PositionTicks": play_time,
                 "PlayMethod": "DirectPlay",
                 "PlaySessionId": session_id,
-                "MediaSourceId": item_id,
+                "MediaSourceId": self.current_track_id or new_item_id,
                 "CanSeek": True,
-                "ItemId": item_id,
+                "ItemId": self.current_track_id or new_item_id,
                 "NowPlayingQueue": now_playing_queue,
                 "PlaylistItemId": playlist_item_id,
             }
+            if new_item_id:
+                self.current_track_id = new_item_id
         else:
             data = {}
 

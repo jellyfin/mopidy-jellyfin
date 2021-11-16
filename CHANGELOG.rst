@@ -1,6 +1,11 @@
 Changelog
 =========
 
+v1.0.3
+---------------------------------------
+
+- Include item ID in stop playback reporting payload
+
 v1.0.2
 ---------------------------------------
 
