@@ -5,6 +5,7 @@ from __future__ import division, absolute_import, print_function, unicode_litera
 
 import json
 import logging
+import time
 import requests
 import threading
 import mopidy_jellyfin
@@ -74,20 +75,19 @@ class WSClient(threading.Thread):
             on_error=lambda ws, error: self.on_error(ws, error))
         self.wsc.on_open = lambda ws: self.on_open(ws)
 
-
+        retry_count = 0
         while not self.stop:
 
+            time.sleep(retry_count * 5)
             self.wsc.run_forever(ping_interval=10)
 
-            if not self.stop:
-                break
-
-        self.callback('WebSocketDisconnect', None)
-
+            # If connection fails, attempt to reconnect every 60 seconds at max
+            max_tries = 12
+            if retry_count < max_tries:
+                retry_count += 1
 
     def on_error(self, ws, error):
         logger.error(error)
-        self.callback('WebSocketError', error)
 
     def on_open(self, ws):
         self.post_capabilities()
