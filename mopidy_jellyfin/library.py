@@ -33,6 +33,10 @@ class JellyfinLibraryProvider(backend.LibraryProvider):
             albums = self.backend.remote.get_all_albums()
             return [self.backend.remote.get_album_as_ref(album)
                     for album in albums]
+        
+        # Used for browsing playlists in Iris
+        if uri.startswith('jellyfin:playlists'):
+            return self.backend.playlists.as_list()
 
         # move one level lower in directory tree
         if uri.startswith('jellyfin:') and len(parts) == 3:
