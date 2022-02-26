@@ -1,6 +1,15 @@
 Changelog
 =========
 
+v1.0.3
+---------------------------------------
+
+- Include bitrates for tracks
+- Support incremental volume up/down commands
+- Add image support
+- Attempt to reconnect websocket connection when it fails
+- Implement jellyfin:playlists uri for Iris
+
 v1.0.2
 ---------------------------------------
 
