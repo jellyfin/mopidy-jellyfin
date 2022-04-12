@@ -530,6 +530,7 @@ class JellyfinHandler(object):
         url_params= {
             'ParentId': id,
             'SortOrder': 'Ascending',
+            'SortBy': 'SortName',
             'fields': 'MediaSources'
         }
         url = self.api_url('/Users/{}/Items'.format(self.user_id), url_params)
@@ -888,6 +889,7 @@ class JellyfinHandler(object):
         """
         url_params = {
             'SortOrder': 'Ascending',
+            'SortBy': 'SortName',
             'Recursive': 'true',
             'IncludeItemTypes': 'Audio',
             'fields': 'MediaSources'
