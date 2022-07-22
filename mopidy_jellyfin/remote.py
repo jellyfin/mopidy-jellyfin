@@ -34,8 +34,8 @@ class JellyfinHandler(object):
         self.hostname = jellyfin.get('hostname')
         self.username = jellyfin.get('username')
         self.password = jellyfin.get('password', '')
-        self.user_id = jellyfin.get('user_id', '')
-        self.token = jellyfin.get('token', '')
+        self.user_id = jellyfin.get('user_id')
+        self.token = jellyfin.get('token')
         self.libraries = jellyfin.get('libraries')
         # If no libraries are provided, default to 'Music'
         if not self.libraries:
@@ -70,7 +70,7 @@ class JellyfinHandler(object):
         if self.hostname != response_url:
             self.hostname = response_url
 
-        if self.token == '':
+        if not self.token:
             self._login()
 
         if self.token:
@@ -94,8 +94,6 @@ class JellyfinHandler(object):
 
         if token:
             self.user_id = auth_details.get('User').get('Id')
-            headers = {'x-mediabrowser-token': token}
-            # self.http.session.headers.update(headers)
             self._save_token(token)
             self.token = token
         else:
