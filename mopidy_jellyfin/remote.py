@@ -34,6 +34,8 @@ class JellyfinHandler(object):
         self.hostname = jellyfin.get('hostname')
         self.username = jellyfin.get('username')
         self.password = jellyfin.get('password', '')
+        self.user_id = jellyfin.get('user_id', '')
+        self.token = jellyfin.get('token', '')
         self.libraries = jellyfin.get('libraries')
         # If no libraries are provided, default to 'Music'
         if not self.libraries:
@@ -67,8 +69,12 @@ class JellyfinHandler(object):
         response_url = self.http.check_redirect(self.hostname)
         if self.hostname != response_url:
             self.hostname = response_url
-        self._login()
 
+        if self.token == '':
+            self._login()
+
+        if self.token:
+           self.http.session.headers.update({'x-mediabrowser-token': self.token})
     def _save_token(self, token):
         # Save the authentication token where the frontend can also access it
         cache_dir = mopidy_jellyfin.Extension.get_cache_dir(self.config)
@@ -89,7 +95,7 @@ class JellyfinHandler(object):
         if token:
             self.user_id = auth_details.get('User').get('Id')
             headers = {'x-mediabrowser-token': token}
-            self.http.session.headers.update(headers)
+            # self.http.session.headers.update(headers)
             self._save_token(token)
             self.token = token
         else:

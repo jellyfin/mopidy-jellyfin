@@ -29,6 +29,7 @@ class Extension(ext.Extension):
         schema['username'] = config.String()
         schema['user_id'] = config.String(optional=True)
         schema['password'] = config.Secret(optional=True)
+        schema['token'] = config.Secret(optional=True)
         schema['hostname'] = config.String()
         schema['libraries'] = config.String(optional=True)
         schema['albumartistsort'] = config.String(optional=True)
