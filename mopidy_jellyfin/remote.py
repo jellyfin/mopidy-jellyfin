@@ -452,7 +452,7 @@ class JellyfinHandler(object):
             uri='jellyfin:album:{}'.format(
                 album.get('Id')
             ),
-            name=album.get('Name')
+            name=self.format_album(album)
         )
 
     def get_track_as_ref(self, track):
@@ -587,7 +587,8 @@ class JellyfinHandler(object):
             genre=','.join(track.get('Genres', [])),
             artists=self.create_artists(track),
             album=self.create_album(track),
-            length=self.ticks_to_milliseconds(track.get('RunTimeTicks', 0))
+            length=self.ticks_to_milliseconds(track.get('RunTimeTicks', 0)),
+            date=self.parse_date(track)
         )
 
     def create_album(self, item):
@@ -603,13 +604,15 @@ class JellyfinHandler(object):
             return models.Album(
                 name=item.get('Album'),
                 artists=self.create_artists(item),
-                uri=f'jellyfin:album:{item.get("AlbumId")}'
+                uri=f'jellyfin:album:{item.get("AlbumId")}',
+                date=self.parse_date(item)
             )
         elif item_type == 'MusicAlbum':
             return models.Album(
                 name=item.get('Name'),
                 artists=self.create_artists(item),
-                uri=f'jellyfin:album:{item.get("Id")}'
+                uri=f'jellyfin:album:{item.get("Id")}',
+                date=self.parse_date(item)
             )
 
     def create_artists(self, item={}, name=None):
@@ -775,7 +778,8 @@ class JellyfinHandler(object):
                         album_obj = models.Album(
                             name=item.get('Name'),
                             artists=self.create_artists(item),
-                            uri='jellyfin:album:{}'.format(item.get('Id'))
+                            uri='jellyfin:album:{}'.format(item.get('Id')),
+                            date=self.parse_date(item)
                         )
                         if album_obj not in albums:
                             albums.append(album_obj)
@@ -819,7 +823,8 @@ class JellyfinHandler(object):
                     album_obj = models.Album(
                         name=album.get('Name'),
                         artists=self.create_artists(album),
-                        uri='jellyfin:album:{}'.format(album.get('Id'))
+                        uri='jellyfin:album:{}'.format(album.get('Id')),
+                        date=self.parse_date(album)
                     )
                     if album_obj not in albums:
                         albums.append(album_obj)
@@ -952,3 +957,23 @@ class JellyfinHandler(object):
             )
         else:
             return []
+
+    def parse_date(self, item):
+        '''
+        Build the date format required for mopidy models
+        '''
+        datestring = item.get('PremiereDate')
+
+        if datestring:
+            # Premiere dates from JF are in format '2019-12-13T00:00:00.0000000Z'
+            # We only need the first part
+            date = datestring.split('T')[0]
+        else:
+            # Take the production year and assemble a date for Jan 1st
+            year = item.get('ProductionYear')
+            if not year:
+                # If there's no metadata, use unix epoch starting point
+                year = '1970'
+            date = f'{year}-01-01'
+
+        return date
