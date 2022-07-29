@@ -969,11 +969,7 @@ class JellyfinHandler(object):
             # We only need the first part
             date = datestring.split('T')[0]
         else:
-            # Take the production year and assemble a date for Jan 1st
-            year = item.get('ProductionYear')
-            if not year:
-                # If there's no metadata, use unix epoch starting point
-                year = '1970'
-            date = f'{year}-01-01'
-
+           # Take the production year if PremiereDate isn't available
+           # Fall back to an empty string for no data
+           date = str(item.get('ProductionYear', ''))
         return date
