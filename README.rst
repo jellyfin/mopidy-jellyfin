@@ -38,6 +38,8 @@ Mopidy-Jellyfin to your Mopidy configuration file::
     hostname = Jellyfin server hostname
     username = username
     password = password
+    user_id = userid (Optional: Needed for token authentication)
+    token = token (Optional: Use for authentication instead of username and password)
     libraries = Library1, Library2 (Optional: will default to "Music" if left undefined)
     albumartistsort = False (Optional: will default to True if left undefined)
     album_format = {ProductionYear} - {Name} (Optional: will default to "{Name}" if left undefined)
