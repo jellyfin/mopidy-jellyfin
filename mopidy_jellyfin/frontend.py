@@ -23,6 +23,7 @@ class EventMonitorFrontend(
         self.config = config
         self.token = self.config['jellyfin'].get('token') or self._read_token(config)
         self.hostname = self.config['jellyfin'].get('hostname')
+        self.hostname = self.hostname.strip('/')
 
         self.wsc = WSClient(self)
         response_url = self.wsc.http.check_redirect(self.hostname)

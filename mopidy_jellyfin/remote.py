@@ -32,6 +32,7 @@ class JellyfinHandler(object):
         proxy = config.get('proxy')
         jellyfin = config.get('jellyfin')
         self.hostname = jellyfin.get('hostname')
+        self.hostname = self.hostname.strip('/')
         self.username = jellyfin.get('username')
         self.password = jellyfin.get('password', '')
         self.user_id = jellyfin.get('user_id')
