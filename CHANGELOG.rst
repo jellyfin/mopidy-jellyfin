@@ -1,6 +1,14 @@
 Changelog
 =========
 
+v1.0.4
+---------------------------------------
+
+- Added SortBy parameters to solve tracks appearing out of order
+- Add ability to authenticate with tokens
+- Add date metadata for albums
+- Remove trailing slash after reading config file
+
 v1.0.3
 ---------------------------------------
 
