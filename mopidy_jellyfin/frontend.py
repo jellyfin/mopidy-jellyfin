@@ -20,8 +20,8 @@ class EventMonitorFrontend(
     def __init__(self, config, core):
         super(EventMonitorFrontend, self).__init__()
         self.core = core
-        self.token = self._read_token(config)
         self.config = config
+        self.token = self.config['jellyfin'].get('token') or self._read_token(config)
         self.hostname = self.config['jellyfin'].get('hostname')
 
         self.wsc = WSClient(self)
