@@ -683,7 +683,7 @@ class JellyfinHandler(object):
             raise Exception('Jellyfin search: no itemtype {}'.format(itemtype))
 
         url_params = {
-            'SearchTerm': quote(term.encode('utf-8')),
+            'SearchTerm': term,
             'IncludeItemTypes': search_query
         }
 
