@@ -189,25 +189,20 @@ class JellyfinHandler(object):
         ]
 
     def get_playlists(self):
-        url = self.api_url(
-            '/Users/{}/Views'.format(self.user_id)
-        )
+        '''
+        Queries the server for any playlist objects
+        '''
+        url_params = {
+            'UserId': self.user_id,
+            'IncludeItemTypes': 'Playlist',
+            'Recursive': 'true',
+            'fields': 'MediaSources'
+        }
 
-        data = self.http.get(url)
+        url = self.api_url('/Users/{}/Items'.format(self.user_id), url_params)
+        playlists = self.http.get(url)
 
-        library_id = [
-            library.get('Id') for library in data.get('Items')
-            if library.get('Name') == 'Playlists'
-        ]
-
-        if library_id:
-            library_id = library_id[0]
-        else:
-            return []
-
-        raw_playlists = self.get_directory(library_id)
-
-        return raw_playlists.get('Items')
+        return playlists.get('Items', [])
 
     def get_playlist_contents(self, playlist_id):
         url_params = {
