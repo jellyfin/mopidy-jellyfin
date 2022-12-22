@@ -210,7 +210,7 @@ class EventMonitorFrontend(
     def play_tracks(self, data):
         # Receives the "Play To" commands from the Jellyfin server
         items = data.get('ItemIds')
-        playcommand = data.get('PlayCommand', '')
+        play_command = data.get('PlayCommand', '')
         start_ticks = data.get('StartPositionTicks')
         if start_ticks:
             start_position = int(start_ticks / 10000)
@@ -218,13 +218,29 @@ class EventMonitorFrontend(
             start_position = 0
 
         uris = ['jellyfin:track:{}'.format(item_id) for item_id in items]
-        tracks = self.core.tracklist.add(uris=uris).get()
-        # Allows adding to play queue without changing currently playing track
-        if playcommand == 'PlayNow':
+
+        if play_command == 'PlayNow':
+            # Play what the server tells us to
+            self.core.tracklist.clear()
+            tracks = self.core.tracklist.add(uris=uris).get()
             start_index = data.get('StartIndex')
+            # If specified, start at a specific track.  otherwise, start at 0
             if not start_index:
                 start_index = 0
             self.core.playback.play(tlid=tracks[start_index].tlid)
+        elif play_command == 'PlayLast':
+            # This maps to the "Play Next" button in JF-Web
+            curr_index = self.core.tracklist.index().get()
+            if curr_index is not None:
+                add_index = curr_index + 1
+            else:
+                # Fall back to position 0 if no tracks currently exist
+                add_index = 0
+            self.core.tracklist.add(uris=uris, at_position=add_index).get()
+        elif play_command == 'PlayNext':
+            # This maps to the "Add to play queue" button in JF-Web
+            self.core.tracklist.add(uris=uris).get()
+
         # If playing a track that already has playback progress, start at that
         # progress point, not the beginning
         if start_position:
