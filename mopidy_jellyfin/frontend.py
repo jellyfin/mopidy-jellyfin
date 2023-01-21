@@ -148,6 +148,10 @@ class EventMonitorFrontend(
                     'Id': track_id,
                     'PlaylistItemId': f'playlistItem{index}'
                 })
+                # Max json body in the server for play queue is 1000
+                # This gives us a little wiggle room
+                if index >= 950:
+                    break
             playlist_item_id = f'playlistItem{track_index}'
 
             # json payload to server
