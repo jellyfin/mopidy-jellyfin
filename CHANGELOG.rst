@@ -1,7 +1,7 @@
 Changelog
 =========
 
-v1.0.4
+v1.0.5
 ---------------------------------------
 
 - Place a limit on the json body for now playing api calls
