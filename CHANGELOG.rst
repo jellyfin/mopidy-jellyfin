@@ -4,6 +4,14 @@ Changelog
 v1.0.4
 ---------------------------------------
 
+- Place a limit on the json body for now playing api calls
+- Properly handle different play command types
+- Search for playlist objects instead of a playlists library
+- Do no additional quoting for search term
+
+v1.0.4
+---------------------------------------
+
 - Added SortBy parameters to solve tracks appearing out of order
 - Add ability to authenticate with tokens
 - Add date metadata for albums

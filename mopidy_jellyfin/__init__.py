@@ -7,7 +7,7 @@ import socket
 from mopidy import config, ext
 
 
-__version__ = '1.0.4'
+__version__ = '1.0.5'
 
 logger = logging.getLogger(__name__)
 
