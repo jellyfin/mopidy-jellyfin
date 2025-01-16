@@ -583,7 +583,7 @@ class JellyfinHandler(object):
             uri='jellyfin:track:{}'.format(track.get('Id')),
             name=name,
             bitrate=bitrate,
-            track_no=track.get('IndexNumber', 0),
+            track_no=track.get('IndexNumber', 0) if track.get('IndexNumber', 0) >= 0 else 0,
             disc_no=track.get('ParentIndexNumber'),
             genre=','.join(track.get('Genres', [])),
             artists=self.create_artists(track),
