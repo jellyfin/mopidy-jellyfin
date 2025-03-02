@@ -39,6 +39,8 @@ class Extension(ext.Extension):
         schema['album_format'] = config.String(optional=True)
         schema['max_bitrate'] = config.Integer(optional=True)
         schema['watched_status'] = config.Boolean(optional=True)
+        schema['friendly_name'] = config.String(optional=True)
+        schema['additional_users'] = config.String(optional=True)
 
         return schema
 
