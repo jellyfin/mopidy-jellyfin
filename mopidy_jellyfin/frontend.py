@@ -24,6 +24,7 @@ class EventMonitorFrontend(
         self.token = self.config['jellyfin'].get('token') or self._read_token(config)
         self.hostname = self.config['jellyfin'].get('hostname')
         self.hostname = self.hostname.strip('/')
+        self.additional_users = self.config['jellyfin'].get('additional_users')
 
         self.wsc = WSClient(self)
         response_url = self.wsc.http.check_redirect(self.hostname)
@@ -37,6 +38,9 @@ class EventMonitorFrontend(
         # Start the websocket client and reporting thread
         self.wsc.start()
         self.reporting_thread.start()
+        # Add additional users to the session
+        if self.additional_users:
+            self._add_usersnames_string_to_session(self.additional_users)
 
     def on_stop(self):
         # Stop the websocket client and tell the server playback has stopped
@@ -67,7 +71,55 @@ class EventMonitorFrontend(
             session_id = None
 
         return session_id
+    
+    def _add_usersnames_string_to_session(self, username_string):
+        # Get the usernames from a comma seperated string and add them 
+        # to the current session
+        session_id = self._get_session_id()
+        if not session_id:
+            return None
+        
+        user_list = [user.strip() for user in username_string.split(',')]
+        users = self._get_user_ids_from_user_list(user_list)
+        for username, user_id in users.items():
+            if not user_id:
+                logger.warning(f"User ID not found for username: {username}")
+                continue
+            self._add_user_id_to_session(user_id, session_id)
+                
+        # Check if users are added
+        session_users = self._get_session_user_ids(session_id)
+        check_users = {username: user_id for username, user_id in users.items() if user_id}
+        for username, user_id in check_users.items():
+            if user_id in session_users:
+                logger.info(f"Successfully added user {username} to the session.")
+            else:
+                logger.warning(f"Failed to add user {username} to the session.")
 
+    def _get_user_ids_from_user_list(self, user_list):
+        # Fetch the user id for a user from their username
+        users = self.wsc.http.get(f"{self.hostname}/Users")
+        username_map = {user["Name"].lower(): user["Id"] for user in users if isinstance(users, list)}
+        return {username: username_map.get(username.lower()) for username in user_list}
+    
+    def _add_user_id_to_session(self, user_id, session_id):
+        # Add a user ID to the given session
+        if not session_id:
+            return False
+        
+        self.wsc.http.post(
+            '{}/Sessions/{}/User/{}'.format(self.hostname, session_id, user_id))
+
+    def _get_session_user_ids(self, session_id):
+        # Retrieve a list of the current users in the given session.
+        device_id = Extension.device_id
+        sessions = self.wsc.http.get(
+            '{}/Sessions?DeviceId={}'.format(self.hostname, device_id))
+
+        if sessions:
+            return {user.get("UserId") for user in sessions[0].get('AdditionalUsers', [])}
+            
+        return []
 
     def _playback_state_changed(self, data):
         # When mopidy changes tracks, send an update to Jellyfin
