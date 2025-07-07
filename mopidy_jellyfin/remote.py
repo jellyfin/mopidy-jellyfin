@@ -245,7 +245,7 @@ class JellyfinHandler(object):
         elif curr_length > new_length:
             # If the new playlist is shorter than the old, delete tracks
             self.delete_from_playlist(playlist_id, curr_tracks, new_ids)
-        elif curr_length < new_length:
+        else:
             # If the new playlist is longer than the old, add new tracks
             self.add_to_playlist(playlist_id, curr_tracks, new_ids)
 
@@ -685,7 +685,7 @@ class JellyfinHandler(object):
         url = self.api_url('/Search/Hints', url_params)
         data = self.http.get(url)
 
-        return [i for i in data.get('SearchHints', [])]
+        return list(data.get('SearchHints', []))
 
     @cache()
     def search(self, query):
