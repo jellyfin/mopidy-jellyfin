@@ -245,7 +245,7 @@ class JellyfinHandler(object):
         elif curr_length > new_length:
             # If the new playlist is shorter than the old, delete tracks
             self.delete_from_playlist(playlist_id, curr_tracks, new_ids)
-        elif curr_length < new_length:
+        else:
             # If the new playlist is longer than the old, add new tracks
             self.add_to_playlist(playlist_id, curr_tracks, new_ids)
 
@@ -685,7 +685,7 @@ class JellyfinHandler(object):
         url = self.api_url('/Search/Hints', url_params)
         data = self.http.get(url)
 
-        return [i for i in data.get('SearchHints', [])]
+        return list(data.get('SearchHints', []))
 
     @cache()
     def search(self, query):
@@ -961,17 +961,22 @@ class JellyfinHandler(object):
             return []
 
     def parse_date(self, item):
-        '''
+        """
         Build the date format required for mopidy models
-        '''
-        datestring = item.get('PremiereDate')
+        """
+        datestring = item.get("PremiereDate")
+        date = "1970-01-01"  # Fallback date if nothing else is available
 
         if datestring:
             # Premiere dates from JF are in format '2019-12-13T00:00:00.0000000Z'
             # We only need the first part
-            date = datestring.split('T')[0]
-        else:
-           # Take the production year if PremiereDate isn't available
-           # Fall back to an empty string for no data
-           date = str(item.get('ProductionYear', ''))
+            date = datestring.split("T")[0]
+        elif item.get("ProductionYear"):
+            # Take the production year if PremiereDate isn't available
+            # Fall back to an empty string for no data
+            date = str(item["ProductionYear"])
+        elif item.get("DateCreated"):
+            # Use DateCreated if no PremiereDate or ProductionYear
+            date = item["DateCreated"].split("T")[0]
+
         return date
