@@ -54,6 +54,9 @@ class JellyfinHandler(object):
         else:
             self.max_bitrate = '140000000'
         self.watched_status = jellyfin.get('watched_status')
+        friendly_name = jellyfin.get('friendly_name')
+        if friendly_name:
+            mopidy_jellyfin.Extension.device_name = friendly_name
         cert = None
         client_cert = jellyfin.get('client_cert', None)
         client_key = jellyfin.get('client_key', None)

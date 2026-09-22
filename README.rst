@@ -44,6 +44,8 @@ Mopidy-Jellyfin to your Mopidy configuration file::
     albumartistsort = False (Optional: will default to True if left undefined)
     album_format = {ProductionYear} - {Name} (Optional: will default to "{Name}" if left undefined)
     max_bitrate = number
+    friendly_name = name (Optional: An alternative name to display in Jellyfin)
+    additional_users = username2,username3 (Optional: Comma seperated list of users added to the session)
 
 * ``libraries`` determines what is populated into Mopidy's internal library (view by Artists/Album/etc).  Using the file browser will show all libraries in the Jellyfin server that have a 'music' type.
 
